@@ -1,0 +1,9 @@
+spring :
+  datasource :
+    url : jdbc:mysql://localhost:3306/skylink_airline_db
+    username : root
+    password : VPSvinura12345#
+    driver-class-name : com.mysql.cj.jdbc.Driver
+  jpa :
+    hibernate :
+      ddl-auto : update
