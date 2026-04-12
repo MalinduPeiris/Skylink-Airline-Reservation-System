@@ -8,6 +8,7 @@ import java.util.List;
 @Entity
 @Data
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,20 +22,15 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column
+    private String phonenumber;
+
+    @Column
+    private String address;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Booking> bookings;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<SupportTicket> supportTickets;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Feedback> feedbacks;
-
-    public enum Role {
-        FREQUENT_TRAVELER, RESERVATION_MANAGER, MARKETING_EXECUTIVE, CUSTOMER_SUPPORT_OFFICER, FINANCE_EXECUTIVE, IT_SYSTEM_ENGINEER
-    }
 }

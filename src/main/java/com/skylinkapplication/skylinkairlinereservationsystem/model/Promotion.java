@@ -25,6 +25,9 @@ public class Promotion {
     @Column(nullable = false)
     private String targetCriteria;
 
+    @Column(unique = true, nullable = false)
+    private String promoCode;
+
     @ManyToMany
     @JoinTable(
             name = "promotion_users",

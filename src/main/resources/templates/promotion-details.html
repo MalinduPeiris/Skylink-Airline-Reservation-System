@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skylink Airlines - Promotion Details</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+        }
+        .logo i {
+            color: #ffc107;
+            margin-right: 10px;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        .detail-card {
+            border-left: 4px solid #2a5298;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        .detail-value {
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="logo"><i class="fas fa-plane"></i>Skylink Airlines</div>
+            </div>
+            <div class="col-md-6 text-right">
+                <h4>Promotion Details</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Success/Error Messages -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${success}"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card detail-card">
+                <div class="card-header bg-white">
+                    <h3 class="mb-0">Promotion Information</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <span class="detail-label">Promotion ID:</span>
+                        </div>
+                        <div class="col-sm-8">
+                            <span class="detail-value" th:text="${promotion.id}">1</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <span class="detail-label">Target Criteria:</span>
+                        </div>
+                        <div class="col-sm-8">
+                            <span class="detail-value" th:text="${promotion.targetCriteria}">Frequent Travelers</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <span class="detail-label">Discount:</span>
+                        </div>
+                        <div class="col-sm-8">
+                            <span class="detail-value" th:text="${promotion.discount + '%'}">15%</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <span class="detail-label">Validity Period:</span>
+                        </div>
+                        <div class="col-sm-8">
+                            <span class="detail-value">
+                              <span th:text="${#dates.format(promotion.validityStart, 'MMM dd, yyyy')}"></span>
+                                <span th:text="${#dates.format(promotion.validityStart, 'MMM dd, yyyy')}"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <span class="detail-label">Status:</span>
+                        </div>
+                        <div class="col-sm-8">
+        <span th:if="${#dates.createNow().getTime() >= promotion.validityStart.getTime()
+                       && #dates.createNow().getTime() <= promotion.validityEnd.getTime()}"
+              class="badge badge-success">Active</span>
+                            <span th:if="${#dates.createNow().getTime() < promotion.validityStart.getTime()}"
+                                  class="badge badge-warning">Scheduled</span>
+                            <span th:if="${#dates.createNow().getTime() > promotion.validityEnd.getTime()}"
+                                  class="badge badge-secondary">Expired</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <span class="detail-label">Promo Code:</span>
+                        </div>
+                        <div class="col-sm-8">
+                            <span class="detail-value" th:text="${promotion.promoCode}">WEEKEND20</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="d-flex justify-content-between">
+                        <a th:href="@{/dashboard/it-system-engineer/promotions}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left mr-1"></i>Back to Dashboard
+                        </a>
+                        <div>
+                            <a th:href="@{/dashboard/it-system-engineer/promotions/{id}/edit(id=${promotion.id})}" class="btn btn-primary">
+                                <i class="fas fa-edit mr-1"></i>Edit
+                            </a>
+                            <form th:action="@{/dashboard/it-system-engineer/promotions/delete/{id}(id=${promotion.id})}" method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this promotion?')">
+                                    <i class="fas fa-trash mr-1"></i>Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -13,6 +13,9 @@ public class SupportTicket {
     private Long id;
 
     @Column(nullable = false)
+    private String issueTitle;
+
+    @Column(nullable = false)
     private String issueDescription;
 
     @Enumerated(EnumType.STRING)

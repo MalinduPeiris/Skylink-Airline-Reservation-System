@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skylink Airlines - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --primary-dark: #0a58ca;
+            --secondary: #1a2a6c;
+            --accent: #fdbb2d;
+            --light: #f8f9fa;
+            --dark: #107ff4;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            padding: 12px 0;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 24px;
+            color: white !important;
+        }
+
+        .sidebar {
+            background: white;
+            min-height: calc(100vh - 76px);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .nav-link {
+            color: var(--dark);
+            padding: 12px 20px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link {
+            color: var(--dark);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: rgba(13, 110, 253, 0.1);
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .metric-card {
+            border-left: 4px solid var(--primary);
+        }
+
+        .metric-card.success {
+            border-left-color: #198754;
+        }
+
+        .metric-card.warning {
+            border-left-color: #ffc107;
+        }
+
+        .metric-card.danger {
+            border-left-color: #dc3545;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-plane-departure"></i> Skylink Airlines
+        </a>
+        <div class="navbar-nav ms-auto">
+            <div class="dropdown">
+                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                    <div class="bg-accent rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <span>IT System Engineer</span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/api/user/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="/api/auth/password-reset"><i class="fas fa-key me-2"></i>Change Password</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/api/auth/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-2 col-md-3 sidebar">
+            <div class="d-flex flex-column p-3">
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item">
+                        <a href="/dashboard/it-system-engineer/dashboard" class="nav-link active">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/dashboard/it-system-engineer/flight-schedule" class="nav-link">
+                            <i class="fas fa-calendar-alt me-2"></i>Flight Schedule
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/dashboard/it-system-engineer/user-management" class="nav-link">
+                            <i class="fas fa-users"></i> User Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/dashboard/it-system-engineer/promotions" class="nav-link">
+                            <i class="fas fa-tags"></i> Promotions
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/dashboard/it-system-engineer/support-tickets" class="nav-link">
+                            <i class="fas fa-headset"></i> Support Tickets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/dashboard/it-system-engineer/finance" class="nav-link">
+                            <i class="fas fa-chart-line"></i> Finance
+                        </a>
+                    </li>
+<!--                    <li class="nav-item">-->
+<!--                        <a href="/dashboard/it-system-engineer/booking-management" class="nav-link">-->
+<!--                            <i class="fas fa-ticket-alt"></i> Booking Management-->
+<!--                        </a>-->
+<!--                    </li>-->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-10 col-md-9 p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Admin Dashboard</h2>
+<!--                <div class="d-flex gap-2">-->
+<!--                    <button class="btn btn-primary">-->
+<!--                        <i class="fas fa-sync-alt me-2"></i>Refresh-->
+<!--                    </button>-->
+<!--                    <button class="btn btn-outline-primary">-->
+<!--                        <i class="fas fa-download me-2"></i>Export-->
+<!--                    </button>-->
+<!--                </div>-->
+            </div>
+
+            <!-- Metrics -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card metric-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <p class="text-muted mb-0">Total Users</p>
+                                    <h3 class="mb-0" th:text="${totalUsers}">0</h3>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-users fa-2x text-primary"></i>
+                                </div>
+                            </div>
+                            <p class="text-success mb-0"><small>Frequent Travelers: <span th:text="${frequentTravelers}">0</span></small></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card metric-card success">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <p class="text-muted mb-0">Active Bookings</p>
+                                    <h3 class="mb-0" th:text="${activeBookings}">0</h3>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-plane fa-2x text-success"></i>
+                                </div>
+                            </div>
+                            <p class="text-success mb-0"><small><span th:text="${activeBookings} + ' active bookings'">+8% from last week</span></small></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card metric-card warning">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <p class="text-muted mb-0">Pending Tickets</p>
+                                    <h3 class="mb-0" th:text="${pendingTickets}">0</h3>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-ticket-alt fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                            <p class="text-danger mb-0"><small><span th:text="${pendingTickets} + ' pending tickets'">-5% from yesterday</span></small></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card metric-card danger">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <p class="text-muted mb-0">System Alerts</p>
+                                    <h3 class="mb-0" th:text="${systemAlerts}">0</h3>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                                </div>
+                            </div>
+                            <p class="text-warning mb-0"><small>No critical alerts</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and Recent Activity -->
+            <div class="row">
+                <div class="col-lg-8 mb-4">
+                    <div class="chart-container">
+                        <h5 class="mb-3">Booking Trends</h5>
+                        <canvas id="bookingChart" height="250"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0">Recent Activity</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item" th:each="user : ${recentUsers}">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <small>New user registration</small>
+                                        <small class="text-muted">Just now</small>
+                                    </div>
+                                    <p class="mb-1" th:text="${user.username} + ' registered'">User registered</p>
+                                </div>
+                                <div class="list-group-item" th:each="booking : ${recentBookings}">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <small>Flight booking</small>
+                                        <small class="text-muted">Just now</small>
+                                    </div>
+                                    <p class="mb-1" th:text="'Booking #' + ${booking.id} + ' created'">Booking created</p>
+                                </div>
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <small>System update</small>
+                                        <small class="text-muted">5 min ago</small>
+                                    </div>
+                                    <p class="mb-1">Database backup completed</p>
+                                </div>
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <small>Security scan</small>
+                                        <small class="text-muted">10 min ago</small>
+                                    </div>
+                                    <p class="mb-1">No threats detected</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Quick Actions</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-2 col-6 mb-3">
+                                    <a href="/dashboard/it-system-engineer/flight-schedule" class="text-decoration-none">
+                                        <div class="p-3 border rounded hover-shadow">
+                                            <i class="fas fa-plane fa-2x text-primary mb-2"></i>
+                                            <p class="mb-0">Manage Flights</p>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-2 col-6 mb-3">
+                                    <a href="/dashboard/it-system-engineer/promotions" class="text-decoration-none">
+                                        <div class="p-3 border rounded hover-shadow">
+                                            <i class="fas fa-tag fa-2x text-success mb-2"></i>
+                                            <p class="mb-0">Promotions</p>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-2 col-6 mb-3">
+                                    <a href="/dashboard/it-system-engineer/support-tickets" class="text-decoration-none">
+                                        <div class="p-3 border rounded hover-shadow">
+                                            <i class="fas fa-headset fa-2x text-warning mb-2"></i>
+                                            <p class="mb-0">Support</p>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-2 col-6 mb-3">
+                                    <a href="/dashboard/it-system-engineer/finance" class="text-decoration-none">
+                                        <div class="p-3 border rounded hover-shadow">
+                                            <i class="fas fa-chart-bar fa-2x text-info mb-2"></i>
+                                            <p class="mb-0">Finance</p>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-2 col-6 mb-3">
+                                    <a href="/dashboard/it-system-engineer/user-management" class="text-decoration-none">
+                                        <div class="p-3 border rounded hover-shadow">
+                                            <i class="fas fa-users fa-2x text-secondary mb-2"></i>
+                                            <p class="mb-0">Users</p>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-2 col-6 mb-3">
+                                    <a href="#" class="text-decoration-none">
+                                        <div class="p-3 border rounded hover-shadow">
+                                            <i class="fas fa-cog fa-2x text-danger mb-2"></i>
+                                            <p class="mb-0">System Settings</p>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Initialize chart
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('bookingChart').getContext('2d');
+        
+        // Get booking trend data from Thymeleaf
+        const bookingTrendData = [/*[[${#strings.listJoin(bookingTrends, ',')}]]*/65, 59, 80, 81, 56, 72];
+        
+        // Generate month labels
+        const monthLabels = [/*[[${#strings.listJoin(monthLabels, ',')}]]*/'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+        
+        const bookingChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: monthLabels,
+                datasets: [{
+                    label: 'Bookings',
+                    data: bookingTrendData,
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Bookings'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Months'
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

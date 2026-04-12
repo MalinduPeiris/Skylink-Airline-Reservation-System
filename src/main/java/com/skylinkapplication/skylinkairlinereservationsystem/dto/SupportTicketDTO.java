@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class SupportTicketDTO {
     private Long id;
+    private String issueTitle;
     private String issueDescription;
     private String status; // e.g., OPEN, RESOLVED
     private Date createdDate;
@@ -11,8 +12,9 @@ public class SupportTicketDTO {
 
     // Constructors
     public SupportTicketDTO() {}
-    public SupportTicketDTO(Long id, String issueDescription, String status, Date createdDate, Long userId) {
+    public SupportTicketDTO(Long id, String issueTitle, String issueDescription, String status, Date createdDate, Long userId) {
         this.id = id;
+        this.issueTitle = issueTitle;
         this.issueDescription = issueDescription;
         this.status = status;
         this.createdDate = createdDate;
@@ -22,6 +24,8 @@ public class SupportTicketDTO {
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    public String getIssueTitle() { return issueTitle; }
+    public void setIssueTitle(String issueTitle) { this.issueTitle = issueTitle; }
     public String getIssueDescription() { return issueDescription; }
     public void setIssueDescription(String issueDescription) { this.issueDescription = issueDescription; }
     public String getStatus() { return status; }

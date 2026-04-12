@@ -8,28 +8,43 @@ import java.util.Date;
 @Entity
 @Data
 public class Payment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
-    private Double amount;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Status status;
-
-    @Column(nullable = false)
-    private String transactionId;
-
-    @Column(nullable = false)
-    private Date transactionDate;
 
     @OneToOne
     @JoinColumn(name = "booking_id", nullable = false)
     private Booking booking;
 
+    @Column(nullable = false)
+    private Double amount;
+
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date paymentDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentMethod paymentMethod;
+
+    @Column(unique = true)
+    private String transactionId;
+
     public enum Status {
-        COMPLETED, REFUNDED, FAILED
+        PENDING,
+        COMPLETED,
+        FAILED,
+        REFUNDED
+    }
+
+    public enum PaymentMethod {
+        CARD,
+        EZ_CASH,
+        BANK_TRANSFER
     }
 }

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skylink Airlines - Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-dark: #003d7a;
+            --primary: #0066cc;
+            --accent: #ffc400;
+            --success: #28a745;
+            --danger: #dc3545;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .register-header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .register-header i {
+            font-size: 40px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .register-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .register-header p {
+            font-size: 14px;
+            opacity: 0.95;
+            margin: 0;
+        }
+
+        .register-body {
+            padding: 40px;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            background: #e0e0e0;
+            color: #999;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-number {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: #999;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .alert {
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border: none;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .form-section h5 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 11px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        .required {
+            color: var(--danger);
+        }
+
+        .password-strength {
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s;
+            border-radius: 2px;
+        }
+
+        .strength-fill.weak {
+            width: 33%;
+            background: var(--danger);
+        }
+
+        .strength-fill.medium {
+            width: 66%;
+            background: #ffc107;
+        }
+
+        .strength-fill.strong {
+            width: 100%;
+            background: var(--success);
+        }
+
+        .strength-text {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .form-check input {
+            width: 18px;
+            height: 18px;
+            margin-top: 3px;
+            margin-right: 10px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .form-check label {
+            margin: 0;
+            cursor: pointer;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .form-check label a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-check label a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-register {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent) 0%, #ffb300 100%);
+            color: var(--primary-dark);
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 196, 0, 0.3);
+        }
+
+        .btn-register:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .login-link p {
+            font-size: 13px;
+            color: #666;
+            margin: 0;
+        }
+
+        .login-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.3s;
+        }
+
+        .login-link a:hover {
+            color: var(--primary-dark);
+        }
+
+        .benefits {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .benefit {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .benefit i {
+            font-size: 22px;
+            color: var(--primary);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .register-container {
+                max-width: 100%;
+            }
+
+            .register-body {
+                padding: 30px 20px;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-steps {
+                gap: 10px;
+            }
+
+            .step-label {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <div class="register-header">
+        <i class="fas fa-plane-departure"></i>
+        <h2>Join Skylink</h2>
+        <p>Create your account and start booking</p>
+    </div>
+
+    <div class="register-body">
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="step active">
+                <div class="step-number">1</div>
+                <div class="step-label">Account</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-label">Details</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-label">Complete</div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div th:if="${error}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Success Message -->
+        <div th:if="${success}" class="alert alert-success">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+        </div>
+
+        <form th:action="@{/api/auth/register}" method="post" id="registerForm">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <!-- Account Section -->
+            <div class="form-section">
+                <h5><i class="fas fa-user-circle"></i> Account Information</h5>
+
+                <div class="form-group">
+                    <label for="username">Username <span class="required">*</span></label>
+                    <input type="text" id="username" name="username" placeholder="Choose a username" required minlength="3" maxlength="50">
+                    <small style="color: #666;">3-50 characters, letters and numbers only</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password <span class="required">*</span></label>
+                    <input type="password" id="password" name="password" placeholder="Create a strong password" required minlength="6" oninput="checkPasswordStrength()">
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <div class="strength-text">Minimum 6 characters</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Details Section -->
+            <div class="form-section">
+                <h5><i class="fas fa-passport"></i> Personal Details</h5>
+
+                <div class="two-column">
+                    <div class="form-group">
+                        <label for="phonenumber">Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phonenumber" name="phonenumber" placeholder="+1234567890" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">Account Type <span class="required">*</span></label>
+                        <select id="role" name="role" class="role-select" required>
+                            <option value="FREQUENT_TRAVELER" selected>Frequent Traveler</option>
+                            <option value="RESERVATION_MANAGER">Reservation Manager</option>
+                            <option value="FINANCE_EXECUTIVE">Finance Executive</option>
+                            <option value="IT_SYSTEM_ENGINEER">IT System Engineer</option>
+                            <option value="MARKETING_EXECUTIVE">Marketing Executive</option>
+                            <option value="CUSTOMER_SUPPORT_OFFICER">Customer Support Officer</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address <span class="required">*</span></label>
+                    <textarea id="address" name="address" placeholder="Enter your full address" required></textarea>
+                </div>
+            </div>
+
+            <!-- Terms & Conditions -->
+            <div class="form-section">
+                <div class="form-check">
+                    <input type="checkbox" id="terms" required>
+                    <label for="terms">
+                        I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a> <span class="required">*</span>
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <input type="checkbox" id="marketing">
+                    <label for="marketing">
+                        Send me emails about special offers and promotions
+                    </label>
+                </div>
+            </div>
+
+            <!-- Register Button -->
+            <button type="submit" class="btn-register">
+                <i class="fas fa-user-plus me-2"></i>Create My Account
+            </button>
+
+            <!-- Login Link -->
+            <div class="login-link">
+                <p>Already have an account? <a th:href="@{/api/auth/login}">Sign in here</a></p>
+            </div>
+
+            <!-- Benefits -->
+            <div class="benefits">
+                <div class="benefit">
+                    <i class="fas fa-lock"></i>
+                    Secure Account
+                </div>
+                <div class="benefit">
+                    <i class="fas fa-ticket-alt"></i>
+                    Easy Bookings
+                </div>
+                <div class="benefit">
+                    <i class="fas fa-gift"></i>
+                    Exclusive Deals
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function checkPasswordStrength() {
+        const password = document.getElementById('password').value;
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.querySelector('.strength-text');
+
+        if (password.length === 0) {
+            strengthFill.className = 'strength-fill';
+            strengthText.textContent = 'Minimum 6 characters';
+        } else if (password.length < 6) {
+            strengthFill.className = 'strength-fill weak';
+            strengthText.textContent = 'Too short';
+        } else if (password.length < 10) {
+            strengthFill.className = 'strength-fill medium';
+            strengthText.textContent = 'Medium strength';
+        } else {
+            strengthFill.className = 'strength-fill strong';
+            strengthText.textContent = 'Strong password';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('registerForm');
+        const progressSteps = document.querySelectorAll('.step');
+
+        // Update progress steps on form interaction
+        form.addEventListener('change', function() {
+            const filledFields = form.querySelectorAll('input[required], select[required], textarea[required]');
+            let filledCount = 0;
+
+            filledFields.forEach(field => {
+                if (field.value.trim() !== '') {
+                    filledCount++;
+                }
+            });
+
+            const progress = Math.ceil((filledCount / filledFields.length) * 3);
+            progressSteps.forEach((step, index) => {
+                if (index < progress) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        });
+
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+            const terms = document.getElementById('terms').checked;
+            if (!terms) {
+                e.preventDefault();
+                alert('Please accept the Terms of Service and Privacy Policy');
+                return false;
+            }
+        });
+    });
+</script>
+</body>
+</html>

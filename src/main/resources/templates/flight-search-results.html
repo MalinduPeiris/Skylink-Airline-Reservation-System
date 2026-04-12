@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flight Search Results - Skylink Airlines</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-dark: #003d7a;
+      --primary: #0066cc;
+      --accent: #ffc400;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+    }
+
+    .navbar {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      font-size: 24px;
+      color: white !important;
+    }
+
+    .search-header {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: white;
+      padding: 40px 0;
+      margin-bottom: 40px;
+    }
+
+    .search-header h1 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .result-count {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 8px 20px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .search-form-section {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .search-form-section h4 {
+      margin-bottom: 20px;
+      color: var(--primary-dark);
+    }
+
+    .flight-result-card {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 25px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+    }
+
+    .flight-result-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .flight-route {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 25px;
+    }
+
+    .location {
+      flex: 1;
+      text-align: center;
+    }
+
+    .location h3 {
+      color: var(--primary);
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .location p {
+      color: #666;
+      margin: 0;
+    }
+
+    .flight-arrow {
+      flex: 0 0 120px;
+      text-align: center;
+      color: var(--primary);
+    }
+
+    .flight-arrow i {
+      font-size: 2.5rem;
+    }
+
+    .flight-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+      padding: 20px 0;
+      border-top: 1px solid #f0f0f0;
+      border-bottom: 1px solid #f0f0f0;
+      margin-bottom: 20px;
+    }
+
+    .info-item {
+      text-align: center;
+    }
+
+    .info-label {
+      color: #999;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .info-value {
+      color: #333;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .pricing-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .price-tag {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .btn-book-flight {
+      background: linear-gradient(135deg, var(--accent), #ffb300);
+      color: var(--primary-dark);
+      border: none;
+      border-radius: 8px;
+      padding: 15px 40px;
+      font-weight: 700;
+      font-size: 16px;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-book-flight:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 196, 0, 0.3);
+      color: var(--primary-dark);
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .no-results i {
+      font-size: 6rem;
+      color: #dee2e6;
+      margin-bottom: 30px;
+    }
+
+    .no-results h3 {
+      font-size: 28px;
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .flight-route {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .flight-arrow {
+        transform: rotate(90deg);
+      }
+
+      .pricing-section {
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="/"><i class="fas fa-plane"></i> SKYLINK</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/api/flight/all"><i class="fas fa-plane-departure"></i> Flights</a></li>
+        <li class="nav-item"><a class="nav-link" href="/deals"><i class="fas fa-tags"></i> Deals</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="search-header">
+  <div class="container">
+    <h1><i class="fas fa-search me-3"></i>Flight Search Results</h1>
+    <div class="result-count">
+      <i class="fas fa-plane-departure me-2"></i>
+      <strong th:text="${resultCount != null ? resultCount : 0}">0</strong> flights found
+    </div>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <!-- Search Form Section -->
+  <div class="search-form-section">
+    <h4><i class="fas fa-filter me-2"></i>Refine Your Search</h4>
+    <form th:action="@{/api/flight/search}" method="get">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">From</label>
+          <select name="origin" class="form-select" th:value="${searchOrigin}">
+            <option value="">All Origins</option>
+            <option th:each="origin : ${origins}"
+                    th:value="${origin}"
+                    th:text="${origin}"
+                    th:selected="${origin == searchOrigin}">City</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">To</label>
+          <select name="destination" class="form-select" th:value="${searchDestination}">
+            <option value="">All Destinations</option>
+            <option th:each="destination : ${destinations}"
+                    th:value="${destination}"
+                    th:text="${destination}"
+                    th:selected="${destination == searchDestination}">City</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Departure</label>
+          <input type="date" name="departureDate" class="form-control"
+                 th:value="${searchDepartureDate != null ? #dates.format(searchDepartureDate, 'yyyy-MM-dd') : ''}">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Class</label>
+          <select name="cabinClass" class="form-select" th:value="${searchCabinClass}">
+            <option value="">Any Class</option>
+            <option value="ECONOMY" th:selected="${searchCabinClass == 'ECONOMY'}">Economy</option>
+            <option value="BUSINESS" th:selected="${searchCabinClass == 'BUSINESS'}">Business</option>
+            <option value="FIRST_CLASS" th:selected="${searchCabinClass == 'FIRST_CLASS'}">First Class</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Passengers</label>
+          <select name="passengers" class="form-select" th:value="${searchPassengers}">
+            <option value="1" th:selected="${searchPassengers == 1}">1</option>
+            <option value="2" th:selected="${searchPassengers == 2}">2</option>
+            <option value="3" th:selected="${searchPassengers == 3}">3</option>
+            <option value="4" th:selected="${searchPassengers == 4}">4</option>
+            <option value="5" th:selected="${searchPassengers == 5}">5+</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-3">
+        <button type="submit" class="btn btn-primary me-2">
+          <i class="fas fa-search me-2"></i>Search
+        </button>
+        <a href="/api/flight/search" class="btn btn-outline-secondary">
+          <i class="fas fa-redo me-2"></i>Clear Filters
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- No Results Message -->
+  <div class="no-results" th:if="${searchResults == null || #lists.isEmpty(searchResults)}">
+    <i class="fas fa-plane-slash"></i>
+    <h3>No Flights Found</h3>
+    <p class="text-muted mb-4">We couldn't find any flights matching your search criteria.<br>Try adjusting your search parameters above.</p>
+    <a href="/" class="btn btn-book-flight">
+      <i class="fas fa-home me-2"></i>Back to Home
+    </a>
+  </div>
+
+  <!-- Flight Results -->
+  <div th:if="${searchResults != null && !#lists.isEmpty(searchResults)}">
+    <div th:each="flight : ${searchResults}" class="flight-result-card">
+      <div class="flight-route">
+        <div class="location">
+          <h3 th:text="${flight.origin}">Origin</h3>
+          <p th:text="${#dates.format(flight.departureDate, 'EEE, MMM dd')}">Date</p>
+          <p class="fw-bold" th:text="${#dates.format(flight.departureDate, 'HH:mm')}">Time</p>
+        </div>
+        <div class="flight-arrow">
+          <i class="fas fa-plane"></i>
+          <p class="small mb-0 mt-2" th:text="${flight.flightNumber}">Flight</p>
+        </div>
+        <div class="location">
+          <h3 th:text="${flight.destination}">Destination</h3>
+          <p th:text="${#dates.format(flight.arrivalDate, 'EEE, MMM dd')}">Date</p>
+          <p class="fw-bold" th:text="${#dates.format(flight.arrivalDate, 'HH:mm')}">Time</p>
+        </div>
+      </div>
+
+      <div class="flight-info">
+        <div class="info-item">
+          <div class="info-label">Class</div>
+          <div class="info-value" th:text="${flight.cabinClass}">Economy</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Aircraft</div>
+          <div class="info-value" th:text="${flight.aircraftType != null ? flight.aircraftType : 'N/A'}">Boeing 737</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Seats Available</div>
+          <div class="info-value" th:text="${flight.seatsAvailable}">50</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Status</div>
+          <div class="info-value" th:text="${flight.status != null ? flight.status : 'Scheduled'}">On Time</div>
+        </div>
+      </div>
+
+      <div class="pricing-section">
+        <div class="price-tag">
+          Rs.<span th:text="${#numbers.formatDecimal(flight.price, 1, 0)}">150000</span>
+          <small style="font-size: 14px; color: #999; font-weight: normal;">per person</small>
+        </div>
+        <a class="btn btn-book-flight" th:href="@{/api/booking/page(flightId=${flight.id}, passengers=${searchPassengers != null ? searchPassengers : 1}, destination=${flight.destination})}">
+          <i class="fas fa-ticket-alt me-2"></i>Book This Flight
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-5">
+    <a href="/" class="btn btn-outline-primary btn-lg">
+      <i class="fas fa-arrow-left me-2"></i>Back to Home
+    </a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

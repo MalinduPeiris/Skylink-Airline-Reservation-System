@@ -5,21 +5,23 @@ import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
 public class Flight {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String flightNumber;
 
-    @Column(nullable = false)
+    @Column(name = "departure_date", nullable = false)
     private Date departureDate;
 
-    @Column(nullable = false)
+    @Column(name = "arrival_date", nullable = false)
     private Date arrivalDate;
 
     @Column(nullable = false)
@@ -32,19 +34,25 @@ public class Flight {
     private Double price;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "cabin_class", nullable = false)
     private CabinClass cabinClass;
 
-    @Column(nullable = false)
+    @Column(name = "seats_available", nullable = false)
     private Integer seatsAvailable;
 
-    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL)
-    private List<Seat> seats;
+    @Column(name = "aircraft_type", nullable = false)
+    private String aircraftType;
 
-    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL)
-    private List<Booking> bookings;
+    @Column(nullable = false)
+    private String status;
+
+    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Seat> seats;
 
     public enum CabinClass {
-        ECONOMY, BUSINESS
+        ECONOMY,
+        BUSINESS,
+        FIRST_CLASS
     }
+
 }
