@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Bookings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 0 16px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #f3f3f3; }
+  </style>
+  </head>
+<body>
+  <h2>My Bookings</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Status</th>
+        <th>Passengers</th>
+        <th>Flight</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="b : ${bookings}">
+        <td th:text="${b.id}">1</td>
+        <td th:text="${b.status}">PENDING</td>
+        <td th:text="${b.passengers}">2</td>
+        <td th:text="${b.flightId}">10</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>
