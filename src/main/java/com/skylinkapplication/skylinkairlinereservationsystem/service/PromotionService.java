@@ -27,7 +27,7 @@ public class PromotionService {
 				promotionDTO.getTargetCriteria(), promotionDTO.getDiscount(),
 				promotionDTO.getValidityStart(), promotionDTO.getValidityEnd(), promotionDTO.getPromoCode());
 
-		// Validate required fields
+
 		if (promotionDTO.getDiscount() == null || promotionDTO.getDiscount() <= 0) {
 			throw new IllegalArgumentException("Valid discount is required (must be greater than 0)");
 		}
@@ -43,13 +43,10 @@ public class PromotionService {
 		if (promotionDTO.getPromoCode() == null || promotionDTO.getPromoCode().trim().isEmpty()) {
 			throw new IllegalArgumentException("Promo code is required");
 		}
-
-		// Validate dates
 		if (!promotionDTO.getValidityStart().before(promotionDTO.getValidityEnd())) {
 			throw new IllegalArgumentException("Validity start date must be before validity end date");
 		}
 
-		// Validate discount range (0-100%)
 		if (promotionDTO.getDiscount() > 100) {
 			throw new IllegalArgumentException("Discount cannot be greater than 100%");
 		}
@@ -72,7 +69,6 @@ public class PromotionService {
 				id, updatedPromotionDTO.getTargetCriteria(), updatedPromotionDTO.getDiscount(),
 				updatedPromotionDTO.getValidityStart(), updatedPromotionDTO.getValidityEnd(), updatedPromotionDTO.getPromoCode());
 
-		// Validate ID
 		if (id == null) {
 			throw new IllegalArgumentException("Promotion ID is required");
 		}
@@ -80,7 +76,6 @@ public class PromotionService {
 		Promotion promotion = promotionRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Promotion not found"));
 
-		// Validate and update fields if provided
 		if (updatedPromotionDTO.getDiscount() != null) {
 			if (updatedPromotionDTO.getDiscount() <= 0) {
 				throw new IllegalArgumentException("Valid discount is required (must be greater than 0)");
@@ -93,7 +88,6 @@ public class PromotionService {
 		
 		if (updatedPromotionDTO.getValidityStart() != null) {
 			promotion.setValidityStart(updatedPromotionDTO.getValidityStart());
-			// Validate dates if both are provided
 			if (updatedPromotionDTO.getValidityEnd() != null && 
 				!updatedPromotionDTO.getValidityStart().before(updatedPromotionDTO.getValidityEnd())) {
 				throw new IllegalArgumentException("Validity start date must be before validity end date");
@@ -105,7 +99,6 @@ public class PromotionService {
 		
 		if (updatedPromotionDTO.getValidityEnd() != null) {
 			promotion.setValidityEnd(updatedPromotionDTO.getValidityEnd());
-			// Validate dates if both are provided
 			if (updatedPromotionDTO.getValidityStart() != null && 
 				!updatedPromotionDTO.getValidityStart().before(updatedPromotionDTO.getValidityEnd())) {
 				throw new IllegalArgumentException("Validity start date must be before validity end date");
