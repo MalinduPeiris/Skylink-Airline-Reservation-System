@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skylink Airlines - All Flights</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #0d6efd; --secondary: #1a2a6c; --accent: #fdbb2d;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f5f7fa;
+        }
+        .navbar {
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            padding: 12px 0;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 24px;
+            color: white !important;
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-link:hover { color: white !important; }
+        .btn-login {
+            border: 2px solid white; color: white; border-radius: 50px; font-weight: 600;
+        }
+        .btn-login:hover { background-color: white; color: var(--primary); }
+        .btn-register {
+            background-color: white; color: var(--primary); border-radius: 50px; font-weight: 600;
+        }
+        .btn-logout {
+            background-color: #dc3545; color: white; border-radius: 50px; font-weight: 600; border: none;
+        }
+        .user-info { display: flex; align-items: center; color: white; }
+        .user-avatar {
+            width: 35px; height: 35px; border-radius: 50%; background-color: var(--accent);
+            display: flex; align-items: center; justify-content: center; margin-right: 10px; font-weight: bold;
+        }
+        .flights-section { padding: 50px 0; }
+        .flight-card {
+            border-radius: 15px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); transition: all 0.3s;
+            background: white; height: 100%;
+        }
+        .flight-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
+        .flight-header {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white; padding: 15px 20px; text-align: center;
+        }
+        .flight-content { padding: 20px; font-size: 14px; }
+        .section-title { font-weight: 700; color: var(--primary); text-align: center; }
+        .btn-view-flights {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white; border: none; border-radius: 50px; padding: 8px 20px; font-weight: 600;
+        }
+        .footer {
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            color: white; padding: 60px 0 30px; border-radius: 20px 20px 0 0;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">
+            <i class="fas fa-plane-departure"></i> Skylink Airlines
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}"><i class="fas fa-home"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/api/flight/all}"><i class="fas fa-plane-departure"></i> Flights</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" th:href="@{/api/booking/dashboard}"><i class="fas fa-suitcase"></i> My Bookings</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" th:href="@{/api/user/profile}"><i class="fas fa-user"></i> My Profile</a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center" sec:authorize="!isAuthenticated()">
+                <a class="btn btn-login me-2" th:href="@{/api/auth/login}">Login</a>
+                <a class="btn btn-register" th:href="@{/api/auth/register}">Register</a>
+            </div>
+
+            <div class="d-flex align-items-center" sec:authorize="isAuthenticated()">
+                <div class="user-info me-3">
+                    <div class="user-avatar" th:text="${#strings.substring(T(org.springframework.security.core.context.SecurityContextHolder).getContext().getAuthentication().getName(), 0, 2).toUpperCase()}">US</div>
+                    <span sec:authentication="principal.username">User</span>
+                </div>
+                <form th:action="@{/api/auth/logout}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-logout">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="flights-section">
+    <div class="container">
+        <h2 class="section-title">All Available Flights</h2>
+        <p class="mb-5 text-center">Browse all our flight offerings and book your next journey with us.</p>
+
+        <div class="row justify-content-center">
+            <div class="col-12 text-center" th:if="${allFlights == null or #lists.isEmpty(allFlights)}">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Sorry, no flights are available at the moment. Please check back later.
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4" th:each="flight : ${allFlights}">
+                <div class="flight-card">
+                    <div class="flight-header">
+                        <h4 class="mb-0" th:text="${flight.origin} + ' to ' + ${flight.destination}">Route</h4>
+                    </div>
+                    <div class="flight-content">
+                        <div class="row mb-2">
+                            <div class="col-6"><strong>Flight Number:</strong></div>
+                            <div class="col-6" th:text="${flight.flightNumber}">FN</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6"><strong>Departure:</strong></div>
+                            <div class="col-6" th:text="${#dates.format(flight.departureDate, 'dd-MMM-yyyy HH:mm')}">DT</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-6"><strong>Arrival:</strong></div>
+                            <div class="col-6" th:text="${#dates.format(flight.arrivalDate, 'dd-MMM-yyyy HH:mm')}">AT</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6"><strong>Price:</strong></div>
+                            <div class="col-6 fw-bold text-primary" th:text="'Rs.' + ${#numbers.formatDecimal(flight.price, 1, 2)} + ' (' + ${flight.cabinClass} + ')'">Rs.150000</div>
+                        </div>
+                        <div class="text-center">
+                            <a class="btn btn-view-flights" th:href="@{/api/booking/page(flightId=${flight.id}, passengers=1)}">
+                                <i class="fas fa-ticket-alt me-2"></i>Book Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a th:href="@{/}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Home
+            </a>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

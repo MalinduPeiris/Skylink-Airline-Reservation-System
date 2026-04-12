@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skylink Airlines - Customer Support</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap">
+    <style>
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #003d7a;
+            --secondary: #1a1a1a;
+            --accent: #ffc400;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf0 100%);
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(90deg, var(--secondary), #2d2d2d);
+            padding: 15px 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: white !important;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 400;
+            margin: 0 15px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--accent) !important;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .user-info i {
+            font-size: 22px;
+            color: white;
+        }
+
+        .user-info span {
+            color: white;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .user-info .btn-login {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(rgba(200, 16, 46, 0.85), rgba(139, 10, 31, 0.85)), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&q=80');
+            background-size: cover;
+            background-position: center;
+            padding: 80px 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .hero-content h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .hero-content p {
+            font-size: 20px;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Contact Cards */
+        .contact-section {
+            max-width: 1200px;
+            margin: -60px auto 60px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .contact-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .contact-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .contact-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            transition: all 0.3s;
+        }
+
+        .contact-card:nth-child(1) .contact-icon {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+        }
+
+        .contact-card:nth-child(2) .contact-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .contact-card:nth-child(3) .contact-icon {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+        }
+
+        .contact-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 12px;
+        }
+
+        .contact-card p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .contact-info {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .availability {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .btn-contact {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+
+        .btn-contact:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(200, 16, 46, 0.3);
+        }
+
+        /* Form Section */
+        .form-section {
+            max-width: 900px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .form-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .form-tab {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-weight: 600;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .form-tab.active {
+            color: var(--primary);
+            background: white;
+        }
+
+        .form-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .form-content {
+            padding: 40px;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .form-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 8px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+        }
+
+        .form-control,
+        .form-textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .form-control:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(200, 16, 46, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .rating-container {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .star-btn {
+            background: none;
+            border: none;
+            font-size: 40px;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .star-btn.active,
+        .star-btn:hover {
+            color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(200, 16, 46, 0.3);
+        }
+
+        /* Resources Section */
+        .resources-section {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            padding: 50px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .resources-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--secondary);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .resource-card {
+            text-align: center;
+            padding: 30px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .resource-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .resource-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .resource-card:nth-child(1) .resource-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+
+        .resource-card:nth-child(2) .resource-icon {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        }
+
+        .resource-card:nth-child(3) .resource-icon {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
+        .resource-card h4 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 12px;
+        }
+
+        .resource-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .btn-resource {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-resource:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Alert Messages */
+        .alert-message {
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border-left: 5px solid #28a745;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border-left: 5px solid #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 32px;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-tabs {
+                flex-direction: column;
+            }
+
+            .form-content {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-lg">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-plane-departure"></i> SKYLINK
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/api/flight/all"><i
+                        class="fas fa-plane-departure"></i> Flights</a></li>
+                <li class="nav-item"><a class="nav-link" href="/deals"><i class="fas fa-tags"></i> Deals</a></li>
+                <li class="nav-item"><a class="nav-link" href="/api/user/profile"><i class="fas fa-user"></i>
+                    Profile</a></li>
+            </ul>
+        </div>
+
+        <div class="user-info ms-3" th:if="${session.username != null}">
+            <i class="fas fa-user-circle"></i>
+            <span th:text="${session.username}">User</span>
+            <form th:action="@{/api/auth/logout}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-login btn-sm">Logout</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1>How Can We Help You?</h1>
+        <p>Our dedicated support team is here to assist you 24/7 with any questions or concerns</p>
+    </div>
+</div>
+
+<!-- Contact Cards -->
+<div class="contact-section">
+    <div class="contact-grid">
+        <div class="contact-card">
+            <div class="contact-icon">
+                <i class="fas fa-phone"></i>
+            </div>
+            <h3>Call Us</h3>
+            <p>Speak directly with our customer service representatives</p>
+            <div class="contact-info">+1 (800) 123-4567</div>
+            <div class="availability">
+                <div class="status-dot"></div>
+                <span>Available 24/7</span>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <div class="contact-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <h3>Email Support</h3>
+            <p>Send us a detailed message and we'll respond promptly</p>
+            <div class="contact-info">support@skylink.com</div>
+            <div class="availability">
+                <i class="fas fa-clock"></i>
+                <span>Response within 24 hours</span>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <div class="contact-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+            <h3>Live Chat</h3>
+            <p>Get instant help from our support agents online</p>
+            <button class="btn-contact">Start Chat Now</button>
+            <div class="availability" style="margin-top: 15px;">
+                <div class="status-dot"></div>
+                <span>Online Now</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form Section -->
+<div class="form-section">
+    <!-- Success/Error Messages -->
+    <div th:if="${success}" class="alert-message alert-success">
+        <i class="fas fa-check-circle" style="font-size: 20px;"></i>
+        <span th:text="${success}">Success message</span>
+    </div>
+    <div th:if="${error}" class="alert-message alert-error">
+        <i class="fas fa-exclamation-circle" style="font-size: 20px;"></i>
+        <span th:text="${error}">Error message</span>
+    </div>
+
+    <div class="form-container">
+        <div class="form-tabs">
+            <button class="form-tab active" onclick="switchFormTab(0)">
+                <i class="fas fa-ticket-alt me-2"></i>Support Ticket
+            </button>
+            <button class="form-tab" onclick="switchFormTab(1)">
+                <i class="fas fa-star me-2"></i>Feedback
+            </button>
+        </div>
+
+        <div class="form-content">
+            <!-- Support Ticket Tab -->
+            <div class="tab-panel active">
+                <h2 class="form-title">Submit a Support Ticket</h2>
+                <form th:action="@{/api/user/support/submit-ticket}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" name="userId" th:value="${userId}" th:if="${userId != null}" />
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" name="name" class="form-control"
+                                       placeholder="Enter your full name" required
+                                       th:value="${currentUser != null ? currentUser.username : ''}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Email Address *</label>
+                                <input type="email" name="email" class="form-control"
+                                       placeholder="your.email@example.com" required
+                                       th:value="${currentUser != null ? currentUser.email : ''}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Issue Title *</label>
+                        <input type="text" name="issueTitle" class="form-control"
+                               placeholder="Brief description of your issue" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Issue Description *</label>
+                        <textarea name="issueDescription" class="form-textarea"
+                                  placeholder="Please provide detailed information about your issue..."
+                                  required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Ticket
+                    </button>
+                </form>
+            </div>
+
+            <!-- Feedback Tab -->
+            <div class="tab-panel">
+                <h2 class="form-title">Share Your Feedback</h2>
+                <form th:action="@{/api/user/support/submit-feedback}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" name="userId" th:value="${userId}" th:if="${userId != null}" />
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" name="name" class="form-control"
+                                       placeholder="Enter your full name"
+                                       th:value="${currentUser != null ? currentUser.username : ''}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" name="email" class="form-control"
+                                       placeholder="your.email@example.com"
+                                       th:value="${currentUser != null ? currentUser.email : ''}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Rate Your Experience *</label>
+                        <div class="rating-container">
+                            <button type="button" class="star-btn" data-rating="1" onclick="setRating(1)">☆</button>
+                            <button type="button" class="star-btn" data-rating="2" onclick="setRating(2)">☆</button>
+                            <button type="button" class="star-btn" data-rating="3" onclick="setRating(3)">☆</button>
+                            <button type="button" class="star-btn" data-rating="4" onclick="setRating(4)">☆</button>
+                            <button type="button" class="star-btn" data-rating="5" onclick="setRating(5)">☆</button>
+                        </div>
+                        <input type="hidden" name="rating" id="ratingValue" value="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Your Comments</label>
+                        <textarea name="comments" class="form-textarea"
+                                  placeholder="Share your experience, suggestions, or what you liked about our service..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-heart me-2"></i>Submit Feedback
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resources Section -->
+<div class="container-lg">
+    <div class="resources-section">
+        <h2 class="resources-title">Helpful Resources</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <div class="resource-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h4>Travel Policies</h4>
+                <p>Review our baggage, cancellation, and travel policies to ensure a smooth journey</p>
+                <button class="btn-resource">View Policies</button>
+            </div>
+
+            <div class="resource-card">
+                <div class="resource-icon">
+                    <i class="fas fa-plane"></i>
+                </div>
+                <h4>Flight Status</h4>
+                <p>Check real-time flight status, delays, and gate information for your upcoming trips</p>
+                <button class="btn-resource">Check Status</button>
+            </div>
+
+            <div class="resource-card">
+                <div class="resource-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h4>Manage Account</h4>
+                <p>Update your profile, view bookings, and manage your travel preferences easily</p>
+                <button class="btn-resource" onclick="window.location.href='/api/user/profile'">My Account</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Tab switching
+    let currentFormTab = 0;
+    const formTabs = document.querySelectorAll('.form-tab');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    function switchFormTab(index) {
+        currentFormTab = index;
+        formTabs.forEach((tab, i) => {
+            tab.classList.toggle('active', i === index);
+        });
+        tabPanels.forEach((panel, i) => {
+            panel.classList.toggle('active', i === index);
+        });
+    }
+
+    // Rating system
+    let currentRating = 0;
+    const stars = document.querySelectorAll('.star-btn');
+
+    function setRating(rating) {
+        currentRating = rating;
+        document.getElementById('ratingValue').value = rating;
+
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.textContent = '★';
+                star.classList.add('active');
+            } else {
+                star.textContent = '☆';
+                star.classList.remove('active');
+            }
+        });
+    }
+
+    // Hover effect for stars
+    stars.forEach((star, index) => {
+        star.addEventListener('mouseenter', () => {
+            stars.forEach((s, i) => {
+                if (i <= index) {
+                    s.textContent = '★';
+                } else {
+                    s.textContent = '☆';
+                }
+            });
+        });
+
+        star.addEventListener('mouseleave', () => {
+            setRating(currentRating);
+        });
+    });
+</script>
+</body>
+
+</html>

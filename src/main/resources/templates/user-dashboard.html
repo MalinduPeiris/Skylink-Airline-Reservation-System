@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>Skylink Airlines - My Account</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@600;700&display=swap">
+  <style>
+    :root {
+      --primary: #0066cc;
+      --primary-dark: #003d7a;
+      --secondary: #1a1a1a;
+      --accent: #ffc400;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --border: #e0e0e0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf0 100%);
+      color: #333;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: linear-gradient(90deg, var(--secondary), #2d2d2d);
+      padding: 15px 0;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+    }
+
+    .navbar-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: white !important;
+      letter-spacing: 1px;
+    }
+
+    .nav-link {
+      color: rgba(255, 255, 255, 0.9) !important;
+      font-weight: 400;
+      margin: 0 15px;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--accent) !important;
+    }
+
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    /* Hero Section */
+    .hero-section {
+      background: linear-gradient(rgba(0, 102, 204, 0.85), rgba(0, 61, 122, 0.85)), url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&q=80');
+      background-size: cover;
+      background-position: center;
+      padding: 60px 0;
+      color: white;
+      margin-bottom: 40px;
+    }
+
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .hero-content h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .hero-content p {
+      font-size: 18px;
+      opacity: 0.95;
+    }
+
+    /* Dashboard Container */
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px 50px;
+    }
+
+    /* Profile Card */
+    .profile-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    .profile-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding: 40px 30px;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
+
+    .profile-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--accent);
+    }
+
+    .profile-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 5px solid white;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .profile-name {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .profile-email {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 15px;
+    }
+
+    .role-badge {
+      background: var(--accent);
+      color: var(--secondary);
+      padding: 6px 20px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .profile-body {
+      padding: 30px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      display: flex;
+      align-items: center;
+      color: #666;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .info-label i {
+      width: 25px;
+      margin-right: 12px;
+      color: var(--primary);
+    }
+
+    .info-value {
+      color: var(--secondary);
+      font-weight: 500;
+    }
+
+    .btn-update-profile {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border: none;
+      color: white;
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s;
+      margin-top: 20px;
+    }
+
+    .btn-update-profile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(200, 16, 46, 0.3);
+    }
+
+    /* Stats Card */
+    .stats-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    .stats-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--secondary);
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 25px 15px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 12px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--primary);
+      transform: scaleX(0);
+      transition: transform 0.3s;
+    }
+
+    .stat-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .stat-item:hover::before {
+      transform: scaleX(1);
+    }
+
+    .stat-icon {
+      font-size: 32px;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .stat-number {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--secondary);
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #666;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Tabs */
+    .custom-tabs {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    .tab-header {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: #f8f9fa;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 18px 20px;
+      border: none;
+      background: transparent;
+      color: #666;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .tab-button.active {
+      color: var(--primary);
+      background: white;
+    }
+
+    .tab-button.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--primary);
+    }
+
+    .tab-content {
+      padding: 35px;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Flight Cards */
+    .flight-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--primary);
+      border-radius: 10px;
+      padding: 25px;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+    }
+
+    .flight-card:hover {
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transform: translateX(5px);
+    }
+
+    .flight-card.cancelled {
+      border-left-color: #dc3545;
+      opacity: 0.7;
+      background: #f8f9fa;
+    }
+
+    .flight-header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .flight-route {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--secondary);
+      margin-bottom: 8px;
+    }
+
+    .flight-date {
+      color: #666;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .flight-price {
+      text-align: right;
+    }
+
+    .price-amount {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .days-badge {
+      background: var(--accent);
+      color: var(--secondary);
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+      margin-top: 5px;
+    }
+
+    .flight-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    .detail-item-inline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .detail-label-inline {
+      color: #666;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .detail-value-inline {
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    .status-badge {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge.confirmed {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-badge.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-badge.cancelled {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .flight-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-flight-action {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-view-details {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-view-details:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .btn-cancel-flight {
+      background: transparent;
+      color: #dc3545;
+      border: 2px solid #dc3545;
+    }
+
+    .btn-cancel-flight:hover {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-refund {
+      background: transparent;
+      color: #ffc107;
+      border: 2px solid #ffc107;
+    }
+
+    .btn-refund:hover {
+      background: #ffc107;
+      color: var(--secondary);
+    }
+
+    .btn-book-new {
+      background: var(--accent);
+      color: var(--secondary);
+      padding: 14px 30px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-book-new:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-state i {
+      font-size: 64px;
+      color: #dee2e6;
+      margin-bottom: 20px;
+    }
+
+    .empty-state h4 {
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .empty-state p {
+      color: #999;
+    }
+
+    /* Modal */
+    .modal-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      border-radius: 15px 15px 0 0;
+      border-bottom: 3px solid var(--accent);
+    }
+
+    .modal-content {
+      border-radius: 15px;
+      border: none;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: var(--secondary);
+      margin-bottom: 8px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-control, .form-select {
+      border-radius: 8px;
+      padding: 12px 15px;
+      border: 2px solid var(--border);
+      transition: all 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.25rem rgba(200, 16, 46, 0.1);
+    }
+
+    .btn-save-changes {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-delete-account {
+      background: #dc3545;
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Alerts */
+    .alert {
+      border-radius: 10px;
+      border: none;
+      padding: 15px 20px;
+      margin-bottom: 30px;
+    }
+
+    .alert-success {
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      color: #155724;
+      border-left: 5px solid #28a745;
+    }
+
+    .alert-danger {
+      background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+      color: #721c24;
+      border-left: 5px solid #dc3545;
+    }
+
+    @media (max-width: 768px) {
+      .hero-content h1 {
+        font-size: 28px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flight-header-section {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .flight-price {
+        text-align: left;
+      }
+
+      .tab-button {
+        font-size: 12px;
+        padding: 15px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container-lg">
+    <a class="navbar-brand" href="/">
+      <i class="fas fa-plane-departure"></i> SKYLINK
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/flight/search"><i class="fas fa-search"></i> Search Flights</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/api/user/support/tickets(userId=${session.userId})}">Customer Support</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/api/user/profile"><i class="fas fa-user"></i> My Account</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/api/auth/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<div class="hero-section">
+  <div class="hero-content">
+    <h1>Welcome Back</h1>
+    <p>Manage your bookings, view your travel history, and update your preferences</p>
+  </div>
+</div>
+
+<!-- Dashboard Container -->
+<div class="dashboard-container">
+  <!-- Alerts -->
+  <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="fas fa-check-circle me-2"></i>
+    <span th:text="${success}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-circle me-2"></i>
+    <span th:text="${error}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <div class="row">
+    <!-- Left Column -->
+    <div class="col-lg-4">
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <div class="profile-header">
+          <img th:src="@{'https://ui-avatars.com/api/?name=' + ${user.username} + '&background=0066cc&color=fff&size=120'}"
+               alt="Profile" class="profile-img">
+          <div class="profile-name" th:text="${user.username}">John Doe</div>
+          <div class="profile-email" th:text="${user.email}">john@example.com</div>
+          <span class="role-badge" th:text="${#strings.replace(user.role, '_', ' ')}">Member</span>
+        </div>
+        <div class="profile-body">
+          <div class="info-row">
+            <div class="info-label">
+              <i class="fas fa-phone"></i>
+              <span>Phone</span>
+            </div>
+            <div class="info-value" th:text="${user.phonenumber != null ? user.phonenumber : 'Not provided'}">+1 234 567 8900</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Address</span>
+            </div>
+            <div class="info-value" th:text="${user.address != null ? user.address : 'Not provided'}">123 Main St</div>
+          </div>
+          <button class="btn-update-profile" data-bs-toggle="modal" data-bs-target="#updateProfileModal">
+            <i class="fas fa-user-edit me-2"></i>Update Profile
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Card -->
+      <div class="stats-card">
+        <h3 class="stats-title"><i class="fas fa-chart-line me-2"></i>Travel Statistics</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-icon"><i class="fas fa-plane-departure"></i></div>
+            <div class="stat-number" th:text="${totalBookings}">12</div>
+            <div class="stat-label">Total Bookings</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon"><i class="fas fa-map-marked-alt"></i></div>
+            <div class="stat-number" th:text="${destinations}">8</div>
+            <div class="stat-label">Destinations</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="stat-number" th:text="${upcomingTrips}">3</div>
+            <div class="stat-label">Upcoming</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-number" th:text="${completedTrips}">9</div>
+            <div class="stat-label">Completed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-8">
+      <!-- Tabs -->
+      <div class="custom-tabs">
+        <div class="tab-header">
+          <button class="tab-button active" onclick="switchTab(0)">
+            <i class="fas fa-plane-departure me-2"></i>Upcoming Flights
+          </button>
+          <button class="tab-button" onclick="switchTab(1)">
+            <i class="fas fa-history me-2"></i>Booking History
+          </button>
+          <!--          <button class="tab-button" onclick="switchTab(2)">-->
+          <!--            <i class="fas fa-sliders-h me-2"></i>Preferences-->
+          <!--          </button>-->
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+          <!-- Upcoming Flights Tab -->
+          <div th:each="booking : ${upcomingBookings}">
+            <div class="flight-card" th:classappend="${booking.status == 'CANCELLED' ? 'cancelled' : ''}">
+              <div class="flight-header-section">
+                <div>
+                  <div class="flight-route" th:text="${booking.flight.origin + ' → ' + booking.flight.destination}">JFK → LHR</div>
+                  <div class="flight-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span th:text="${#dates.format(booking.flight.departureDate, 'EEEE, MMMM dd, yyyy HH:mm')}"></span>
+                  </div>
+                </div>
+                <div class="flight-price">
+                  <div class="price-amount">$<span th:text="${#numbers.formatDecimal(booking.totalPrice, 1, 2)}">150000</span></div>
+                  <span class="days-badge" th:if="${booking.status != 'CANCELLED' and booking.daysLeft != null}" th:text="${booking.daysLeft + ' days left'}">5 days left</span>
+                </div>
+              </div>
+
+              <div class="flight-details-grid">
+                <div class="detail-item-inline">
+                  <span class="detail-label-inline">Flight Number</span>
+                  <span class="detail-value-inline" th:text="${booking.flight.flightNumber}">SL101</span>
+                </div>
+                <div class="detail-item-inline">
+                  <span class="detail-label-inline">Passengers</span>
+                  <span class="detail-value-inline" th:text="${booking.passengers}">2</span>
+                </div>
+                <div class="detail-item-inline">
+                  <span class="detail-label-inline">Status</span>
+                  <span class="status-badge" th:classappend="${booking.status == 'CONFIRMED' ? 'confirmed' : (booking.status == 'PENDING' ? 'pending' : 'cancelled')}" th:text="${booking.status}">CONFIRMED</span>
+                </div>
+              </div>
+
+              <div class="flight-actions">
+                <button class="btn-flight-action btn-view-details" th:onclick="'viewBookingDetails(' + ${booking.id} + ')'">
+                  <i class="fas fa-eye me-1"></i> View Details
+                </button>
+                <form th:if="${booking.status != 'CANCELLED'}"
+                      th:action="@{/api/booking/cancel}"
+                      method="post"
+                      style="display: inline;"
+                      th:onsubmit="'return confirm(\'Are you sure you want to cancel this booking?\');'">
+                  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                  <input type="hidden" name="bookingId" th:value="${booking.id}" />
+                  <input type="hidden" name="userId" th:value="${user.id}" />
+                  <button type="submit" class="btn-flight-action btn-cancel-flight">
+                    <i class="fas fa-times-circle me-1"></i> Cancel Flight
+                  </button>
+                </form>
+                <button th:if="${booking.status == 'CANCELLED'}"
+                        class="btn-flight-action btn-refund"
+                        onclick="alert('Refund request submitted. Our team will contact you within 24 hours.')">
+                  <i class="fas fa-money-bill-wave me-1"></i> Request Refund
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Booking History Tab -->
+          <div th:if="${!#lists.isEmpty(pastBookings)}">
+            <div th:each="booking : ${pastBookings}" class="flight-card">
+              <div class="flight-header-section">
+                <div>
+                  <div class="flight-route" th:text="${booking.flight.origin + ' → ' + booking.flight.destination}">JFK → LHR</div>
+                  <div class="flight-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span th:text="${#dates.format(booking.flight.departureDate, 'EEEE, MMMM dd, yyyy HH:mm')}">Monday, January 15, 2024 14:30</span>
+                  </div>
+                </div>
+                <div class="flight-price">
+                  <div class="price-amount">$<span th:text="${#numbers.formatDecimal(booking.totalPrice, 1, 2)}">150000</span></div>
+                </div>
+              </div>
+
+              <div class="flight-details-grid">
+                <div class="detail-item-inline">
+                  <span class="detail-label-inline">Booking ID</span>
+                  <span class="detail-value-inline">BK-<span th:text="${booking.id}">12345</span></span>
+                </div>
+                <div class="detail-item-inline">
+                  <span class="detail-label-inline">Flight Number</span>
+                  <span class="detail-value-inline" th:text="${booking.flight.flightNumber}">SL101</span>
+                </div>
+                <div class="detail-item-inline">
+                  <span class="detail-label-inline">Passengers</span>
+                  <span class="detail-value-inline" th:text="${booking.passengers}">2</span>
+                </div>
+                <div class="detail-item-inline">
+                  <span class="detail-label-inline">Status</span>
+                  <span class="status-badge" th:classappend="${booking.status == 'CONFIRMED' ? 'confirmed' : (booking.status == 'PENDING' ? 'pending' : 'cancelled')}" th:text="${booking.status}">CONFIRMED</span>
+                </div>
+              </div>
+
+              <div class="flight-actions">
+                <button class="btn-flight-action btn-view-details" th:onclick="'viewBookingDetails(' + ${booking.id} + ')'">
+                  <i class="fas fa-eye me-1"></i> View Details
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preferences Tab -->
+          <div class="tab-pane">
+            <div class="alert" style="background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); color: #0c5460; border-left: 5px solid #17a2b8;">
+              <i class="fas fa-info-circle me-2"></i>
+              <strong>Personalize Your Experience</strong><br>
+              Set your travel preferences to make booking faster and more convenient
+            </div>
+
+            <form id="preferencesForm">
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  <label class="form-label"><i class="fas fa-chair me-2"></i>Preferred Cabin Class</label>
+                  <select class="form-select">
+                    <option value="ECONOMY">Economy</option>
+                    <option value="BUSINESS" selected>Business</option>
+                    <option value="FIRST">First Class</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label"><i class="fas fa-couch me-2"></i>Seat Preference</label>
+                  <select class="form-select">
+                    <option value="WINDOW">Window</option>
+                    <option value="AISLE" selected>Aisle</option>
+                    <option value="MIDDLE">Middle</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label"><i class="fas fa-utensils me-2"></i>Meal Preference</label>
+                <select class="form-select">
+                  <option value="STANDARD">Standard</option>
+                  <option value="VEGETARIAN">Vegetarian</option>
+                  <option value="VEGAN">Vegan</option>
+                  <option value="GLUTEN_FREE">Gluten-Free</option>
+                  <option value="KOSHER">Kosher</option>
+                  <option value="HALAL">Halal</option>
+                </select>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label"><i class="fas fa-comment-alt me-2"></i>Special Requests</label>
+                <textarea class="form-control" rows="4" placeholder="E.g., wheelchair assistance, extra legroom, traveling with infant, etc."></textarea>
+              </div>
+
+              <div class="mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="newsletter" checked>
+                  <label class="form-check-label" for="newsletter">
+                    <i class="fas fa-envelope me-2"></i>Receive exclusive offers and promotional deals via email
+                  </label>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="smsNotifications">
+                  <label class="form-check-label" for="smsNotifications">
+                    <i class="fas fa-sms me-2"></i>Receive SMS notifications for flight updates and reminders
+                  </label>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-update-profile">
+                <i class="fas fa-save me-2"></i>Save Preferences
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Update Profile Modal -->
+<div class="modal fade" id="updateProfileModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-user-edit me-2"></i>Update Profile Information</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form th:action="@{/api/user/update}" method="post">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <input type="hidden" name="id" th:value="${user.id}" />
+
+          <div class="mb-3">
+            <label for="editUsername" class="form-label">Username</label>
+            <input type="text" class="form-control" id="editUsername" name="username" th:value="${user.username}" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="editEmail" class="form-label">Email Address</label>
+            <input type="email" class="form-control" id="editEmail" name="email" th:value="${user.email}" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="editPhone" class="form-label">Phone Number</label>
+            <input type="tel" class="form-control" id="editPhone" name="phonenumber" th:value="${user.phonenumber}" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="editAddress" class="form-label">Address</label>
+            <textarea class="form-control" id="editAddress" name="address" rows="3" required th:text="${user.address}"></textarea>
+          </div>
+
+          <div class="mb-4">
+            <label for="editPassword" class="form-label">New Password (Optional)</label>
+            <input type="password" class="form-control" id="editPassword" name="password" placeholder="Leave blank to keep current password">
+            <small class="text-muted">Minimum 6 characters if changing password</small>
+          </div>
+
+          <div class="d-flex justify-content-between gap-2">
+            <button type="submit" class="btn-save-changes">
+              <i class="fas fa-save me-2"></i>Save Changes
+            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times me-2"></i>Cancel
+            </button>
+            <button type="button" class="btn-delete-account" data-bs-toggle="modal" data-bs-target="#deleteModal">
+              <i class="fas fa-trash me-2"></i>Delete Account
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="background: #dc3545;">
+        <h5 class="modal-title">
+          <i class="fas fa-exclamation-triangle me-2"></i>Confirm Account Deletion
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Are you absolutely sure you want to delete your account?</strong></p>
+        <p>This action is permanent and cannot be undone. You will lose:</p>
+        <ul>
+          <li>Your complete profile information</li>
+          <li>All booking history and records</li>
+          <li>Active flight bookings and reservations</li>
+          <li>Saved travel preferences and settings</li>
+          <li>Loyalty points and rewards</li>
+        </ul>
+        <p class="text-danger"><strong>Warning:</strong> This action is irreversible!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form th:action="@{/api/user/delete}" method="post" style="display: inline;">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <input type="hidden" name="id" th:value="${user.id}" />
+          <button type="submit" class="btn-delete-account">
+            <i class="fas fa-trash me-2"></i>Yes, Delete My Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Details Modal -->
+<div class="modal fade" id="bookingDetailsModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-ticket-alt me-2"></i>Booking Details</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="bookingDetailsContent">
+        <!-- Details loaded via JavaScript -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+  // Get CSRF token
+  const token = /*[[${_csrf.token}]]*/ '';
+  const header = /*[[${_csrf.headerName}]]*/ '';
+
+  // Tab switching
+  let currentTab = 0;
+  const tabButtons = document.querySelectorAll('.tab-button');
+  const tabPanes = document.querySelectorAll('.tab-pane');
+
+  function switchTab(index) {
+    currentTab = index;
+    tabButtons.forEach((btn, i) => {
+      btn.classList.toggle('active', i === index);
+    });
+    tabPanes.forEach((pane, i) => {
+      pane.classList.toggle('active', i === index);
+    });
+  }
+
+  // Load booking details
+  function viewBookingDetails(bookingId) {
+    // Show the modal with loading state
+    const content = document.getElementById('bookingDetailsContent');
+    content.innerHTML = `
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3">Loading booking details...</p>
+      </div>
+    `;
+    
+    const modal = new bootstrap.Modal(document.getElementById('bookingDetailsModal'));
+    modal.show();
+
+    // Fetch booking details from the correct endpoint with CSRF token
+    fetch('/api/user/booking-details/' + bookingId, {
+      headers: {
+        [header]: token
+      }
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to load booking details');
+        }
+        return response.json();
+      })
+      .then(booking => {
+        // Format dates
+        const departureDate = new Date(booking.flight.departureDate);
+        const arrivalDate = new Date(booking.flight.arrivalDate);
+        const bookingDate = new Date(booking.bookingDate);
+
+        // Build HTML
+        let html = `
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3" style="font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                <i class="fas fa-plane me-2"></i>Flight Information
+              </h6>
+              <div class="mb-2"><strong>Flight Number:</strong> ${booking.flight.flightNumber || 'N/A'}</div>
+              <div class="mb-2"><strong>Route:</strong> ${booking.flight.origin || 'N/A'} → ${booking.flight.destination || 'N/A'}</div>
+              <div class="mb-2"><strong>Departure:</strong> ${departureDate.toLocaleString() || 'N/A'}</div>
+              <div class="mb-2"><strong>Arrival:</strong> ${arrivalDate.toLocaleString() || 'N/A'}</div>
+              <div class="mb-2"><strong>Cabin Class:</strong> ${booking.flight.cabinClass || 'N/A'}</div>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3" style="font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                <i class="fas fa-ticket-alt me-2"></i>Booking Information
+              </h6>
+              <div class="mb-2"><strong>Booking ID:</strong> BK-${booking.id || 'N/A'}</div>
+              <div class="mb-2"><strong>Booking Date:</strong> ${bookingDate.toLocaleDateString() || 'N/A'}</div>
+              <div class="mb-2"><strong>Status:</strong> <span class="status-badge ${booking.status === 'CONFIRMED' ? 'confirmed' : (booking.status === 'PENDING' ? 'pending' : 'cancelled')}">${booking.status || 'N/A'}</span></div>
+              <div class="mb-2"><strong>Passengers:</strong> ${booking.passengers || 'N/A'}</div>
+              <div class="mb-2"><strong>Total Price:</strong> Rs.${booking.totalPrice ? booking.totalPrice.toFixed(2) : '0.00'}</div>
+              ${booking.bookingExtras && booking.bookingExtras > 0 ? `<div class="mb-2"><strong>Extras:</strong> Rs.${booking.bookingExtras.toFixed(2)}</div>` : ''}
+              ${booking.promoCode ? `<div class="mb-2"><strong>Promo Code:</strong> ${booking.promoCode}</div>` : ''}
+            </div>
+          </div>
+        `;
+
+        // Add passenger details if available
+        if (booking.passengerList && booking.passengerList.length > 0) {
+          html += `
+          <hr class="my-4">
+          <h6 class="text-primary mb-3" style="font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+            <i class="fas fa-users me-2"></i>Passenger Details
+          </h6>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead style="background: #f8f9fa;">
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Passport</th>
+                  <th>DOB</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+          booking.passengerList.forEach(p => {
+            const dob = p.dateOfBirth ? new Date(p.dateOfBirth).toLocaleDateString() : 'N/A';
+            html += `
+            <tr>
+              <td>${p.firstName || ''} ${p.lastName || ''}</td>
+              <td>${p.email || 'N/A'}</td>
+              <td>${p.phone || 'N/A'}</td>
+              <td>${p.passportNumber || 'N/A'}</td>
+              <td>${dob}</td>
+            </tr>
+          `;
+          });
+
+          html += `
+              </tbody>
+            </table>
+          </div>
+        `;
+        }
+
+        html += `
+        <div class="alert" style="background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); color: #0c5460; border-left: 5px solid #17a2b8; margin-top: 20px;">
+          <i class="fas fa-info-circle me-2"></i>
+          For any changes or inquiries, please contact our customer support at <strong>support@skylink.com</strong>
+        </div>
+      `;
+
+        content.innerHTML = html;
+      })
+      .catch(error => {
+        console.error('Error loading booking details:', error);
+        content.innerHTML = `
+          <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <strong>Error:</strong> Unable to load booking details. Please try again.
+          </div>
+        `;
+      });
+  }
+
+  // Handle preferences form
+  document.getElementById('preferencesForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Preferences saved successfully! This feature will be fully implemented soon.');
+  });
+
+  // Auto-dismiss alerts
+  setTimeout(function() {
+    const alerts = document.querySelectorAll('.alert-dismissible');
+    alerts.forEach(alert => {
+      const bsAlert = new bootstrap.Alert(alert);
+      bsAlert.close();
+    });
+  }, 5000);
+</script>
+</body>
+</html>

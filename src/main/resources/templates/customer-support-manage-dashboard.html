@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Support Manager - Skylink Airlines</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        :root {
+            /* SriLankan Airlines Theme Colors */
+            --primary: #d32f2f;
+            --primary-dark: #b71c1c;
+            --secondary: #1565c0;
+            --accent: #ff6f00;
+            --success: #2e7d32;
+            --warning: #f57c00;
+            --danger: #c62828;
+            --light: #f5f5f5;
+            --dark: #212121;
+            --sidebar-bg: #1a1a1a;
+            --sidebar-hover: #2d2d2d;
+            --card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafafa;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: linear-gradient(180deg, var(--sidebar-bg) 0%, #2d2d2d 100%);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            width: 260px;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: rgba(211, 47, 47, 0.1);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .sidebar-header h3 {
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 2px;
+        }
+
+        .sidebar-menu a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: var(--sidebar-hover);
+            color: white;
+            border-left: 3px solid var(--primary);
+            padding-left: 25px;
+        }
+
+        .sidebar-menu a.active {
+            background-color: var(--sidebar-hover);
+            color: white;
+            border-left: 3px solid var(--primary);
+            font-weight: 600;
+        }
+
+        .sidebar-menu i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 20px 30px;
+            transition: all 0.3s;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .header h1 {
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0;
+            font-size: 1.8rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-profile img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            object-fit: cover;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .dropdown-toggle {
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: var(--dark);
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .dropdown-toggle:hover {
+            border-color: var(--primary);
+            background: #fafafa;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .dropdown-item {
+            padding: 10px 20px;
+            transition: all 0.3s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+            color: var(--primary);
+        }
+
+        /* Cards */
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+            border: 1px solid #e0e0e0;
+        }
+
+        .dashboard-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .dashboard-card h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f5f5f5;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        /* Stats Cards */
+        .stats-card {
+            text-align: center;
+            padding: 25px 20px;
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 25px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+        }
+
+        .stats-card:hover::before {
+            top: -60%;
+            right: -60%;
+        }
+
+        .stats-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .stats-card .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-card .label {
+            font-size: 0.95rem;
+            opacity: 0.95;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-card.feedback {
+            background: linear-gradient(135deg, var(--secondary), #1976d2);
+        }
+
+        .stats-card.complaints {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+
+        .stats-card.resolved {
+            background: linear-gradient(135deg, var(--success), #388e3c);
+        }
+
+        .stats-card.pending {
+            background: linear-gradient(135deg, var(--warning), var(--accent));
+        }
+
+        /* Feedback and Complaint Cards */
+        .item-card {
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #fafafa;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .item-card:hover {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+
+        .item-card.resolved {
+            border-left-color: var(--success);
+        }
+
+        .item-card.pending {
+            border-left-color: var(--warning);
+        }
+
+        .item-card h5 {
+            color: var(--dark);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .item-card .meta {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .item-card .meta i {
+            margin-right: 5px;
+            color: var(--primary);
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .rating.high {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .rating.medium {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .rating.low {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.3);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+            font-weight: 600;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(211, 47, 47, 0.15);
+        }
+
+        /* Alert Messages */
+        .alert {
+            border-radius: 10px;
+            padding: 15px 20px;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-danger {
+            background-color: #ffebee;
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        /* Modal */
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 20px 25px;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 2px solid #f5f5f5;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h4 {
+            color: #999;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #bbb;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            .sidebar .sidebar-header h3,
+            .sidebar .sidebar-header p,
+            .sidebar-menu span {
+                display: none;
+            }
+            .sidebar-menu i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+            .main-content {
+                margin-left: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h3><i class="fas fa-headset me-2"></i> Support Manager</h3>
+        <p>Skylink Airlines</p>
+    </div>
+    <div class="sidebar-menu">
+        <ul>
+            <li><a href="#" class="active" data-tab="dashboard"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+            <li><a href="#" data-tab="feedback"><i class="fas fa-comment-alt"></i> <span>Customer Feedback</span></a></li>
+            <li><a href="#" data-tab="complaints"><i class="fas fa-exclamation-triangle"></i> <span>Complaints</span></a></li>
+            <li><a href="#" data-tab="finance"><i class="fas fa-chart-line"></i> <span>Finance</span></a></li>
+            <li><a href="#" data-tab="reservations"><i class="fas fa-calendar-check"></i> <span>Reservations</span></a></li>
+            <li>
+                <form th:action="@{/api/auth/logout}" method="post" style="margin: 0;">
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                    <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <!-- Header -->
+    <div class="header">
+        <h1 id="pageTitle">Dashboard Overview</h1>
+        <div class="user-profile">
+            <img th:src="${'https://ui-avatars.com/api/?name=' + (#authentication?.principal?.username != null ? #authentication.principal.username : 'User') + '&background=d32f2f&color=fff&size=45'}" alt="User Profile">
+            <div class="user-info">
+                <span class="user-name" th:text="${#authentication?.principal?.username ?: 'User'}">User Name</span>
+                <span class="user-role">Support Manager</span>
+            </div>
+            <div class="dropdown">
+                <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/api/user/profile"><i class="fas fa-user me-2"></i>My Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form th:action="@{/api/auth/logout}" method="post" style="margin: 0;">
+                            <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Dashboard Tab -->
+    <div class="tab-content" id="tabContent">
+        <div class="tab-pane fade show active" id="dashboard">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="stats-card feedback">
+                        <i class="fas fa-comments"></i>
+                        <div class="number" th:text="${feedbackCount != null ? feedbackCount : 0}">0</div>
+                        <div class="label">Customer Feedbacks</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card complaints">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div class="number" th:text="${ticketCount != null ? ticketCount : 0}">0</div>
+                        <div class="label">Open Complaints</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card resolved">
+                        <i class="fas fa-check-circle"></i>
+                        <div class="number" th:text="${resolvedCount != null ? resolvedCount : 0}">0</div>
+                        <div class="label">Resolved Issues</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card pending">
+                        <i class="fas fa-clock"></i>
+                        <div class="number" th:text="${pendingCount != null ? pendingCount : 0}">0</div>
+                        <div class="label">Pending Actions</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="dashboard-card">
+                        <h3><i class="fas fa-tasks me-2"></i>Quick Actions</h3>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <button class="btn btn-primary w-100 mb-3" data-tab="feedback">
+                                    <i class="fas fa-comments me-2"></i>View Feedback
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary w-100 mb-3" data-tab="complaints">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Manage Complaints
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary w-100 mb-3" data-tab="finance">
+                                    <i class="fas fa-chart-line me-2"></i>Finance Reports
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary w-100 mb-3" data-tab="reservations">
+                                    <i class="fas fa-calendar-check me-2"></i>Reservations
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Feedback Tab -->
+        <div class="tab-pane fade" id="feedback">
+            <div class="dashboard-card">
+                <h3><i class="fas fa-comment-alt me-2"></i>Customer Feedback</h3>
+
+                <div class="filter-section mb-4">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" id="feedbackSearch" class="form-control" placeholder="Search feedback...">
+                        </div>
+                        <div class="col-md-3">
+                            <select id="feedbackRatingFilter" class="form-select">
+                                <option value="">All Ratings</option>
+                                <option value="5">5 Stars</option>
+                                <option value="4">4 Stars</option>
+                                <option value="3">3 Stars</option>
+                                <option value="2">2 Stars</option>
+                                <option value="1">1 Star</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary" onclick="filterFeedback()">
+                                <i class="fas fa-filter me-2"></i>Apply Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="feedbackList">
+                    <div th:if="${feedbacks != null and not #lists.isEmpty(feedbacks)}" th:each="feedback : ${feedbacks}">
+                        <div class="item-card" th:attr="data-rating=${feedback.rating ?: 0}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h5>Feedback ID: #<span th:text="${feedback.id ?: 'N/A'}"></span></h5>
+                                    <div class="meta">
+                                        <i class="fas fa-calendar"></i> <span th:text="${#dates.format(feedback.submittedDate ?: #dates.createNow(), 'MMM dd, yyyy')}"></span>
+                                        <span class="ms-3" th:classappend="${(feedback.rating ?: 0) >= 4 ? 'rating high' : (feedback.rating ?: 0) == 3 ? 'rating medium' : 'rating low'}">
+                                            <i class="fas fa-star"></i> <span th:text="${feedback.rating ?: 0}"></span> Stars
+                                        </span>
+                                    </div>
+                                    <p class="mb-2 mt-2" th:text="${feedback.comments ?: 'No comments'}"></p>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editFeedbackModal"
+                                            th:attr="data-id=${feedback.id ?: 0}, data-rating=${feedback.rating ?: 0}, data-comments=${feedback.comments ?: ''}"
+                                            onclick="editFeedback(this.getAttribute('data-id'), this.getAttribute('data-rating'), this.getAttribute('data-comments'))">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <form th:action="@{/api/feedback/delete/{id}(id=${feedback.id})}" method="post" style="display: inline;" th:if="${feedback.id != null}">
+                                        <input type="hidden" name="_method" value="POST" />
+                                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                        <button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('Are you sure you want to delete this feedback?')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${feedbacks == null or #lists.isEmpty(feedbacks)}" class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h4>No feedbacks found</h4>
+                        <p>Customer feedback will appear here once submitted</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Complaints Tab -->
+        <div class="tab-pane fade" id="complaints">
+            <div class="dashboard-card">
+                <h3><i class="fas fa-exclamation-triangle me-2"></i>Customer Complaints</h3>
+
+                <div class="filter-section mb-4">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" id="complaintSearch" class="form-control" placeholder="Search complaints...">
+                        </div>
+                        <div class="col-md-3">
+                            <select id="complaintStatusFilter" class="form-select">
+                                <option value="">All Status</option>
+                                <option value="OPEN">Open</option>
+                                <option value="RESOLVED">Resolved</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary" onclick="filterComplaints()">
+                                <i class="fas fa-filter me-2"></i>Apply Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="complaintsList">
+                    <div th:if="${tickets != null and not #lists.isEmpty(tickets)}" th:each="ticket : ${tickets}">
+                        <div class="item-card" th:classappend="${(ticket.status ?: 'OPEN') == 'RESOLVED' ? 'resolved' : 'pending'}" th:attr="data-status=${ticket.status ?: 'OPEN'}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h5 th:text="${ticket.issueTitle != null and !ticket.issueTitle.empty ? ticket.issueTitle : 'Untitled Ticket'}">Ticket Title</h5>
+                                    <div class="meta">
+                                        <i class="fas fa-calendar"></i> <span th:text="${#dates.format(ticket.createdDate ?: #dates.createNow(), 'MMM dd, yyyy')}"></span>
+                                        <span class="ms-3 badge" th:classappend="${(ticket.status ?: 'OPEN') == 'RESOLVED' ? 'bg-success' : 'bg-warning'}">
+                                            <span th:text="${ticket.status ?: 'OPEN'}"></span>
+                                        </span>
+                                    </div>
+                                    <p class="mb-2 mt-2" th:text="${ticket.issueDescription ?: 'No description provided'}">Ticket description</p>
+                                    <small class="text-muted">Ticket ID: #<span th:text="${ticket.id ?: 'N/A'}"></span></small>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editTicketModal"
+                                            th:attr="data-id=${ticket.id ?: 0}, data-title=${ticket.issueTitle != null and !ticket.issueTitle.empty ? ticket.issueTitle : 'Untitled Ticket'}, data-description=${ticket.issueDescription ?: ''}, data-status=${ticket.status ?: 'OPEN'}"
+                                            onclick="editTicket(this.getAttribute('data-id'), this.getAttribute('data-title'), this.getAttribute('data-description'), this.getAttribute('data-status'))">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <form th:action="@{/api/support/delete/{id}(id=${ticket.id})}" method="post" style="display: inline;" th:if="${ticket.id != null}">
+                                        <input type="hidden" name="_method" value="POST" />
+                                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                        <button class="btn btn-sm btn-outline-danger" type="submit" onclick="return confirm('Are you sure you want to delete this ticket?')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${tickets == null or #lists.isEmpty(tickets)}" class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h4>No complaints found</h4>
+                        <p>Customer complaints will appear here</p>
+                        <a href="/api/support/init-sample-data" class="btn btn-primary mt-3">
+                            <i class="fas fa-arrows-rotate me-2"></i>Load Sample Data
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Finance Tab -->
+        <div class="tab-pane fade" id="finance">
+            <div class="dashboard-card">
+                <h3><i class="fas fa-chart-line me-2"></i>Payment Transactions</h3>
+
+                <!-- Filter Section -->
+                <div class="filter-section mb-4">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" id="paymentSearch" class="form-control" placeholder="Search payments...">
+                        </div>
+                        <div class="col-md-3">
+                            <select id="paymentStatusFilter" class="form-select">
+                                <option value="">All Status</option>
+                                <option value="COMPLETED">Completed</option>
+                                <option value="REFUNDED">Refunded</option>
+                                <option value="FAILED">Failed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary" onclick="filterPayments()">
+                                <i class="fas fa-filter me-2"></i>Apply Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payments Table -->
+                <div class="table-responsive" id="paymentsTable">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Booking ID</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Transaction ID</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${payments != null and not #lists.isEmpty(payments)}" th:each="payment : ${payments}">
+                                <td>#<span th:text="${payment.id}">1</span></td>
+                                <td><span th:text="${payment.bookingId}">100</span></td>
+                                <td class="fw-bold">$<span th:text="${#numbers.formatDecimal(payment.amount ?: 0.0, 1, 2)}">0.00</span></td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${payment.status == 'COMPLETED'} ? 'bg-success' :
+                                                         (${payment.status == 'REFUNDED'} ? 'bg-danger' : 'bg-warning')"
+                                          th:text="${payment.status ?: 'N/A'}">COMPLETED</span>
+                                </td>
+                                <td><small th:text="${payment.transactionId ?: 'N/A'}">TXN-123</small></td>
+                                <td><span th:text="${payment != null and payment.paymentDate != null
+    ? payment.paymentDate
+    : 'N/A'}"></span>
+                                </td>
+                            </tr>
+                            <tr th:if="${payments == null or #lists.isEmpty(payments)}">
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No payments found</h5>
+                                    <p class="text-muted">Payment transactions will appear here</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reservations Tab -->
+        <div class="tab-pane fade" id="reservations">
+            <div class="dashboard-card">
+                <h3><i class="fas fa-calendar-check me-2"></i>All Reservations</h3>
+
+                <!-- Filter Section -->
+                <div class="filter-section mb-4">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" id="bookingSearch" class="form-control" placeholder="Search reservations...">
+                        </div>
+                        <div class="col-md-3">
+                            <select id="bookingStatusFilter" class="form-select">
+                                <option value="">All Status</option>
+                                <option value="PENDING">Pending</option>
+                                <option value="CONFIRMED">Confirmed</option>
+                                <option value="CANCELLED">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary" onclick="filterBookings()">
+                                <i class="fas fa-filter me-2"></i>Apply Filter
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bookings Table -->
+                <div class="table-responsive" id="bookingsTable">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>User</th>
+                                <th>Flight</th>
+                                <th>Passengers</th>
+                                <th>Status</th>
+                                <th>Total Price</th>
+                                <th>Booking Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${bookings != null and not #lists.isEmpty(bookings)}" th:each="booking : ${bookings}">
+                                <td>BK-<span th:text="${booking.id}">1</span></td>
+                                <td>
+                                    <span th:text="${booking.user != null ? booking.user.username : 'N/A'}">user</span>
+                                    <br>
+                                    <small th:text="${booking.user != null ? booking.user.email : 'N/A'}">user@example.com</small>
+                                </td>
+                                <td>
+                                    <span th:text="${booking.flight != null ? booking.flight.flightNumber : 'N/A'}">SL123</span>
+                                    <br>
+                                    <small th:text="${booking.flight != null ? booking.flight.origin + ' → ' + booking.flight.destination : 'N/A'}">Origin → Destination</small>
+                                </td>
+                                <td><span th:text="${booking.passengers ?: 0}">1</span></td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${booking.status == 'CONFIRMED'} ? 'bg-success' :
+                                                         (${booking.status == 'CANCELLED'} ? 'bg-danger' : 'bg-warning')"
+                                          th:text="${booking.status ?: 'N/A'}">PENDING</span>
+                                </td>
+                                <td class="fw-bold">$<span th:text="${#numbers.formatDecimal(booking.totalPrice ?: 0.0, 1, 2)}">0.00</span></td>
+                                <td><small th:text="${booking.bookingDate != null ? #dates.format(booking.bookingDate, 'dd MMM yyyy') : 'N/A'}">01 Jan 2024</small></td>
+                            </tr>
+                            <tr th:if="${bookings == null or #lists.isEmpty(bookings)}">
+                                <td colspan="7" class="text-center py-5">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No reservations found</h5>
+                                    <p class="text-muted">Reservations will appear here</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Feedback Modal -->
+<div class="modal fade" id="editFeedbackModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Feedback</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editFeedbackForm" th:action="@{/api/feedback/update/{id}(id=${editFeedbackId})}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="editFeedbackId" name="feedbackId" th:value="${editFeedbackId ?: 0}">
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+
+                    <div class="mb-3">
+                        <label for="editFeedbackRating" class="form-label">Rating</label>
+                        <select class="form-select" id="editFeedbackRating" name="rating" required>
+                            <option value="5" th:selected="${editFeedbackRating == 5}">5 Stars - Excellent</option>
+                            <option value="4" th:selected="${editFeedbackRating == 4}">4 Stars - Good</option>
+                            <option value="3" th:selected="${editFeedbackRating == 3}">3 Stars - Average</option>
+                            <option value="2" th:selected="${editFeedbackRating == 2}">2 Stars - Poor</option>
+                            <option value="1" th:selected="${editFeedbackRating == 1}">1 Star - Very Poor</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editFeedbackComments" class="form-label">Comments</label>
+                        <textarea class="form-control" id="editFeedbackComments" name="comments" rows="4" required th:text="${editFeedbackComments ?: ''}"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Ticket Modal -->
+<div class="modal fade" id="editTicketModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Support Ticket</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editTicketForm" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="editTicketId" name="ticketId">
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+
+                    <div class="mb-3">
+                        <label for="editTicketTitle" class="form-label">Issue Title</label>
+                        <input type="text" class="form-control" id="editTicketTitle" name="issueTitle" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editTicketDescription" class="form-label">Issue Description</label>
+                        <textarea class="form-control" id="editTicketDescription" name="issueDescription" rows="4" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editTicketStatus" class="form-label">Status</label>
+                        <select class="form-select" id="editTicketStatus" name="status" required>
+                            <option value="OPEN">Open</option>
+                            <option value="RESOLVED">Resolved</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Tab Navigation
+    document.querySelectorAll('.sidebar-menu a[data-tab], .btn[data-tab]').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tabName = this.getAttribute('data-tab');
+
+            if (tabName) {
+                // Update active tab in sidebar
+                document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                    link.classList.remove('active');
+                });
+                const sidebarLink = document.querySelector(`.sidebar-menu a[data-tab="${tabName}"]`);
+                if (sidebarLink) {
+                    sidebarLink.classList.add('active');
+                }
+
+                // Update page title
+                const pageTitle = document.getElementById('pageTitle');
+                const titles = {
+                    'dashboard': 'Dashboard Overview',
+                    'feedback': 'Customer Feedback Management',
+                    'complaints': 'Customer Complaints & Support',
+                    'finance': 'Finance Management',
+                    'reservations': 'Reservation Management'
+                };
+                pageTitle.textContent = titles[tabName] || 'Dashboard';
+
+                // Show the selected tab
+                document.querySelectorAll('.tab-pane').forEach(tab => {
+                    tab.classList.remove('show', 'active');
+                });
+                const targetTab = document.getElementById(tabName);
+                if (targetTab) {
+                    targetTab.classList.add('show', 'active');
+                }
+            }
+        });
+    });
+
+    // Edit Feedback Function
+    function editFeedback(id, rating, comments) {
+        // Ensure values are valid
+        id = id || 0;
+        rating = rating || 0;
+        comments = comments || '';
+
+        // Set form values
+        document.getElementById('editFeedbackId').value = id;
+        document.getElementById('editFeedbackRating').value = rating;
+        document.getElementById('editFeedbackComments').value = comments;
+
+        // Update form action dynamically
+        const form = document.getElementById('editFeedbackForm');
+        form.action = '/api/feedback/update/' + id;
+    }
+
+    // Edit Ticket Function
+    function editTicket(id, title, description, status) {
+        // Ensure values are valid
+        id = id || 0;
+        title = title || 'Untitled Ticket';
+        description = description || '';
+        status = status || 'OPEN';
+
+        document.getElementById('editTicketId').value = id;
+        document.getElementById('editTicketTitle').value = title;
+        document.getElementById('editTicketDescription').value = description;
+        document.getElementById('editTicketStatus').value = status;
+        document.getElementById('editTicketForm').action = '/api/support/update/' + id;
+    }
+
+    // Filter Feedback Function
+    function filterFeedback() {
+        const searchText = document.getElementById('feedbackSearch').value.toLowerCase();
+        const ratingFilter = document.getElementById('feedbackRatingFilter').value;
+
+        const feedbackCards = document.querySelectorAll('#feedbackList .item-card');
+
+        feedbackCards.forEach(card => {
+            const cardText = card.textContent.toLowerCase();
+            const cardRating = card.getAttribute('data-rating');
+
+            let showCard = true;
+
+            // Apply search filter
+            if (searchText && !cardText.includes(searchText)) {
+                showCard = false;
+            }
+
+            // Apply rating filter
+            if (ratingFilter && cardRating !== ratingFilter) {
+                showCard = false;
+            }
+
+            card.style.display = showCard ? 'block' : 'none';
+        });
+    }
+
+    // Filter Complaints Function
+    function filterComplaints() {
+        const searchText = document.getElementById('complaintSearch').value.toLowerCase();
+        const statusFilter = document.getElementById('complaintStatusFilter').value;
+
+        const complaintCards = document.querySelectorAll('#complaintsList .item-card');
+
+        complaintCards.forEach(card => {
+            const cardText = card.textContent.toLowerCase();
+            const cardStatus = card.getAttribute('data-status');
+
+            let showCard = true;
+
+            // Apply search filter
+            if (searchText && !cardText.includes(searchText)) {
+                showCard = false;
+            }
+
+            // Apply status filter
+            if (statusFilter && cardStatus !== statusFilter) {
+                showCard = false;
+            }
+
+            card.style.display = showCard ? 'block' : 'none';
+        });
+    }
+
+    // Filter Bookings Function
+    function filterBookings() {
+        const searchText = document.getElementById('bookingSearch').value.toLowerCase();
+        const statusFilter = document.getElementById('bookingStatusFilter').value;
+
+        const bookingRows = document.querySelectorAll('#bookingsTable tbody tr');
+
+        bookingRows.forEach(row => {
+            // Skip the "no bookings found" row
+            if (row.querySelector('td[colspan]')) return;
+
+            const rowText = row.textContent.toLowerCase();
+            const statusCell = row.querySelector('.badge');
+            const rowStatus = statusCell ? statusCell.textContent : '';
+
+            let showRow = true;
+
+            // Apply search filter
+            if (searchText && !rowText.includes(searchText)) {
+                showRow = false;
+            }
+
+            // Apply status filter
+            if (statusFilter && rowStatus !== statusFilter) {
+                showRow = false;
+            }
+
+            row.style.display = showRow ? '' : 'none';
+        });
+    }
+
+    // Real-time search for bookings
+    document.getElementById('bookingSearch')?.addEventListener('input', filterBookings);
+
+    // Filter Payments Function
+    function filterPayments() {
+        const searchText = document.getElementById('paymentSearch').value.toLowerCase();
+        const statusFilter = document.getElementById('paymentStatusFilter').value;
+
+        const paymentRows = document.querySelectorAll('#paymentsTable tbody tr');
+
+        paymentRows.forEach(row => {
+            // Skip the "no payments found" row
+            if (row.querySelector('td[colspan]')) return;
+
+            const rowText = row.textContent.toLowerCase();
+            const statusCell = row.querySelector('.badge');
+            const rowStatus = statusCell ? statusCell.textContent : '';
+
+            let showRow = true;
+
+            // Apply search filter
+            if (searchText && !rowText.includes(searchText)) {
+                showRow = false;
+            }
+
+            // Apply status filter
+            if (statusFilter && rowStatus !== statusFilter) {
+                showRow = false;
+            }
+
+            row.style.display = showRow ? '' : 'none';
+        });
+    }
+
+    // Real-time search for payments
+    document.getElementById('paymentSearch')?.addEventListener('input', filterPayments);
+
+    // Auto-hide alerts after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 5000);
+        });
+    });
+
+    // Confirmation dialogs
+    document.querySelectorAll('form[action*="/delete/"]').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            if (!confirm('Are you sure you want to delete this item? This action cannot be undone.')) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+</body>
+</html>

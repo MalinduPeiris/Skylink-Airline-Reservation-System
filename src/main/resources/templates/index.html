@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <title>Skylink Airlines - Premium Flight Booking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-dark: #003d7a;
+            --primary: #0066cc;
+            --accent: #ffc400;
+            --light-bg: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light-bg);
+        }
+
+        nav {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: 800;
+            color: white !important;
+            letter-spacing: 1px;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: var(--accent) !important;
+        }
+
+        .btn-login {
+            border: 2px solid white;
+            color: white;
+            border-radius: 5px;
+            padding: 6px 16px;
+            font-weight: 600;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            background: white;
+            color: var(--primary-dark);
+        }
+
+        .btn-signup {
+            background: var(--accent);
+            color: var(--primary-dark);
+            border-radius: 5px;
+            padding: 8px 18px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-signup:hover {
+            background: #ffb300;
+            transform: translateY(-2px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-size: 13px;
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(0, 61, 122, 0.75), rgba(0, 102, 204, 0.75)), url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&q=80');
+            background-size: cover;
+            background-position: center;
+            padding: 120px 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .hero-section h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .hero-section p {
+            font-size: 18px;
+            margin-bottom: 40px;
+            opacity: 0.95;
+        }
+
+        .search-section {
+            max-width: 1200px;
+            margin: -60px auto 50px;
+            padding: 40px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            position: relative;
+            z-index: 100;
+        }
+
+        .search-section h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--primary-dark);
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 102, 204, 0.2);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, var(--accent) 0%, #ffb300 100%);
+            color: var(--primary-dark);
+            padding: 12px 40px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 196, 0, 0.3);
+        }
+
+        .carousel-section {
+            max-width: 1400px;
+            margin: 60px auto;
+            padding: 0 40px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--primary-dark);
+        }
+
+        .carousel-container {
+            position: relative;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel-inner-custom {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-item-custom {
+            min-width: 100%;
+            padding: 80px 40px;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .carousel-item-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 61, 122, 0.7);
+        }
+
+        .carousel-item-custom>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .carousel-item-custom h3 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .carousel-item-custom p {
+            font-size: 16px;
+            margin-bottom: 25px;
+            max-width: 500px;
+        }
+
+        .carousel-btn {
+            background: var(--accent);
+            color: var(--primary-dark);
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            cursor: pointer;
+            width: fit-content;
+            transition: all 0.3s;
+        }
+
+        .carousel-btn:hover {
+            background: #ffb300;
+            transform: translateY(-2px);
+        }
+
+        .carousel-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            background: white;
+        }
+
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .carousel-dot.active {
+            background: var(--primary-dark);
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        .flights-carousel,
+        .deals-carousel,
+        .image-carousel {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flights-carousel-inner,
+        .deals-carousel-inner,
+        .image-carousel-inner {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            gap: 20px;
+        }
+
+        .flight-card-item {
+            min-width: calc(33.333% - 14px);
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .flight-card-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .flight-header {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .flight-route {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .route-item {
+            text-align: center;
+        }
+
+        .route-time {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+
+        .route-airport {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .route-arrow {
+            text-align: center;
+            color: var(--primary-dark);
+        }
+
+        .flight-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .flight-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .book-flight-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent) 0%, #ffb300 100%);
+            color: var(--primary-dark);
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .book-flight-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 196, 0, 0.3);
+        }
+
+        .carousel-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s;
+        }
+
+        .carousel-nav-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .carousel-nav-btn.prev {
+            left: 10px;
+        }
+
+        .carousel-nav-btn.next {
+            right: 10px;
+        }
+
+        .image-card {
+            min-width: calc(25% - 15px);
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .image-caption {
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--primary-dark);
+        }
+
+        .deals-section {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .deals-section h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .deals-section p {
+            font-size: 16px;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .deals-btn {
+            background: var(--accent);
+            color: var(--primary-dark);
+            padding: 15px 40px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .deals-btn:hover {
+            background: #ffb300;
+            transform: translateY(-2px);
+        }
+
+        .deal-card {
+            min-width: calc(25% - 15px);
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .deal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .deal-header {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .deal-content {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .discount-badge {
+            background: var(--accent);
+            color: var(--primary-dark);
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 18px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .promo-code {
+            background: #f0f0f0;
+            border: 2px dashed var(--primary);
+            padding: 12px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 14px;
+        }
+
+        .deal-validity {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .deal-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .deal-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        footer {
+            background: var(--primary-dark);
+            color: white;
+            padding: 50px 40px 30px;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h4 {
+            font-size: 15px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--accent);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+
+            .flight-card-item,
+            .deal-card {
+                min-width: calc(50% - 10px);
+            }
+
+            .image-card {
+                min-width: calc(50% - 10px);
+            }
+
+            .hero-section h1 {
+                font-size: 32px;
+            }
+
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+
+            .flight-card-item,
+            .deal-card,
+            .image-card {
+                min-width: calc(100% - 20px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-lg">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-plane"></i> SKYLINK
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/api/flight/all"><i
+                        class="fas fa-plane-departure"></i> Flights</a></li>
+                <li class="nav-item"><a class="nav-link" href="/deals"><i class="fas fa-tags"></i> Deals</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/api/user/support/tickets(userId=${session.userId})}">Customer
+                        Support</a>
+                </li>
+                <li class="nav-item" th:if="${session.username != null}"><a class="nav-link"
+                                                                            href="/api/user/profile"><i class="fas fa-user"></i> Profile</a></li>
+            </ul>
+            <div class="ms-auto" th:if="${session.username == null}">
+                <a href="/api/auth/login" class="btn btn-login">Login</a>
+                <a href="/api/auth/register" class="btn btn-signup">Register</a>
+            </div>
+            <div class="user-info ms-3" th:if="${session.username != null}">
+                <i class="fas fa-user-circle" style="font-size: 20px;"></i>
+                <span th:text="${session.username}">User</span>
+                <form th:action="@{/api/auth/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-login btn-sm">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="hero-section">
+    <h1>Your Journey Begins Here</h1>
+    <p>Discover the world with Skylink Airlines - where comfort meets adventure</p>
+</section>
+
+<div class="container-lg search-section">
+    <h3>Find Your Perfect Flight</h3>
+    <form th:action="@{/api/flight/search}" method="get">
+        <div class="search-grid">
+            <div class="form-group">
+                <label>From</label>
+                <select name="origin" class="form-control">
+                    <option value="">Select origin</option>
+                    <option th:each="origin : ${origins}" th:value="${origin}" th:text="${origin}">City</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>To</label>
+                <select name="destination" class="form-control">
+                    <option value="">Select destination</option>
+                    <option th:each="destination : ${destinations}" th:value="${destination}" th:text="${destination}">City</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Departure</label>
+                <input type="date" name="departureDate" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Passengers</label>
+                <select name="passengers" class="form-control">
+                    <option value="1">1 Passenger</option>
+                    <option value="2">2 Passengers</option>
+                    <option value="3">3 Passengers</option>
+                    <option value="4">4 Passengers</option>
+                    <option value="5">5+ Passengers</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Class</label>
+                <select name="cabinClass" class="form-control">
+                    <option value="">Any Class</option>
+                    <option value="ECONOMY">Economy</option>
+                    <option value="BUSINESS">Business</option>
+                    <option value="FIRST_CLASS">First Class</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="search-btn"><i class="fas fa-search"></i> Search Flights</button>
+    </form>
+</div>
+
+<div class="container-lg carousel-section">
+    <h2 class="section-title">Explore Destinations</h2>
+    <div class="image-carousel">
+        <button class="carousel-nav-btn prev" onclick="moveImageCarousel(-1)"><i
+                class="fas fa-chevron-left"></i></button>
+        <button class="carousel-nav-btn next" onclick="moveImageCarousel(1)"><i
+                class="fas fa-chevron-right"></i></button>
+        <div class="image-carousel-inner" id="imageCarousel">
+            <div class="image-card">
+                <img src="data:image/jpeg;base64,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"
+                     alt="Tropical Beach">
+                <div class="image-caption">Tropical Paradise - Maldives</div>
+            </div>
+            <div class="image-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhYyO72ehwTgbUV4eOgcIT0qg1z1g5rbv4Kizy2kBRvlFglYwKmvqjRl8&s"
+                     alt="City Skyline">
+                <div class="image-caption">Vibrant Cities - New York</div>
+            </div>
+            <div class="image-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRj9tumuSWMiVupqIYZzWH4L9kX6tXwlEkVNWDXcI1U30FIQPLuk3XMIBc&s"
+                     alt="Historical Site">
+                <div class="image-caption">Cultural Heritage - Rome</div>
+            </div>
+            <div class="image-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5LoFATKEEqagqVTbjqEneRn0b7jCbGsYij1FJpc6z689op7JPP3LO2b4&s"
+                     alt="Mountain Landscape">
+                <div class="image-caption">Adventure Awaits - Swiss Alps</div>
+            </div>
+            <div class="image-card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFAW3rjqZPZxFW6GdywfMzCmzuohc5uZSEusDoZFagREbncWBHSEicqGE&s"
+                     alt="Safari">
+                <div class="image-caption">Wild Escapes - African Safari</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="carousel-section">
+    <h2 class="section-title">Featured Flights</h2>
+    <div class="flights-carousel">
+        <button class="carousel-nav-btn prev" onclick="moveFlightsCarousel(-1)"><i class="fas fa-chevron-left"></i></button>
+        <button class="carousel-nav-btn next" onclick="moveFlightsCarousel(1)"><i class="fas fa-chevron-right"></i></button>
+        <div class="flights-carousel-inner" id="flightsCarousel">
+            <div class="flight-card-item">
+                <div class="flight-header">NYC → LHR</div>
+                <div class="flight-route">
+                    <div class="route-item">
+                        <div class="route-time">14:30</div>
+                        <div class="route-airport">JFK</div>
+                    </div>
+                    <div class="route-arrow"><i class="fas fa-plane"></i></div>
+                    <div class="route-item">
+                        <div class="route-time">02:45</div>
+                        <div class="route-airport">LHR</div>
+                    </div>
+                </div>
+                <div class="flight-details">
+                    <div class="detail-item"><span>Flight:</span><span>SL101</span></div>
+                    <div class="detail-item"><span>Class:</span><span>Economy</span></div>
+                    <div class="detail-item"><span>Aircraft:</span><span>B787</span></div>
+                    <div class="detail-item"><span>Seats:</span><span>25</span></div>
+                </div>
+                <div class="flight-price">Rs.150000</div>
+            </div>
+            <div class="flight-card-item">
+                <div class="flight-header">LAX → SYD</div>
+                <div class="flight-route">
+                    <div class="route-item">
+                        <div class="route-time">18:00</div>
+                        <div class="route-airport">LAX</div>
+                    </div>
+                    <div class="route-arrow"><i class="fas fa-plane"></i></div>
+                    <div class="route-item">
+                        <div class="route-time">10:15</div>
+                        <div class="route-airport">SYD</div>
+                    </div>
+                </div>
+                <div class="flight-details">
+                    <div class="detail-item"><span>Flight:</span><span>SL205</span></div>
+                    <div class="detail-item"><span>Class:</span><span>Business</span></div>
+                    <div class="detail-item"><span>Aircraft:</span><span>A380</span></div>
+                    <div class="detail-item"><span>Seats:</span><span>12</span></div>
+                </div>
+                <div class="flight-price">Rs.280000</div>
+            </div>
+            <div class="flight-card-item">
+                <div class="flight-header">DXB → CMB</div>
+                <div class="flight-route">
+                    <div class="route-item">
+                        <div class="route-time">22:30</div>
+                        <div class="route-airport">DXB</div>
+                    </div>
+                    <div class="route-arrow"><i class="fas fa-plane"></i></div>
+                    <div class="route-item">
+                        <div class="route-time">03:20</div>
+                        <div class="route-airport">CMB</div>
+                    </div>
+                </div>
+                <div class="flight-details">
+                    <div class="detail-item"><span>Flight:</span><span>SL312</span></div>
+                    <div class="detail-item"><span>Class:</span><span>Economy</span></div>
+                    <div class="detail-item"><span>Aircraft:</span><span>B777</span></div>
+                    <div class="detail-item"><span>Seats:</span><span>45</span></div>
+                </div>
+                <div class="flight-price">Rs.95000</div>
+            </div>
+            <div class="flight-card-item">
+                <div class="flight-header">LHR → CDG</div>
+                <div class="flight-route">
+                    <div class="route-item">
+                        <div class="route-time">09:00</div>
+                        <div class="route-airport">LHR</div>
+                    </div>
+                    <div class="route-arrow"><i class="fas fa-plane"></i></div>
+                    <div class="route-item">
+                        <div class="route-time">11:30</div>
+                        <div class="route-airport">CDG</div>
+                    </div>
+                </div>
+                <div class="flight-details">
+                    <div class="detail-item"><span>Flight:</span><span>SL401</span></div>
+                    <div class="detail-item"><span>Class:</span><span>First Class</span></div>
+                    <div class="detail-item"><span>Aircraft:</span><span>B787</span></div>
+                    <div class="detail-item"><span>Seats:</span><span>8</span></div>
+                </div>
+                <div class="flight-price">Rs.420000</div>
+            </div>
+            <div class="text-center mt-4">
+                <a href="/api/flight/all" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plane me-2"></i>View All Flights
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="container-lg carousel-section">
+    <h2 class="section-title">Latest Deals & Offers</h2>
+    <div class="carousel-container">
+        <div class="carousel-inner-custom" id="promoCarousel">
+            <div class="carousel-item-custom"
+                 style="background-image: url('https://images.unsplash.com/photo-1469854523014-85cb44e25828?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&q=80');">
+                <h3>Summer Getaway</h3>
+                <p>Get up to 40% off on summer flights. Book your dream vacation now!</p>
+                <button class="carousel-btn" onclick="window.location.href='/deals'">Explore Deals</button>
+            </div>
+            <div class="carousel-item-custom"
+                 style="background-image: url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&q=80');">
+                <h3>Frequent Flyer Rewards</h3>
+                <p>Earn points on every booking and redeem for exclusive rewards</p>
+                <button class="carousel-btn" onclick="window.location.href='/api/flight/all'">Browse
+                    Flights</button>
+            </div>
+            <div class="carousel-item-custom"
+                 style="background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=1500&q=80');">
+                <h3>Group Travel Discounts</h3>
+                <p>Travel with friends and enjoy special group booking rates</p>
+                <button class="carousel-btn" onclick="window.location.href='/deals'">View Group Offers</button>
+            </div>
+        </div>
+        <div class="carousel-controls">
+            <button class="carousel-dot active" onclick="movePromoCarousel(0)"></button>
+            <button class="carousel-dot" onclick="movePromoCarousel(1)"></button>
+            <button class="carousel-dot" onclick="movePromoCarousel(2)"></button>
+        </div>
+    </div>
+</div>
+
+<div
+        style="background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); color: white; padding: 80px 40px; text-align: center; margin: 60px 0;">
+    <div class="container-lg">
+        <h2 style="font-size: 36px; margin-bottom: 15px; font-weight: 700;">Find Best Offers with Skylink</h2>
+        <p style="font-size: 16px; margin-bottom: 30px; opacity: 0.95;">Exclusive travel packages and special
+            promotions</p>
+
+        <div class="carousel-section">
+            <div class="deals-carousel">
+                <button class="carousel-nav-btn prev" onclick="moveDealsCarousel(-1)"><i
+                        class="fas fa-chevron-left"></i></button>
+                <button class="carousel-nav-btn next" onclick="moveDealsCarousel(1)"><i
+                        class="fas fa-chevron-right"></i></button>
+                <div class="deals-carousel-inner" id="dealsCarousel">
+                    <div class="deal-card">
+                        <div class="deal-header">Summer Travel</div>
+                        <div class="deal-content">
+                            <div class="discount-badge">30% OFF</div>
+                            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Use code at checkout</p>
+                            <div class="promo-code">SUMMER30</div>
+                            <p style="font-size: 12px; color: #666;">Valid: Jun 01 - Aug 31</p>
+                        </div>
+                    </div>
+                    <div class="deal-card">
+                        <div class="deal-header">Frequent Flyer</div>
+                        <div class="deal-content">
+                            <div class="discount-badge">25% OFF</div>
+                            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Use code at checkout</p>
+                            <div class="promo-code">FLYBACK25</div>
+                            <p style="font-size: 12px; color: #666;">Valid: Apr 15 - Oct 31</p>
+                        </div>
+                    </div>
+                    <div class="deal-card">
+                        <div class="deal-header">Group Travel</div>
+                        <div class="deal-content">
+                            <div class="discount-badge">40% OFF</div>
+                            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Use code at checkout</p>
+                            <div class="promo-code">GROUP40</div>
+                            <p style="font-size: 12px; color: #666;">Valid: May 01 - Dec 31</p>
+                        </div>
+                    </div>
+                    <div class="deal-card">
+                        <div class="deal-header">Weekend Getaway</div>
+                        <div class="deal-content">
+                            <div class="discount-badge">35% OFF</div>
+                            <p style="font-size: 14px; color: #666; margin-bottom: 10px;">Use code at checkout</p>
+                            <div class="promo-code">WEEKEND35</div>
+                            <p style="font-size: 12px; color: #666;">Valid: Jul 01 - Sep 30</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>Skylink Airlines</h4>
+            <p>Your trusted partner for comfortable and reliable travels worldwide with exceptional service.</p>
+        </div>
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/api/flight/all">All Flights</a></li>
+                <li><a href="/deals">Special Offers</a></li>
+                <li><a class="nav-link" th:href="@{/api/user/support/tickets(userId=${session.userId})}">Customer
+                    Support</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Travel Info</h4>
+            <ul>
+                <li><a href="#">Baggage Policy</a></li>
+                <li><a href="#">Check-in Online</a></li>
+                <li><a href="#">Flight Status</a></li>
+                <li><a href="#">Travel Requirements</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h4>Contact</h4>
+            <ul>
+                <li><i class="fas fa-map-marker-alt"></i> 123 Aviation Blvd, Sky City</li>
+                <li><i class="fas fa-phone"></i> +1 (800) 123-4567</li>
+                <li><i class="fas fa-envelope"></i> support@skylink.com</li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2024 Skylink Airlines. All rights reserved.</p>
+        <div style="margin-top: 10px;">
+            <a href="#" style="color: rgba(255,255,255,0.8); margin: 0 15px; text-decoration: none;">Privacy
+                Policy</a>
+            <a href="#" style="color: rgba(255,255,255,0.8); margin: 0 15px; text-decoration: none;">Terms of
+                Service</a>
+            <a href="#" style="color: rgba(255,255,255,0.8); margin: 0 15px; text-decoration: none;">Cookie
+                Policy</a>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Promotional Banner Carousel
+    let promoSlide = 0;
+    const promoCarousel = document.getElementById('promoCarousel');
+    const promoDots = document.querySelectorAll('.carousel-controls .carousel-dot');
+
+    function movePromoCarousel(n) {
+        promoSlide = n;
+        if (promoSlide >= 3) promoSlide = 0;
+        if (promoSlide < 0) promoSlide = 2;
+        promoCarousel.style.transform = `translateX(-${promoSlide * 100}%)`;
+        promoDots.forEach((d, i) => {
+            d.classList.toggle('active', i === promoSlide);
+        });
+    }
+
+    setInterval(() => {
+        movePromoCarousel((promoSlide + 1) % 3);
+    }, 5000);
+
+    // Image Destinations Carousel
+    let imageSlide = 0;
+    const imageCarousel = document.getElementById('imageCarousel');
+    const imageCards = imageCarousel.querySelectorAll('.image-card');
+
+    function moveImageCarousel(direction) {
+        const cardsPerView = window.innerWidth > 768 ? 4 : (window.innerWidth > 576 ? 2 : 1);
+        const maxImageSlide = Math.max(0, imageCards.length - cardsPerView);
+
+        imageSlide += direction;
+        if (imageSlide > maxImageSlide) imageSlide = 0;
+        if (imageSlide < 0) imageSlide = maxImageSlide;
+
+        const cardWidth = imageCards[0].offsetWidth;
+        const gap = 20;
+        const moveAmount = (cardWidth + gap) * imageSlide;
+        imageCarousel.style.transform = `translateX(-${moveAmount}px)`;
+    }
+
+    // Featured Flights Carousel
+    let flightsSlide = 0;
+    const flightsCarousel = document.getElementById('flightsCarousel');
+    const flightCards = flightsCarousel.querySelectorAll('.flight-card-item');
+
+    function moveFlightsCarousel(direction) {
+        const cardsPerView = window.innerWidth > 768 ? 3 : (window.innerWidth > 576 ? 2 : 1);
+        const maxFlightsSlide = Math.max(0, flightCards.length - cardsPerView);
+
+        flightsSlide += direction;
+        if (flightsSlide > maxFlightsSlide) flightsSlide = 0;
+        if (flightsSlide < 0) flightsSlide = maxFlightsSlide;
+
+        const cardWidth = flightCards[0].offsetWidth;
+        const gap = 20;
+        const moveAmount = (cardWidth + gap) * flightsSlide;
+        flightsCarousel.style.transform = `translateX(-${moveAmount}px)`;
+    }
+
+    // Deals Carousel
+    let dealsSlide = 0;
+    const dealsCarousel = document.getElementById('dealsCarousel');
+    const dealCards = dealsCarousel.querySelectorAll('.deal-card');
+
+    function moveDealsCarousel(direction) {
+        const cardsPerView = window.innerWidth > 768 ? 4 : (window.innerWidth > 576 ? 2 : 1);
+        const maxDealsSlide = Math.max(0, dealCards.length - cardsPerView);
+
+        dealsSlide += direction;
+        if (dealsSlide > maxDealsSlide) dealsSlide = 0;
+        if (dealsSlide < 0) dealsSlide = maxDealsSlide;
+
+        const cardWidth = dealCards[0].offsetWidth;
+        const gap = 20;
+        const moveAmount = (cardWidth + gap) * dealsSlide;
+        dealsCarousel.style.transform = `translateX(-${moveAmount}px)`;
+    }
+
+    // Responsive recalculation on window resize
+    window.addEventListener('resize', () => {
+        // Reset all carousels to first position on resize
+        imageSlide = 0;
+        flightsSlide = 0;
+        dealsSlide = 0;
+
+        imageCarousel.style.transform = 'translateX(0)';
+        flightsCarousel.style.transform = 'translateX(0)';
+        dealsCarousel.style.transform = 'translateX(0)';
+    });
+</script>
+</body>
+
+</html>
+
+////////////////////////////////////////

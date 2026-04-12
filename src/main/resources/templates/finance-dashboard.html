@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skylink Airlines - Finance Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #0d6efd;
+      --secondary: #1a2a6c;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+    }
+    .navbar {
+      background: linear-gradient(90deg, var(--secondary), var(--primary));
+    }
+    .stat-card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+      height: 100%;
+      cursor: pointer;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    }
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .sidebar {
+      background: white;
+      min-height: calc(100vh - 76px);
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="#">
+      <i class="fas fa-plane-departure"></i> Skylink Airlines
+    </a>
+    <div class="navbar-nav ms-auto">
+      <div class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+          <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px;">
+            <i class="fas fa-chart-line text-white"></i>
+          </div>
+          <span>Finance Executive</span>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="/dashboard/it-system-engineer/finance"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+          <li><a class="dropdown-item" href="/dashboard/it-system-engineer/finance/all-payments"><i class="fas fa-credit-card me-2"></i>All Payments</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="/api/auth/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <button class="btn btn-primary d-lg-none mb-3 mt-3 ms-3" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar">
+      <i class="fas fa-bars"></i> Menu
+    </button>
+    <div class="col-lg-2 col-md-3 p-3 collapse d-lg-block sidebar" id="sidebar">
+      <h5 class="mb-3">Finance Panel</h5>
+      <ul class="nav nav-pills flex-column">
+        <li class="nav-item">
+          <a href="/dashboard/it-system-engineer/finance" class="nav-link active">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/dashboard/it-system-engineer/finance/all-payments" class="nav-link">
+            <i class="fas fa-list me-2"></i>All Payments
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/dashboard/it-system-engineer/finance/completed" class="nav-link">
+            <i class="fas fa-check-circle me-2"></i>Completed
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/dashboard/it-system-engineer/finance/failed" class="nav-link">
+            <i class="fas fa-times-circle me-2"></i>Failed
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/dashboard/it-system-engineer/finance/refunded" class="nav-link">
+            <i class="fas fa-undo me-2"></i>Refunded
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/dashboard/it-system-engineer/finance/cancelled-bookings" class="nav-link">
+            <i class="fas fa-ban me-2"></i>Cancelled Bookings
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="col-lg-10 col-md-9 p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2>Finance Dashboard</h2>
+          <p class="text-muted mb-0">Overview of payment statistics and financial metrics</p>
+        </div>
+        <a href="/dashboard/it-system-engineer/finance/all-payments" class="btn btn-primary">
+          <i class="fas fa-credit-card me-2"></i>Manage All Payments
+        </a>
+      </div>
+
+      <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="card stat-card border-start border-success border-4">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="text-muted small mb-1">Total Revenue</div>
+                  <h3 class="mb-0 fw-bold text-success">
+                    Rs.<span th:text="${#numbers.formatDecimal(totalRevenue, 1, 2)}">0.00</span>
+                  </h3>
+                </div>
+                <div class="stat-icon bg-success bg-opacity-10 text-success">
+                  <i class="fas fa-rupee-sign"></i>
+                </div>
+              </div>
+              <div class="mt-2 small text-muted">
+                <i class="fas fa-check-circle me-1"></i>From completed payments
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="card stat-card border-start border-primary border-4">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="text-muted small mb-1">Total Payments</div>
+                  <h3 class="mb-0 fw-bold text-primary" th:text="${totalPayments}">0</h3>
+                </div>
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                  <i class="fas fa-receipt"></i>
+                </div>
+              </div>
+              <div class="mt-2 small text-muted">
+                <i class="fas fa-chart-line me-1"></i>All time transactions
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+          <a href="/dashboard/it-system-engineer/finance/completed" class="text-decoration-none">
+            <div class="card stat-card border-start border-info border-4">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="text-muted small mb-1">Completed</div>
+                    <h3 class="mb-0 fw-bold text-info" th:text="${completedPayments}">0</h3>
+                  </div>
+                  <div class="stat-icon bg-info bg-opacity-10 text-info">
+                    <i class="fas fa-check-circle"></i>
+                  </div>
+                </div>
+                <div class="mt-2 small text-muted">
+                  <i class="fas fa-percentage me-1"></i>
+                  <span th:text="${totalPayments > 0 ? #numbers.formatDecimal((completedPayments * 100.0 / totalPayments), 1, 1) : 0}">0</span>% success rate
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+          <a href="/dashboard/it-system-engineer/finance/refunded" class="text-decoration-none">
+            <div class="card stat-card border-start border-danger border-4">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="text-muted small mb-1">Total Refunded</div>
+                    <h3 class="mb-0 fw-bold text-danger">
+                      Rs.<span th:text="${#numbers.formatDecimal(totalRefunded, 1, 2)}">0.00</span>
+                    </h3>
+                  </div>
+                  <div class="stat-icon bg-danger bg-opacity-10 text-danger">
+                    <i class="fas fa-undo"></i>
+                  </div>
+                </div>
+                <div class="mt-2 small text-muted">
+                  <i class="fas fa-exclamation-triangle me-1"></i>
+                  <span th:text="${refundedPayments}">0</span> refunds
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-lg-8 mb-4">
+          <div class="card stat-card">
+            <div class="card-header bg-white">
+              <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Payment Status Breakdown</h5>
+            </div>
+            <div class="card-body">
+              <div class="row text-center">
+                <div class="col-md-4 mb-3">
+                  <a href="/dashboard/it-system-engineer/finance/completed" class="text-decoration-none">
+                    <div class="p-3 bg-success bg-opacity-10 rounded">
+                      <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                      <h4 class="mb-1" th:text="${completedPayments}">0</h4>
+                      <p class="mb-0 text-muted small">Completed</p>
+                    </div>
+                  </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <a href="/dashboard/it-system-engineer/finance/refunded" class="text-decoration-none">
+                    <div class="p-3 bg-danger bg-opacity-10 rounded">
+                      <i class="fas fa-undo fa-2x text-danger mb-2"></i>
+                      <h4 class="mb-1" th:text="${refundedPayments}">0</h4>
+                      <p class="mb-0 text-muted small">Refunded</p>
+                    </div>
+                  </a>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <a href="/dashboard/it-system-engineer/finance/failed" class="text-decoration-none">
+                    <div class="p-3 bg-warning bg-opacity-10 rounded">
+                      <i class="fas fa-times-circle fa-2x text-warning mb-2"></i>
+                      <h4 class="mb-1" th:text="${failedPayments}">0</h4>
+                      <p class="mb-0 text-muted small">Failed</p>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+          <div class="card stat-card">
+            <div class="card-header bg-white">
+              <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <a href="/dashboard/it-system-engineer/finance/completed" class="btn btn-success">
+                  <i class="fas fa-check-circle me-2"></i>View Completed
+                </a>
+                <a href="/dashboard/it-system-engineer/finance/failed" class="btn btn-warning">
+                  <i class="fas fa-times-circle me-2"></i>View Failed
+                </a>
+                <a href="/dashboard/it-system-engineer/finance/refunded" class="btn btn-danger">
+                  <i class="fas fa-undo me-2"></i>View Refunded
+                </a>
+                <a href="/dashboard/it-system-engineer/finance/all-payments" class="btn btn-outline-primary">
+                  <i class="fas fa-credit-card me-2"></i>All Payments
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card stat-card">
+        <div class="card-header bg-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Payments</h5>
+            <a href="/dashboard/it-system-engineer/finance/all-payments" class="btn btn-sm btn-outline-primary">View All</a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive" th:if="${!#lists.isEmpty(payments)}">
+            <table class="table table-hover">
+              <thead>
+              <tr>
+                <th>Payment ID</th>
+                <th>Booking ID</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Transaction ID</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="payment, iterStat : ${payments}" th:if="${iterStat.index < 10}">
+                <td>#<span th:text="${payment.id}">1</span></td>
+                <td><span th:text="${payment.bookingId}">100</span></td>
+                <td class="fw-bold">Rs.<span th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">0.00</span></td>
+                <td>
+                    <span class="badge"
+                          th:classappend="${payment.status == 'COMPLETED'} ? 'bg-success' :
+                                         (${payment.status == 'REFUNDED'} ? 'bg-danger' : 'bg-warning')"
+                          th:text="${payment.status}">COMPLETED</span>
+                </td>
+                <td><small th:text="${payment.transactionId}">TXN-123</small></td>
+                <td><small th:text="${#dates.format(payment.paymentDate, 'dd MMM yyyy')}">01 Jan 2024</small>
+                </td>
+                <td>
+                  <a th:href="@{/dashboard/it-system-engineer/finance/{status}(status=${#strings.toLowerCase(payment.status)})}"
+                     class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <div th:if="${#lists.isEmpty(payments)}" class="text-center py-5">
+            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No payments found</h5>
+            <p class="text-muted">Payments will appear here once created</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
