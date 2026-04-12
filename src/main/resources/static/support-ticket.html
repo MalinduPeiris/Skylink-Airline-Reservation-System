@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Support Tickets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style> body{font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 0 16px;} table{width:100%; border-collapse: collapse;} th, td{border:1px solid #ddd; padding:8px;} th{background:#f3f3f3} </style>
+</head>
+<body>
+<h2>Tickets</h2>
+<table>
+  <thead><tr><th>ID</th><th>Description</th><th>Status</th><th>Created</th></tr></thead>
+  <tbody>
+    <tr th:each="t : ${tickets}">
+      <td th:text="${t.id}">1</td>
+      <td th:text="${t.issueDescription}">Issue</td>
+      <td th:text="${t.status}">OPEN</td>
+      <td th:text="${t.createdDate}">2025-01-01</td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

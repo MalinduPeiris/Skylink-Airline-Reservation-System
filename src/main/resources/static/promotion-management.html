@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Promotions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style> body{font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 0 16px;} table{width:100%; border-collapse: collapse;} th, td{border:1px solid #ddd; padding:8px;} th{background:#f3f3f3} </style>
+</head>
+<body>
+<h2>Active Promotions</h2>
+<table>
+  <thead>
+    <tr><th>ID</th><th>Discount</th><th>Start</th><th>End</th><th>Target</th></tr>
+  </thead>
+  <tbody>
+    <tr th:each="p : ${promotions}">
+      <td th:text="${p.id}">1</td>
+      <td th:text="${p.discount}">10</td>
+      <td th:text="${p.validityStart}">2025-01-01</td>
+      <td th:text="${p.validityEnd}">2025-12-31</td>
+      <td th:text="${p.targetCriteria}">All</td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

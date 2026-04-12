@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 420px; margin: 40px auto; padding: 0 16px; }
+        form { display: grid; gap: 12px; }
+        input, button { padding: 10px; font-size: 16px; }
+        .error { color: #b00020; margin-bottom: 8px; }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+<body>
+<h2>Skylink Login</h2>
+<div th:if="${error}" class="error" th:text="${error}"></div>
+<form method="post" action="/api/auth/login">
+    <label>Username
+        <input name="username" autocomplete="username" required />
+    </label>
+    <label>Password
+        <input name="password" type="password" autocomplete="current-password" required />
+    </label>
+    <button type="submit">Login</button>
+</form>
+<p><a href="/api/auth/password-reset">Forgot password?</a></p>
+</body>
+</html>
