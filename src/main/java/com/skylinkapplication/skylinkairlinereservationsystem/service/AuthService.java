@@ -29,7 +29,6 @@ public class AuthService {
 
 	@Transactional
 	public UserDTO registerUser(UserDTO userDTO) {
-		// Validate required fields
 		if (userDTO.getUsername() == null || userDTO.getUsername().trim().isEmpty()) {
 			throw new IllegalArgumentException("Username is required");
 		}
@@ -43,29 +42,25 @@ public class AuthService {
 			throw new IllegalArgumentException("Role is required");
 		}
 
-		// Validate email format
 		if (!isValidEmail(userDTO.getEmail())) {
 			throw new IllegalArgumentException("Invalid email format");
 		}
 
-		// Validate password strength
 		if (!isStrongPassword(userDTO.getPassword())) {
-			throw new IllegalArgumentException("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one digit");
+			throw new IllegalArgumentException(
+					"Password must be at least 8 characters long and contain at least one uppercase letter, " +
+							"one lowercase letter, and one digit");
 		}
 
-		// Validate role
 		try {
 			Role.valueOf(userDTO.getRole());
 		} catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException("Invalid role: " + userDTO.getRole());
 		}
 
-		// Check if username already exists
 		if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
 			throw new RuntimeException("Username already exists");
 		}
-		
-		// Check if email already exists
 		if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
 			throw new RuntimeException("Email already exists");
 		}
@@ -91,7 +86,8 @@ public class AuthService {
 				"EMAIL",
 				savedUser.getEmail(),
 				"Welcome to SkyLink Airline Reservation System",
-				String.format("Dear %s,\n\nWelcome to SkyLink! Your account has been successfully created.\n\nUsername: %s\nRole: %s\n\nThank you for choosing SkyLink Airlines.",
+				String.format("Dear %s,\n\nWelcome to SkyLink! Your account has been successfully created.\n\n" +
+								"Username: %s\nRole: %s\n\nThank you for choosing SkyLink Airlines.",
 						savedUser.getUsername(), savedUser.getUsername(), savedUser.getRole())
 		);
 		notificationService.addNotification(emailNotification);
@@ -101,7 +97,8 @@ public class AuthService {
 					"SMS",
 					savedUser.getPhonenumber(),
 					"Account Created",
-					String.format("Welcome %s! Your SkyLink account is ready. Login at skylink.com", savedUser.getUsername())
+					String.format("Welcome %s! Your SkyLink account is ready. Login at skylink.com",
+							savedUser.getUsername())
 			);
 			notificationService.addNotification(smsNotification);
 		}
@@ -117,20 +114,8 @@ public class AuthService {
 		return convertToDTO(savedUser);
 	}
 
-	private UserDTO convertToDTO(User user) {
-		UserDTO dto = new UserDTO();
-		dto.setId(user.getId());
-		dto.setUsername(user.getUsername());
-		dto.setEmail(user.getEmail());
-		dto.setPhonenumber(user.getPhonenumber());
-		dto.setAddress(user.getAddress());
-		dto.setRole(user.getRole().name());
-		return dto;
-	}
-
 	@Transactional
 	public User createUser(User user) {
-		// Validate required fields
 		if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
 			throw new IllegalArgumentException("Username is required");
 		}
@@ -144,22 +129,19 @@ public class AuthService {
 			throw new IllegalArgumentException("Role is required");
 		}
 
-		// Validate email format
 		if (!isValidEmail(user.getEmail())) {
 			throw new IllegalArgumentException("Invalid email format");
 		}
 
-		// Validate password strength
 		if (!isStrongPassword(user.getPassword())) {
-			throw new IllegalArgumentException("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one digit");
+			throw new IllegalArgumentException(
+					"Password must be at least 8 characters long and contain at least one uppercase letter, " +
+							"one lowercase letter, and one digit");
 		}
 
-		// Check if username already exists
 		if (userRepository.findByUsername(user.getUsername()).isPresent()) {
 			throw new RuntimeException("Username '" + user.getUsername() + "' already exists!");
 		}
-
-		// Check if email already exists
 		if (userRepository.findByEmail(user.getEmail()).isPresent()) {
 			throw new RuntimeException("Email '" + user.getEmail() + "' is already registered!");
 		}
@@ -169,9 +151,9 @@ public class AuthService {
 		User createdUser = userRepository.save(user);
 
 		AuditLogger.getInstance().logAction(
-				user.getId().toString(),
+				createdUser.getId().toString(),
 				"USER_REGISTRATION",
-				"User-" + user.getUsername(),
+				"User-" + createdUser.getUsername(),
 				"New user registered"
 		);
 
@@ -180,12 +162,9 @@ public class AuthService {
 
 	@Transactional
 	public User updateUser(Long id, User updatedUser) {
-		// Validate ID
 		if (id == null) {
 			throw new IllegalArgumentException("User ID is required");
 		}
-
-		// Validate required fields
 		if (updatedUser.getUsername() == null || updatedUser.getUsername().trim().isEmpty()) {
 			throw new IllegalArgumentException("Username is required");
 		}
@@ -196,7 +175,6 @@ public class AuthService {
 			throw new IllegalArgumentException("Role is required");
 		}
 
-		// Validate email format
 		if (!isValidEmail(updatedUser.getEmail())) {
 			throw new IllegalArgumentException("Invalid email format");
 		}
@@ -204,14 +182,12 @@ public class AuthService {
 		User user = userRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("User not found"));
 
-		// Check if username is being changed and if new username already exists
 		if (!user.getUsername().equals(updatedUser.getUsername())) {
 			if (userRepository.findByUsername(updatedUser.getUsername()).isPresent()) {
 				throw new RuntimeException("Username '" + updatedUser.getUsername() + "' is already taken");
 			}
 		}
 
-		// Check if email is being changed and if new email already exists
 		if (!user.getEmail().equals(updatedUser.getEmail())) {
 			if (userRepository.findByEmail(updatedUser.getEmail()).isPresent()) {
 				throw new RuntimeException("Email '" + updatedUser.getEmail() + "' is already registered");
@@ -225,15 +201,19 @@ public class AuthService {
 		user.setRole(updatedUser.getRole());
 
 		if (updatedUser.getPassword() != null && !updatedUser.getPassword().trim().isEmpty()) {
-			// Validate password strength if it's being updated
-			if (!isStrongPassword(updatedUser.getPassword())) {
-				throw new IllegalArgumentException("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one digit");
-			}
 
-			if (!updatedUser.getPassword().startsWith("$2a$") &&
-					!updatedUser.getPassword().startsWith("$2b$") &&
-					!updatedUser.getPassword().startsWith("$2y$")) {
-				user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+			String rawOrEncoded = updatedUser.getPassword();
+			boolean alreadyEncoded = rawOrEncoded.startsWith("$2a$")
+					|| rawOrEncoded.startsWith("$2b$")
+					|| rawOrEncoded.startsWith("$2y$");
+
+			if (!alreadyEncoded) {
+				if (!isStrongPassword(rawOrEncoded)) {
+					throw new IllegalArgumentException(
+							"Password must be at least 8 characters long and contain at least one uppercase " +
+									"letter, one lowercase letter, and one digit");
+				}
+				user.setPassword(passwordEncoder.encode(rawOrEncoded));
 			}
 		}
 
@@ -244,7 +224,6 @@ public class AuthService {
 		if (id == null) {
 			throw new IllegalArgumentException("User ID is required");
 		}
-		
 		return userRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
 	}
@@ -253,7 +232,6 @@ public class AuthService {
 		if (username == null || username.trim().isEmpty()) {
 			throw new IllegalArgumentException("Username is required");
 		}
-		
 		return userRepository.findByUsername(username)
 				.orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 	}
@@ -267,11 +245,11 @@ public class AuthService {
 		if (id == null) {
 			throw new IllegalArgumentException("User ID is required");
 		}
-		
 		User user = userRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("User not found"));
 		userRepository.delete(user);
 	}
+
 
 	public User login(String username, String password) {
 		if (username == null || username.trim().isEmpty()) {
@@ -280,10 +258,8 @@ public class AuthService {
 		if (password == null || password.trim().isEmpty()) {
 			throw new IllegalArgumentException("Password is required");
 		}
-
 		User user = userRepository.findByUsername(username)
 				.orElseThrow(() -> new RuntimeException("Invalid username or password"));
-
 		if (passwordEncoder.matches(password, user.getPassword())) {
 			return user;
 		}
@@ -298,15 +274,13 @@ public class AuthService {
 		if (newPassword == null || newPassword.trim().isEmpty()) {
 			throw new IllegalArgumentException("New password is required");
 		}
-
-		// Validate password strength
 		if (!isStrongPassword(newPassword)) {
-			throw new IllegalArgumentException("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one digit");
+			throw new IllegalArgumentException(
+					"Password must be at least 8 characters long and contain at least one uppercase letter, " +
+							"one lowercase letter, and one digit");
 		}
-
 		User user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new RuntimeException("Email not found"));
-
 		user.setPassword(passwordEncoder.encode(newPassword));
 		userRepository.save(user);
 	}
@@ -315,40 +289,38 @@ public class AuthService {
 		return user != null && user.getRole().name().equals(requiredRole);
 	}
 
-	// Utility method to validate email format
 	private boolean isValidEmail(String email) {
 		if (email == null || email.trim().isEmpty()) {
 			return false;
 		}
 		String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-		Pattern pattern = Pattern.compile(emailRegex);
-		return pattern.matcher(email.trim()).matches();
+		return Pattern.compile(emailRegex).matcher(email.trim()).matches();
 	}
 
-	// Utility method to validate password strength
 	private boolean isStrongPassword(String password) {
 		if (password == null || password.length() < 8) {
 			return false;
 		}
-
 		boolean hasUppercase = false;
 		boolean hasLowercase = false;
 		boolean hasDigit = false;
-
 		for (char c : password.toCharArray()) {
-			if (Character.isUpperCase(c)) {
-				hasUppercase = true;
-			} else if (Character.isLowerCase(c)) {
-				hasLowercase = true;
-			} else if (Character.isDigit(c)) {
-				hasDigit = true;
-			}
-
-			if (hasUppercase && hasLowercase && hasDigit) {
-				return true;
-			}
+			if      (Character.isUpperCase(c)) hasUppercase = true;
+			else if (Character.isLowerCase(c)) hasLowercase = true;
+			else if (Character.isDigit(c))     hasDigit     = true;
+			if (hasUppercase && hasLowercase && hasDigit) return true;
 		}
+		return false;
+	}
 
-		return hasUppercase && hasLowercase && hasDigit;
+	private UserDTO convertToDTO(User user) {
+		UserDTO dto = new UserDTO();
+		dto.setId(user.getId());
+		dto.setUsername(user.getUsername());
+		dto.setEmail(user.getEmail());
+		dto.setPhonenumber(user.getPhonenumber());
+		dto.setAddress(user.getAddress());
+		dto.setRole(user.getRole().name());
+		return dto;
 	}
 }
