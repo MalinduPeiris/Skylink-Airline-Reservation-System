@@ -19,12 +19,14 @@ import com.skylinkapplication.skylinkairlinereservationsystem.singleton.Notifica
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
+
 	@Autowired
 	private BookingRepository bookingRepository;
 
@@ -43,10 +45,8 @@ public class BookingService {
 	@Autowired
 	private PromotionService promotionService;
 
-
 	@Transactional
 	public BookingDTO createBooking(BookingDTO bookingDTO) {
-		// Validate required fields
 		if (bookingDTO.getUserId() == null) {
 			throw new IllegalArgumentException("User ID is required");
 		}
@@ -60,7 +60,6 @@ public class BookingService {
 			throw new IllegalArgumentException("Invalid number of passengers (maximum 10 passengers allowed)");
 		}
 
-		// Validate status if provided
 		if (bookingDTO.getStatus() != null && !bookingDTO.getStatus().trim().isEmpty()) {
 			try {
 				Booking.Status.valueOf(bookingDTO.getStatus().toUpperCase());
@@ -89,8 +88,8 @@ public class BookingService {
 
 		Booking booking = new Booking();
 		booking.setBookingDate(new Date());
-		booking.setStatus(Booking.Status.valueOf(bookingDTO.getStatus() != null ?
-				bookingDTO.getStatus().toUpperCase() : "PENDING"));
+		booking.setStatus(Booking.Status.valueOf(
+				bookingDTO.getStatus() != null ? bookingDTO.getStatus().toUpperCase() : "PENDING"));
 		booking.setPassengers(bookingDTO.getPassengers());
 		booking.setUser(user);
 		booking.setFlight(flight);
@@ -101,36 +100,29 @@ public class BookingService {
 		flight.setSeatsAvailable(flight.getSeatsAvailable() - bookingDTO.getPassengers());
 		flightRepository.save(flight);
 
-
 		Booking savedBooking = bookingRepository.save(booking);
 
-
-		AuditLogger auditLogger = AuditLogger.getInstance();
-		auditLogger.logAction(
+		AuditLogger.getInstance().logAction(
 				bookingDTO.getUserId().toString(),
 				"CREATE_BOOKING",
 				"Booking-" + savedBooking.getId(),
 				"Flight: " + bookingDTO.getFlightId() + ", Passengers: " + bookingDTO.getPassengers()
 		);
 
-		NotificationService notificationService = NotificationService.getInstance();
-		notificationService.addNotification(new NotificationService.Notification(
+		NotificationService.getInstance().addNotification(new NotificationService.Notification(
 				"EMAIL",
-				bookingDTO.getUser().getEmail(),
+				user.getEmail(),
 				"Booking Created",
 				"Your booking has been created successfully"
 		));
 
-		CacheManager cacheManager = CacheManager.getInstance();
-		cacheManager.put("booking_" + savedBooking.getId(), savedBooking);
+		CacheManager.getInstance().put("booking_" + savedBooking.getId(), savedBooking);
 
 		return convertToDTO(savedBooking);
 	}
 
-
 	@Transactional
 	public BookingDTO createBookingWithPassengers(BookingRequestDTO bookingRequest) {
-		// Validate required fields
 		if (bookingRequest.getUserId() == null) {
 			throw new IllegalArgumentException("User ID is required");
 		}
@@ -161,23 +153,22 @@ public class BookingService {
 			throw new RuntimeException("Primary passenger email must match logged-in user email");
 		}
 
-		// Validate all passenger details
 		for (int i = 0; i < bookingRequest.getPassengers().size(); i++) {
 			PassengerDTO passenger = bookingRequest.getPassengers().get(i);
 			if (passenger.getFirstName() == null || passenger.getFirstName().trim().isEmpty()) {
-				throw new IllegalArgumentException("Passenger " + (i+1) + " first name is required");
+				throw new IllegalArgumentException("Passenger " + (i + 1) + " first name is required");
 			}
 			if (passenger.getLastName() == null || passenger.getLastName().trim().isEmpty()) {
-				throw new IllegalArgumentException("Passenger " + (i+1) + " last name is required");
+				throw new IllegalArgumentException("Passenger " + (i + 1) + " last name is required");
 			}
 			if (passenger.getEmail() == null || passenger.getEmail().trim().isEmpty()) {
-				throw new IllegalArgumentException("Passenger " + (i+1) + " email is required");
+				throw new IllegalArgumentException("Passenger " + (i + 1) + " email is required");
 			}
 			if (passenger.getDateOfBirth() == null) {
-				throw new IllegalArgumentException("Passenger " + (i+1) + " date of birth is required");
+				throw new IllegalArgumentException("Passenger " + (i + 1) + " date of birth is required");
 			}
 			if (passenger.getCountry() == null || passenger.getCountry().trim().isEmpty()) {
-				throw new IllegalArgumentException("Passenger " + (i+1) + " country is required");
+				throw new IllegalArgumentException("Passenger " + (i + 1) + " country is required");
 			}
 		}
 
@@ -191,7 +182,16 @@ public class BookingService {
 		Double baseFlightPrice = flight.getPrice() * bookingRequest.getPassengerCount();
 		Double discount = 0.0;
 
-		if (bookingRequest.getPromoCode() != null && !bookingRequest.getPromoCode().isEmpty()) {
+ 		if (bookingRequest.getPromoCode() != null && !bookingRequest.getPromoCode().trim().isEmpty()) {
+			try {
+				var promoOpt = promotionService.getAllPromotions().stream()
+						.filter(p -> bookingRequest.getPromoCode().equalsIgnoreCase(p.getPromoCode()))
+						.findFirst();
+				if (promoOpt.isPresent()) {
+					discount = baseFlightPrice * (promoOpt.get().getDiscount() / 100.0);
+				}
+			} catch (Exception ignored) {
+			}
 		}
 
 		Double flightPriceAfterDiscount = baseFlightPrice - discount;
@@ -230,16 +230,16 @@ public class BookingService {
 		passengerRepository.saveAll(passengers);
 		savedBooking.setPassengerList(passengers);
 
+		// FIX 3: Decrement seats only after booking is persisted to avoid orphaned
+		//         seat decrements if the save fails above.
 		flight.setSeatsAvailable(flight.getSeatsAvailable() - bookingRequest.getPassengerCount());
 		flightRepository.save(flight);
 
 		return convertToDTO(savedBooking);
 	}
 
-
 	@Transactional
 	public BookingDTO updateBooking(Long id, BookingDTO updatedBookingDTO) {
-		// Validate ID
 		if (id == null) {
 			throw new IllegalArgumentException("Booking ID is required");
 		}
@@ -248,8 +248,9 @@ public class BookingService {
 				.orElseThrow(() -> new RuntimeException("Booking not found"));
 
 		int oldPassengers = booking.getPassengers();
-		int newPassengers = updatedBookingDTO.getPassengers() != null ?
-				updatedBookingDTO.getPassengers() : oldPassengers;
+		int newPassengers = updatedBookingDTO.getPassengers() != null
+				? updatedBookingDTO.getPassengers()
+				: oldPassengers;
 
 		if (newPassengers <= 0) {
 			throw new IllegalArgumentException("Invalid number of passengers (must be greater than 0)");
@@ -282,24 +283,23 @@ public class BookingService {
 			if (updatedBookingDTO.getBookingExtras() < 0) {
 				throw new IllegalArgumentException("Booking extras cannot be negative");
 			}
-			// Recalculate total price based on new booking extras
 			Double newTotalPrice = flight.getPrice() * newPassengers;
 			newTotalPrice += updatedBookingDTO.getBookingExtras();
 			booking.setTotalPrice(newTotalPrice);
+			booking.setBookingExtras(updatedBookingDTO.getBookingExtras());
 		}
 
-		booking.setBookingExtras(updatedBookingDTO.getBookingExtras());
 		booking.setPromoCode(updatedBookingDTO.getPromoCode());
 
 		Booking updatedBooking = bookingRepository.save(booking);
 		return convertToDTO(updatedBooking);
 	}
 
+
 	public BookingDTO getBookingById(Long id) {
 		if (id == null) {
 			throw new IllegalArgumentException("Booking ID is required");
 		}
-		
 		Booking booking = bookingRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Booking not found"));
 		return convertToDTO(booking);
@@ -315,9 +315,8 @@ public class BookingService {
 		if (status == null || status.trim().isEmpty()) {
 			throw new IllegalArgumentException("Status is required");
 		}
-		
 		try {
-			Booking.Status bookingStatus = Booking.Status.valueOf(status);
+			Booking.Status bookingStatus = Booking.Status.valueOf(status.toUpperCase());
 			return bookingRepository.findByStatus(bookingStatus).stream()
 					.map(this::convertToDTO)
 					.collect(Collectors.toList());
@@ -326,17 +325,29 @@ public class BookingService {
 		}
 	}
 
+	public List<BookingDTO> getBookingsByUserId(Long userId) {
+		if (userId == null) {
+			throw new IllegalArgumentException("User ID is required");
+		}
+		return bookingRepository.findByUser_Id(userId).stream()
+				.map(this::convertToDTO)
+				.collect(Collectors.toList());
+	}
+
+
 	@Transactional
 	public void deleteBooking(Long id) {
 		if (id == null) {
 			throw new IllegalArgumentException("Booking ID is required");
 		}
-		
+
 		Booking booking = bookingRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Booking not found"));
 
 		if (booking.getPayment() != null) {
-			throw new RuntimeException("Cannot delete booking because it has an associated payment. Please cancel or remove the payment first.");
+			throw new RuntimeException(
+					"Cannot delete booking because it has an associated payment. " +
+							"Please cancel or remove the payment first.");
 		}
 
 		if (booking.getPassengerList() != null && !booking.getPassengerList().isEmpty()) {
@@ -349,17 +360,7 @@ public class BookingService {
 			flightRepository.save(flight);
 		}
 
-
 		bookingRepository.delete(booking);
-	}
-
-	public List<BookingDTO> getBookingsByUserId(Long userId) {
-		if (userId == null) {
-			throw new IllegalArgumentException("User ID is required");
-		}
-		return bookingRepository.findByUser_Id(userId).stream()
-				.map(this::convertToDTO)
-				.collect(Collectors.toList());
 	}
 
 	@Transactional
@@ -367,7 +368,7 @@ public class BookingService {
 		if (bookingId == null) {
 			throw new IllegalArgumentException("Booking ID is required");
 		}
-		
+
 		Booking booking = bookingRepository.findById(bookingId)
 				.orElseThrow(() -> new RuntimeException("Booking not found"));
 
@@ -379,12 +380,10 @@ public class BookingService {
 		flight.setSeatsAvailable(flight.getSeatsAvailable() + booking.getPassengers());
 		flightRepository.save(flight);
 
-		// If there's a payment associated with this booking, cancel it too
 		if (booking.getPayment() != null) {
 			Payment payment = booking.getPayment();
 			payment.setStatus(Payment.Status.REFUNDED);
 			paymentRepository.save(payment);
-			// In a real system, you would process the actual refund here
 		}
 
 		booking.setStatus(Booking.Status.CANCELLED);
