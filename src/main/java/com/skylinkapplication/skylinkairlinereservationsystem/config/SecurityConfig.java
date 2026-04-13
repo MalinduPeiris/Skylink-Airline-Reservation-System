@@ -2,13 +2,13 @@ package com.skylinkapplication.skylinkairlinereservationsystem.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,128 +26,86 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    AuthenticationSuccessHandler authenticationSuccessHandler,
                                                    AuthenticationProvider authenticationProvider) throws Exception {
+
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
 
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(
+
+                         .requestMatchers(
                                 "/",
-                                "/api/auth/register",
-                                "/api/auth/login",
-                                "/api/auth/password-reset",
-                                "/api/admin/dashboard",
-                                "/dashboard/admin",
-                                "/api/flight/search",
-                                "/api/flight/all",
-
-                                "/api/support/update/**",
-                                "/api/feedback/update/**",
-
-                                "/api/feedback/delete/**",
-                                "/deals",
-                                "/api/marketing/promotions",
-                                "/api/marketing/promotion/**",
-                                "/api/marketing/update/**",
-                                "/api/marketing/delete/**",
-                                "/api/support/tickets",
-                                "/api/user/profile",
-                                "/api/user/update",
-                                "/api/user/delete",
-                                "/api/user/support/tickets",
-                                "/flights",
-                                "/api/booking/page",
-                                "/flight-admin/delete/",
-                                "/api/support/init-sample-data",
-                                "/dashboard/reservation-manager",
-                                "/dashboard/finance",
-                                "/dashboard/flight-admin",
-                                "/dashboard/flight-admin/delete/**",
-                                "/dashboard/flight-admin/update/**",
-                                "/api/user/support/submit-ticket",
-                                "/dashboard/marketing-manager",
-                                "/dashboard/customer-support",
-                                "/api/support/delete/**",
-                                "/api/booking/update/**",
-                                "/api/marketing/create",
-                                "/api/payment/update/**",
-                                "/api/payment/delete/**",
-                                "/api/auth/logout",
-                                "/dashboard",
-                                "/api/booking/delete/**",
-                                "/api/booking/cancel",
-                                "/logout",
-                                "/api/user/support/submit-feedback",
-                                "/api/booking/traveler-payment",
-                                "/dashboard/finance/cancelled-bookings",
-                                "/api/feedback/edit/**",
-                                "/api/support/respond",
-                                "/api/support/edit/**",
-                                "/dashboard/finance/completed",
-                                "/dashboard/finance/all-payments",
-                                "/dashboard/finance/failed",
-                                "/dashboard/finance/refunded",
-                                "/dashboard/finance/payment/update/**",
-                                "/dashboard/finance/payment/delete/**",
-                                "/dashboard/finance/cancelled-bookings",
-                                "/dashboard/finance/booking/update-payment-status/**",
-                                "/booking",
-                                "/booking-confirmation",
-                                "/traveler-payment",
+                                "/index",
+                                "/index.html",
+                                "/register.html",
                                 "/css/**",
                                 "/js/**",
                                 "/static/**",
                                 "/images/**",
-                                "/favicon.ico",
-                                "/api/booking/create-with-passengers"
+                                "/favicon.ico"
                         ).permitAll()
-                        .requestMatchers(
-                                "/",
-                                "/index",
-                                "/index.html",
-                                "/register.html"
-                        ).permitAll()
-                        // Auth endpoints
-                        .requestMatchers(
+
+                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login",
                                 "/api/auth/password-reset",
-                                "/api/auth/logout"
+                                "/api/auth/logout",
+                                "/logout"
                         ).permitAll()
-                        // Public flight search and viewing
-                        .requestMatchers(
+
+                         .requestMatchers(
                                 "/api/flight/search",
                                 "/api/flight/all",
-                                "/flights"
+                                "/flights",
+                                "/deals",
+                                "/api/marketing/promotions",
+                                "/api/marketing/promotion/**"
                         ).permitAll()
-                        // User support endpoints - should be accessible to authenticated users
-                        .requestMatchers("/api/user/support/**").authenticated()
-                        // Booking endpoints - require authentication
-                        .requestMatchers("/api/booking/**").authenticated()
-                        // User profile endpoints - require authentication
-                        .requestMatchers("/api/user/**").authenticated()
-                        // Traveler payment endpoints - require authentication (allow page/process/confirmation)
-                        .requestMatchers("/api/payment/page", "/api/payment/process", "/api/payment/confirmation").authenticated()
-                        // Marketing endpoints - require authentication
-                        .requestMatchers("/api/marketing/**").authenticated()
-                        // Dashboard endpoints - role-based (handled by @PreAuthorize in controllers)
-                        .requestMatchers("/dashboard/**").authenticated()
-                        // Role-based API access
-                        .requestMatchers("/dashboard/flight-admin/**").hasRole("IT_SYSTEM_ENGINEER")
-                        .requestMatchers("/dashboard/reservation-manager/**").hasAnyRole("RESERVATION_MANAGER", "IT_SYSTEM_ENGINEER")
-                        .requestMatchers("/dashboard/marketing-manager/**").hasAnyRole("MARKETING_EXECUTIVE", "IT_SYSTEM_ENGINEER")
-                        .requestMatchers("/dashboard/customer-support/**").hasAnyRole("CUSTOMER_SUPPORT_OFFICER", "IT_SYSTEM_ENGINEER")
-                        .requestMatchers("/dashboard/admin/**").hasRole("IT_SYSTEM_ENGINEER")
-                        .requestMatchers("/dashboard/user-management/**").hasRole("IT_SYSTEM_ENGINEER")
-                        .requestMatchers("/dashboard/promotion-management/**").hasAnyRole("MARKETING_EXECUTIVE", "IT_SYSTEM_ENGINEER")
+
+                         .requestMatchers("/dashboard/it-system-engineer/**")
+                        .hasRole("IT_SYSTEM_ENGINEER")
+
+                        .requestMatchers("/dashboard/flight-admin/**")
+                        .hasAnyRole("IT_SYSTEM_ENGINEER", "RESERVATION_MANAGER")
+
+                        .requestMatchers("/dashboard/reservation-manager/**")
+                        .hasAnyRole("RESERVATION_MANAGER", "IT_SYSTEM_ENGINEER")
+
                         .requestMatchers(
                                 "/dashboard/finance",
-                                "/dashboard/finance/**"
+                                "/dashboard/finance/**",
+                                "/api/finance/**"
                         ).hasAnyRole("FINANCE_EXECUTIVE", "IT_SYSTEM_ENGINEER")
-                        .requestMatchers("/api/finance/**").hasAnyRole("FINANCE_EXECUTIVE", "IT_SYSTEM_ENGINEER")
-                        .requestMatchers("/api/user/profile", "/api/user/update", "/api/user/delete").authenticated()
-                        .requestMatchers("/dashboard/it-system-engineer/**").hasRole("IT_SYSTEM_ENGINEER")
-                        .anyRequest().authenticated()
+
+                        .requestMatchers(
+                                "/dashboard/marketing-manager/**",
+                                "/dashboard/promotion-management/**"
+                        ).hasAnyRole("MARKETING_EXECUTIVE", "IT_SYSTEM_ENGINEER")
+
+                        .requestMatchers("/dashboard/customer-support/**")
+                        .hasAnyRole("CUSTOMER_SUPPORT_OFFICER", "IT_SYSTEM_ENGINEER")
+
+                        .requestMatchers(
+                                "/dashboard/admin/**",
+                                "/dashboard/user-management/**"
+                        ).hasRole("IT_SYSTEM_ENGINEER")
+
+                         .requestMatchers("/dashboard/**").authenticated()
+
+                         .requestMatchers("/api/booking/**").authenticated()
+                        .requestMatchers("/api/payment/**").authenticated()
+                        .requestMatchers("/api/user/**").authenticated()
+                        .requestMatchers("/api/support/**").authenticated()
+                        .requestMatchers("/api/feedback/**").authenticated()
+                        .requestMatchers("/api/marketing/**").authenticated()
+
+                         .requestMatchers(
+                                "/booking",
+                                "/booking-confirmation",
+                                "/traveler-payment"
+                        ).authenticated()
+
+                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/api/auth/login")
@@ -166,9 +124,8 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendRedirect("/api/auth/login");
-                        })
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendRedirect("/api/auth/login"))
                 )
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -184,9 +141,9 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Use the existing component `CustomAuthenticationSuccessHandler`
     @Bean
-    public AuthenticationSuccessHandler authenticationSuccessHandler(CustomAuthenticationSuccessHandler handler) {
+    public AuthenticationSuccessHandler authenticationSuccessHandler(
+            CustomAuthenticationSuccessHandler handler) {
         return handler;
     }
 
@@ -210,7 +167,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 }
