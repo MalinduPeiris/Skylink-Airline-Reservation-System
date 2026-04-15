@@ -4,296 +4,356 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skylink Airlines - All Flights</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-dark: #003d7a;
-            --primary: #0066cc;
-            --accent: #ffc400;
-            --light-bg: #f8f9fa;
+            --navy: #001845;
+            --navy-mid: #0033a0;
+            --blue: #0057d9;
+            --blue-light: #3a7ef7;
+            --gold: #e8a820;
+            --gold-light: #f5c842;
+            --off-white: #f4f6fb;
+            --text-dark: #0d1b3e;
+            --text-light: #6b7a99;
+            --card-shadow: 0 4px 24px rgba(0,24,69,0.09);
+            --card-hover: 0 12px 40px rgba(0,24,69,0.16);
         }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans',sans-serif; background:var(--off-white); color:var(--text-dark); }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* NAV */
+        nav { background:linear-gradient(135deg,var(--navy),var(--navy-mid) 60%,var(--blue)); position:sticky; top:0; z-index:1000; box-shadow:0 4px 24px rgba(0,0,0,0.18); }
+        .navbar-brand { font-family:'Playfair Display',serif; font-size:26px; font-weight:800; color:white !important; letter-spacing:2px; }
+        .navbar-brand span { color:var(--gold); }
+        .navbar-nav .nav-link { color:rgba(255,255,255,0.88) !important; font-weight:500; margin:0 4px; padding:8px 12px; border-radius:6px; transition:all 0.25s; font-size:14.5px; }
+        .navbar-nav .nav-link:hover { color:var(--gold-light) !important; background:rgba(255,255,255,0.08); }
+        .btn-nav-login { border:1.5px solid rgba(255,255,255,0.5); color:white !important; border-radius:8px; padding:8px 20px; font-weight:600; font-size:14px; background:transparent; transition:all 0.25s; text-decoration:none; }
+        .btn-nav-login:hover { background:rgba(255,255,255,0.12); }
+        .btn-nav-register { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:var(--navy) !important; border-radius:8px; padding:8px 22px; font-weight:700; font-size:14px; transition:all 0.25s; text-decoration:none; }
+        .btn-nav-register:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(232,168,32,0.4); }
+        .user-chip { display:flex; align-items:center; gap:10px; color:white; font-size:14px; background:rgba(255,255,255,0.1); padding:6px 14px; border-radius:50px; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--light-bg);
+        /* PAGE HEADER */
+        .page-header { background:linear-gradient(135deg,var(--navy),var(--navy-mid) 50%,var(--blue)); color:white; padding:70px 0 100px; position:relative; overflow:hidden; }
+        .page-header::before { content:''; position:absolute; top:-80px; right:-60px; width:350px; height:350px; border-radius:50%; background:rgba(255,255,255,0.04); }
+        .page-header::after { content:''; position:absolute; bottom:-100px; left:20%; width:250px; height:250px; border-radius:50%; background:rgba(255,255,255,0.03); }
+        .page-header h1 { font-family:'Playfair Display',serif; font-size:clamp(32px,4vw,50px); font-weight:800; margin-bottom:12px; }
+        .page-header p { font-size:16px; opacity:0.85; margin-bottom:0; }
+        .breadcrumb-nav { font-size:13px; margin-bottom:20px; }
+        .breadcrumb-nav a { color:rgba(255,255,255,0.65); text-decoration:none; }
+        .breadcrumb-nav span { color:rgba(255,255,255,0.4); margin:0 8px; }
+        .breadcrumb-nav .current { color:var(--gold); }
+
+        /* FILTER BAR */
+        .filter-bar-wrap { margin-top:-50px; position:relative; z-index:50; }
+        .filter-bar { background:white; border-radius:16px; box-shadow:0 8px 40px rgba(0,24,69,0.14); padding:24px 32px; }
+        .filter-row { display:flex; align-items:flex-end; gap:16px; flex-wrap:wrap; }
+        .filter-group { flex:1; min-width:140px; }
+        .filter-group label { display:block; font-size:11px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:7px; }
+        .filter-group select, .filter-group input { width:100%; padding:10px 14px; border:1.5px solid #e2e7f4; border-radius:10px; font-size:13.5px; color:var(--text-dark); font-family:'DM Sans',sans-serif; background:#fafbff; transition:border-color 0.2s; }
+        .filter-group select:focus, .filter-group input:focus { border-color:var(--blue); outline:none; box-shadow:0 0 0 3px rgba(0,87,217,0.08); }
+        .btn-filter { background:linear-gradient(135deg,var(--blue),var(--navy-mid)); color:white; border:none; padding:11px 28px; border-radius:10px; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.25s; white-space:nowrap; }
+        .btn-filter:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,87,217,0.3); }
+        .btn-reset { background:transparent; border:1.5px solid #e2e7f4; color:var(--text-light); padding:11px 20px; border-radius:10px; font-weight:600; font-size:13.5px; cursor:pointer; transition:all 0.25s; white-space:nowrap; }
+        .btn-reset:hover { border-color:var(--text-dark); color:var(--text-dark); }
+
+        /* RESULTS META */
+        .results-meta { display:flex; align-items:center; justify-content:space-between; margin:32px 0 20px; flex-wrap:wrap; gap:12px; }
+        .results-count { font-size:14px; color:var(--text-light); }
+        .results-count strong { color:var(--text-dark); font-size:16px; }
+        .sort-group { display:flex; align-items:center; gap:10px; }
+        .sort-group label { font-size:13px; font-weight:600; color:var(--text-light); white-space:nowrap; }
+        .sort-group select { padding:8px 14px; border:1.5px solid #e2e7f4; border-radius:8px; font-size:13px; color:var(--text-dark); background:white; cursor:pointer; }
+
+        /* FLIGHT CARD - Horizontal list style */
+        .flight-list { display:flex; flex-direction:column; gap:16px; }
+        .flight-row { background:white; border-radius:16px; box-shadow:var(--card-shadow); transition:all 0.3s; overflow:hidden; border:1px solid #eef1fb; }
+        .flight-row:hover { box-shadow:var(--card-hover); transform:translateY(-2px); }
+        .flight-row-inner { display:grid; grid-template-columns:auto 1fr auto auto; align-items:center; gap:0; }
+        .flight-airline-stripe { width:6px; background:linear-gradient(180deg,var(--navy),var(--blue)); min-height:120px; }
+        .flight-main { padding:22px 28px; display:flex; align-items:center; gap:36px; flex-wrap:wrap; }
+        .fl-number-badge { background:linear-gradient(135deg,var(--navy),var(--blue)); color:white; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:700; white-space:nowrap; letter-spacing:0.5px; }
+        .fl-route { display:flex; align-items:center; gap:16px; }
+        .fl-point { text-align:center; }
+        .fl-time { font-family:'Playfair Display',serif; font-size:26px; font-weight:700; color:var(--navy); }
+        .fl-airport { font-size:12px; color:var(--text-light); margin-top:2px; font-weight:600; letter-spacing:1px; }
+        .fl-city { font-size:11.5px; color:var(--text-light); margin-top:1px; }
+        .fl-arrow { display:flex; flex-direction:column; align-items:center; gap:4px; padding:0 8px; min-width:100px; }
+        .fl-line { width:100%; height:1.5px; background:linear-gradient(90deg,transparent,var(--blue-light),transparent); position:relative; }
+        .fl-plane-icon { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:var(--blue); font-size:14px; background:white; padding:0 6px; }
+        .fl-duration { font-size:11px; color:var(--text-light); text-align:center; margin-top:4px; }
+        .fl-details { display:flex; flex-direction:column; gap:6px; }
+        .fl-detail-tag { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text-light); }
+        .fl-detail-tag i { color:var(--blue); width:14px; }
+        .class-badge { display:inline-block; padding:4px 12px; border-radius:50px; font-size:11.5px; font-weight:700; }
+        .class-economy { background:#e8f4ff; color:#0057d9; }
+        .class-business { background:#fef3e0; color:#c47a00; }
+        .class-first { background:#f3e8ff; color:#7c3aed; }
+        .seats-badge { display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:600; }
+        .seats-high { color:#16a34a; }
+        .seats-mid { color:#d97706; }
+        .seats-low { color:#dc2626; }
+
+        /* PRICE & BOOK */
+        .flight-price-col { padding:22px 28px; text-align:right; border-left:1px solid #f0f2fa; min-width:200px; display:flex; flex-direction:column; align-items:flex-end; justify-content:center; gap:12px; }
+        .fl-price { font-family:'Playfair Display',serif; font-size:28px; font-weight:800; color:var(--navy); white-space:nowrap; }
+        .fl-price-sub { font-size:12px; color:var(--text-light); font-family:'DM Sans',sans-serif; font-weight:400; margin-top:-8px; }
+        .btn-book-now { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:var(--navy); border:none; padding:12px 28px; border-radius:10px; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.25s; text-decoration:none; display:inline-flex; align-items:center; gap:7px; white-space:nowrap; }
+        .btn-book-now:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(232,168,32,0.45); color:var(--navy); }
+        .btn-details { background:transparent; border:1.5px solid #e2e7f4; color:var(--text-light); padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s; text-decoration:none; display:inline-block; text-align:center; }
+        .btn-details:hover { border-color:var(--blue); color:var(--blue); }
+
+        /* EMPTY STATE */
+        .empty-state { text-align:center; padding:100px 20px; }
+        .empty-icon { width:90px; height:90px; border-radius:50%; background:linear-gradient(135deg,#f0f4ff,#e0e9ff); display:flex; align-items:center; justify-content:center; margin:0 auto 24px; }
+        .empty-icon i { font-size:36px; color:var(--blue-light); }
+
+        /* STATUS BADGE */
+        .status-scheduled { background:#e8f4ff; color:var(--blue); }
+        .status-departed { background:#d1fae5; color:#065f46; }
+        .status-delayed { background:#fee2e2; color:#991b1b; }
+        .status-cancelled { background:#f3f4f6; color:#6b7280; }
+
+        @media(max-width:900px){
+            .flight-row-inner { grid-template-columns:auto 1fr; }
+            .flight-price-col { border-left:none; border-top:1px solid #f0f2fa; text-align:left; align-items:flex-start; flex-direction:row; align-items:center; justify-content:space-between; width:100%; }
+            .fl-main { flex-wrap:wrap; }
         }
-
-        nav {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
-            padding: 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .navbar-brand {
-            font-size: 24px;
-            font-weight: 800;
-            color: white !important;
-            letter-spacing: 1px;
-        }
-
-        .navbar-nav .nav-link {
-            color: rgba(255,255,255,0.9) !important;
-            font-weight: 500;
-            margin: 0 10px;
-            transition: color 0.3s;
-        }
-
-        .navbar-nav .nav-link:hover {
-            color: var(--accent) !important;
-        }
-
-        .btn-login {
-            border: 2px solid white;
-            color: white;
-            border-radius: 5px;
-            padding: 6px 16px;
-            font-weight: 600;
-            margin-right: 10px;
-            transition: all 0.3s;
-        }
-
-        .btn-login:hover {
-            background: white;
-            color: var(--primary-dark);
-        }
-
-        .btn-signup {
-            background: var(--accent);
-            color: var(--primary-dark);
-            border-radius: 5px;
-            padding: 8px 18px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-signup:hover {
-            background: #ffb300;
-            transform: translateY(-2px);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            font-size: 13px;
-        }
-
-        .page-header {
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-            color: white;
-            padding: 60px 0 80px;
-            text-align: center;
-            position: relative;
-        }
-
-        .page-header h1 {
-            font-size: 42px;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-
-        .flights-section {
-            margin-top: -50px;
-            padding-bottom: 60px;
-        }
-
-        .flight-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s;
-            height: 100%;
-        }
-
-        .flight-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-        }
-
-        .flight-header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .flight-header h4 {
-            margin: 0;
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .flight-content {
-            padding: 25px;
-        }
-
-        .flight-detail {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .flight-detail:last-child {
-            border-bottom: none;
-        }
-
-        .detail-label {
-            color: #666;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .detail-value {
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .flight-price {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary);
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .btn-book {
-            background: linear-gradient(135deg, var(--accent), #ffb300);
-            color: var(--primary-dark);
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            font-weight: 700;
-            width: 100%;
-            transition: all 0.3s;
-        }
-
-        .btn-book:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 196, 0, 0.3);
-        }
-
-        .no-flights {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .no-flights i {
-            font-size: 5rem;
-            color: #dee2e6;
-            margin-bottom: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .page-header h1 {
-                font-size: 32px;
-            }
+        @media(max-width:600px){
+            .filter-row { flex-direction:column; }
+            .filter-group { min-width:100%; }
+            .fl-time { font-size:20px; }
+            .fl-price { font-size:22px; }
         }
     </style>
 </head>
 <body>
+
+<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-        <a class="navbar-brand" href="/"><i class="fas fa-plane"></i> SKYLINK</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <a class="navbar-brand" href="/"><i class="fas fa-paper-plane me-2"></i>SKY<span>LINK</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="/api/flight/all"><i class="fas fa-plane-departure"></i> Flights</a></li>
-                <li class="nav-item"><a class="nav-link" href="/deals"><i class="fas fa-tags"></i> Deals</a></li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/api/user/support/tickets(userId=${session.userId})}">Customer Support</a>
-                </li>
-                <li class="nav-item" th:if="${session.username != null}"><a class="nav-link" href="/api/user/profile"><i class="fas fa-user"></i> Profile</a></li>
+                <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home me-1"></i> Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/api/flight/all"><i class="fas fa-plane-departure me-1"></i> Flights</a></li>
+                <li class="nav-item"><a class="nav-link" href="/deals"><i class="fas fa-tags me-1"></i> Deals</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/api/user/support/tickets(userId=${session.userId})}"><i class="fas fa-headset me-1"></i> Support</a></li>
+                <li class="nav-item" th:if="${session.username != null}"><a class="nav-link" href="/api/user/profile"><i class="fas fa-user me-1"></i> Profile</a></li>
             </ul>
-            <div class="ms-auto" th:if="${session.username == null}">
-                <a href="/api/auth/login" class="btn btn-login">Login</a>
-                <a href="/api/auth/register" class="btn btn-signup">Register</a>
+            <div class="ms-3 d-flex align-items-center gap-2" th:if="${session.username == null}">
+                <a href="/api/auth/login" class="btn-nav-login">Login</a>
+                <a href="/api/auth/register" class="btn-nav-register">Register</a>
             </div>
-            <div class="user-info ms-3" th:if="${session.username != null}">
-                <i class="fas fa-user-circle" style="font-size: 20px;"></i>
-                <span th:text="${session.username}">User</span>
-                <form th:action="@{/api/auth/logout}" method="post" style="display: inline;">
-                    <button type="submit" class="btn btn-login btn-sm">Logout</button>
-                </form>
+            <div class="ms-3" th:if="${session.username != null}">
+                <div class="user-chip">
+                    <i class="fas fa-user-circle" style="font-size:18px;"></i>
+                    <span th:text="${session.username}">User</span>
+                    <form th:action="@{/api/auth/logout}" method="post" style="display:inline;margin:0;">
+                        <button type="submit" style="background:transparent;border:1px solid rgba(255,255,255,0.4);color:rgba(255,255,255,0.8);padding:3px 10px;border-radius:5px;font-size:12px;cursor:pointer;">Logout</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </nav>
 
+<!-- PAGE HEADER -->
 <div class="page-header">
-    <div class="container">
-        <h1><i class="fas fa-plane-departure me-3"></i>All Available Flights</h1>
-        <p>Explore our complete flight schedule and book your journey</p>
+    <div class="container" style="position:relative;z-index:1;">
+        <div class="breadcrumb-nav">
+            <a href="/">Home</a>
+            <span>/</span>
+            <span class="current">Flights</span>
+        </div>
+        <h1><i class="fas fa-plane-departure me-3" style="opacity:0.85;"></i>All Available Flights</h1>
+        <p>Browse our complete schedule — find the best route, class, and price for your next journey</p>
     </div>
 </div>
 
-<section class="flights-section">
-    <div class="container mt-5">
-        <div class="no-flights" th:if="${allFlights == null or #lists.isEmpty(allFlights)}">
-            <i class="fas fa-plane-slash"></i>
-            <h3>No Flights Available</h3>
-            <p class="text-muted">Please check back later for new flights</p>
-            <a href="/" class="btn btn-book" style="max-width: 200px; margin: 20px auto;">Back to Home</a>
-        </div>
+<!-- FILTER BAR -->
+<div class="container filter-bar-wrap">
+    <div class="filter-bar">
+        <form th:action="@{/api/flight/search}" method="get" id="filterForm">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label><i class="fas fa-map-marker-alt me-1"></i>From</label>
+                    <select name="origin" id="filterOrigin">
+                        <option value="">Any Origin</option>
+                        <option th:each="origin : ${origins}" th:value="${origin}" th:text="${origin}">City</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-location-dot me-1"></i>To</label>
+                    <select name="destination" id="filterDest">
+                        <option value="">Any Destination</option>
+                        <option th:each="dest : ${destinations}" th:value="${dest}" th:text="${dest}">City</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-calendar me-1"></i>Date</label>
+                    <input type="date" name="departureDate" id="filterDate">
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-couch me-1"></i>Class</label>
+                    <select name="cabinClass" id="filterClass">
+                        <option value="">All Classes</option>
+                        <option value="ECONOMY">Economy</option>
+                        <option value="BUSINESS">Business</option>
+                        <option value="FIRST_CLASS">First Class</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-users me-1"></i>Passengers</label>
+                    <select name="passengers">
+                        <option value="1">1 Passenger</option>
+                        <option value="2">2 Passengers</option>
+                        <option value="3">3 Passengers</option>
+                        <option value="4">4 Passengers</option>
+                        <option value="5">5 Passengers</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-filter"><i class="fas fa-search me-2"></i>Search</button>
+                <button type="button" class="btn-reset" onclick="resetFilters()"><i class="fas fa-undo me-1"></i>Reset</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-        <div class="row g-4 mt-5">
-            <div class="col-md-6 col-lg-4" th:each="flight : ${allFlights}">
-                <div class="flight-card">
-                    <div class="flight-header">
-                        <h4 th:text="${flight.origin} + ' → ' + ${flight.destination}">Route</h4>
+<div class="container pb-5 mt-3">
+
+    <!-- EMPTY STATE -->
+    <div th:if="${allFlights == null or #lists.isEmpty(allFlights)}" class="empty-state">
+        <div class="empty-icon"><i class="fas fa-plane-slash"></i></div>
+        <h3 style="font-family:'Playfair Display',serif;color:var(--navy);margin-bottom:10px;">No Flights Found</h3>
+        <p style="color:var(--text-light);margin-bottom:28px;max-width:380px;margin-left:auto;margin-right:auto;">We couldn't find any flights matching your criteria. Try adjusting your filters or check back later.</p>
+        <a href="/" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--blue),var(--navy-mid));color:white;padding:13px 28px;border-radius:10px;font-weight:700;text-decoration:none;font-size:14.5px;"><i class="fas fa-home"></i> Back to Home</a>
+    </div>
+
+    <!-- RESULTS META -->
+    <div class="results-meta" th:if="${allFlights != null and !#lists.isEmpty(allFlights)}">
+        <div class="results-count">
+            Showing <strong th:text="${#lists.size(allFlights)}">0</strong> available flights
+        </div>
+        <div class="sort-group">
+            <label>Sort by:</label>
+            <select id="sortSelect" onchange="sortFlights(this.value)">
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="date-asc">Departure: Earliest</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- FLIGHT LIST -->
+    <div class="flight-list" id="flightList" th:if="${allFlights != null and !#lists.isEmpty(allFlights)}">
+        <div class="flight-row" th:each="flight : ${allFlights}"
+             th:data-price="${flight.price}" th:data-date="${flight.departureDate}">
+            <div class="flight-row-inner">
+                <div class="flight-airline-stripe"></div>
+                <div class="flight-main">
+                    <!-- Flight number -->
+                    <div class="fl-number-badge">
+                        <i class="fas fa-plane me-2" style="opacity:0.75;"></i>
+                        <span th:text="${flight.flightNumber}">FL123</span>
                     </div>
-                    <div class="flight-content">
-                        <div class="flight-detail">
-                            <span class="detail-label"><i class="fas fa-plane me-2"></i>Flight Number</span>
-                            <span class="detail-value" th:text="${flight.flightNumber}">FN</span>
+
+                    <!-- Route -->
+                    <div class="fl-route">
+                        <div class="fl-point">
+                            <div class="fl-time" th:text="${#dates.format(flight.departureDate,'HH:mm')}">00:00</div>
+                            <div class="fl-airport" th:text="${flight.origin}">JFK</div>
                         </div>
-                        <div class="flight-detail">
-                            <span class="detail-label"><i class="fas fa-calendar-alt me-2"></i>Departure</span>
-                            <span class="detail-value" th:text="${#dates.format(flight.departureDate, 'MMM dd, HH:mm')}">DT</span>
+                        <div class="fl-arrow">
+                            <div class="fl-line" style="position:relative;">
+                                <span class="fl-plane-icon"><i class="fas fa-plane"></i></span>
+                            </div>
+                            <div class="fl-duration">Direct</div>
                         </div>
-                        <div class="flight-detail">
-                            <span class="detail-label"><i class="fas fa-clock me-2"></i>Arrival</span>
-                            <span class="detail-value" th:text="${#dates.format(flight.arrivalDate, 'MMM dd, HH:mm')}">AT</span>
+                        <div class="fl-point">
+                            <div class="fl-time" th:text="${#dates.format(flight.arrivalDate,'HH:mm')}">00:00</div>
+                            <div class="fl-airport" th:text="${flight.destination}">LHR</div>
                         </div>
-                        <div class="flight-detail">
-                            <span class="detail-label"><i class="fas fa-chair me-2"></i>Class</span>
-                            <span class="detail-value" th:text="${flight.cabinClass}">Class</span>
-                        </div>
-                        <div class="flight-detail">
-                            <span class="detail-label"><i class="fas fa-users me-2"></i>Seats Available</span>
-                            <span class="detail-value" th:text="${flight.seatsAvailable}">0</span>
-                        </div>
-                        <div class="flight-price">
-                            Rs.<span th:text="${#numbers.formatDecimal(flight.price, 1, 0)}">150000</span>
-                        </div>
-                        <a class="btn btn-book" th:href="@{/api/booking/page(flightId=${flight.id}, passengers=1)}">
-                            <i class="fas fa-ticket-alt me-2"></i>Book Now
-                        </a>
                     </div>
+
+                    <!-- Details -->
+                    <div class="fl-details">
+                        <div class="fl-detail-tag">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span th:text="${#dates.format(flight.departureDate,'MMM dd, yyyy')}">Date</span>
+                        </div>
+                        <div class="fl-detail-tag">
+                            <i class="fas fa-couch"></i>
+                            <span th:class="${flight.cabinClass == 'ECONOMY'} ? 'class-badge class-economy' :
+                                            (${flight.cabinClass == 'BUSINESS'} ? 'class-badge class-business' : 'class-badge class-first')"
+                                  th:text="${flight.cabinClass}">Economy</span>
+                        </div>
+                        <div class="fl-detail-tag">
+                            <i class="fas fa-users"></i>
+                            <span th:class="${flight.seatsAvailable > 20} ? 'seats-badge seats-high' :
+                                            (${flight.seatsAvailable > 5} ? 'seats-badge seats-mid' : 'seats-badge seats-low')">
+                                <i class="fas fa-circle" style="font-size:6px;"></i>
+                                <span th:text="${flight.seatsAvailable} + ' seats left'">25 seats left</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price & Book -->
+                <div class="flight-price-col">
+                    <div>
+                        <div class="fl-price">Rs.<span th:text="${#numbers.formatDecimal(flight.price,1,0)}">0</span></div>
+                        <div class="fl-price-sub">per person</div>
+                    </div>
+                    <a class="btn-book-now" th:href="@{/api/booking/page(flightId=${flight.id}, passengers=1)}">
+                        <i class="fas fa-ticket-alt"></i> Book Now
+                    </a>
+                    <a class="btn-details" th:href="@{/api/booking/page(flightId=${flight.id}, passengers=1)}">View Details</a>
                 </div>
             </div>
         </div>
-
-        <div class="text-center mt-5">
-            <a href="/" class="btn btn-book" style="max-width: 200px; margin: 0 auto;">
-                <i class="fas fa-arrow-left me-2"></i>Back to Home
-            </a>
-        </div>
     </div>
-</section>
+
+    <div class="text-center mt-5" th:if="${allFlights != null and !#lists.isEmpty(allFlights)}">
+        <a href="/" style="display:inline-flex;align-items:center;gap:8px;background:white;color:var(--navy);border:1.5px solid #dde3f5;padding:12px 28px;border-radius:10px;font-weight:700;text-decoration:none;font-size:14.5px;transition:all 0.25s;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='#dde3f5'">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+</div>
+
+<!-- FOOTER STRIP -->
+<div style="background:var(--navy);color:rgba(255,255,255,0.5);text-align:center;padding:20px;font-size:13px;">
+    &copy; 2024 Skylink Airlines. All rights reserved.
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function resetFilters() {
+        document.getElementById('filterOrigin').value = '';
+        document.getElementById('filterDest').value = '';
+        document.getElementById('filterDate').value = '';
+        document.getElementById('filterClass').value = '';
+    }
+    function sortFlights(method) {
+        const list = document.getElementById('flightList');
+        if (!list) return;
+        const rows = Array.from(list.querySelectorAll('.flight-row'));
+        rows.sort((a, b) => {
+            if (method === 'price-asc') return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+            if (method === 'price-desc') return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+            if (method === 'date-asc') return new Date(a.dataset.date) - new Date(b.dataset.date);
+            return 0;
+        });
+        rows.forEach(r => list.appendChild(r));
+    }
+</script>
 </body>
 </html>
