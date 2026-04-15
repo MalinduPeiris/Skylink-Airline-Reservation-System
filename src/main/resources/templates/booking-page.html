@@ -3,254 +3,377 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skylink Airlines - Booking</title>
+    <title>Skylink Airlines - Book Flight</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #f6f8fb; }
-        .step { width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; }
-        .step.active { background: #0d6efd; color: #fff; }
-        .step.inactive { background: #e9ecef; color: #6c757d; }
-        .card-sticky { position: sticky; top: 1rem; }
-        .nav-link { font-weight: 500; }
-        .required::after { content: " *"; color: #dc3545; }
-        .is-invalid { border-color: #dc3545; }
-        .invalid-feedback { display: none; }
-        .is-invalid ~ .invalid-feedback { display: block; }
+        :root {
+            --navy: #001845;
+            --navy-mid: #0033a0;
+            --blue: #0057d9;
+            --gold: #e8a820;
+            --gold-light: #f5c842;
+            --off-white: #f4f6fb;
+            --text-dark: #0d1b3e;
+            --text-light: #6b7a99;
+            --green: #16a34a;
+            --red: #dc2626;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans',sans-serif; background:var(--off-white); color:var(--text-dark); }
+
+        /* NAV */
+        nav { background:linear-gradient(135deg,var(--navy),var(--navy-mid) 60%,var(--blue)); position:sticky; top:0; z-index:1000; box-shadow:0 4px 24px rgba(0,0,0,0.18); }
+        .navbar-brand { font-family:'Playfair Display',serif; font-size:24px; font-weight:800; color:white !important; letter-spacing:2px; }
+        .navbar-brand span { color:var(--gold); }
+        .nav-link-custom { color:rgba(255,255,255,0.85); font-size:14px; font-weight:500; padding:8px 14px; border-radius:6px; transition:all 0.25s; text-decoration:none; }
+        .nav-link-custom:hover { color:var(--gold-light); background:rgba(255,255,255,0.08); }
+
+        /* STEP INDICATOR */
+        .step-bar { background:white; border-bottom:1px solid #eef1fb; padding:20px 0; position:sticky; top:64px; z-index:100; box-shadow:0 2px 12px rgba(0,24,69,0.06); }
+        .step-inner { display:flex; align-items:center; max-width:700px; margin:0 auto; padding:0 24px; }
+        .step-item { display:flex; align-items:center; gap:10px; }
+        .step-circle { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; transition:all 0.3s; }
+        .step-circle.active { background:linear-gradient(135deg,var(--blue),var(--navy-mid)); color:white; box-shadow:0 4px 12px rgba(0,87,217,0.35); }
+        .step-circle.done { background:var(--green); color:white; }
+        .step-circle.inactive { background:#eef1fb; color:var(--text-light); }
+        .step-label { font-size:13.5px; font-weight:600; }
+        .step-label.active { color:var(--navy); }
+        .step-label.done { color:var(--green); }
+        .step-label.inactive { color:var(--text-light); }
+        .step-connector { flex:1; height:2px; margin:0 16px; border-radius:2px; transition:background 0.3s; }
+        .step-connector.done { background:var(--green); }
+        .step-connector.inactive { background:#eef1fb; }
+
+        /* LAYOUT */
+        .booking-wrap { max-width:1200px; margin:0 auto; padding:40px 24px 80px; display:grid; grid-template-columns:1fr 380px; gap:32px; }
+        @media(max-width:960px) { .booking-wrap { grid-template-columns:1fr; } }
+
+        /* CARDS */
+        .bk-card { background:white; border-radius:16px; box-shadow:0 4px 20px rgba(0,24,69,0.08); border:1px solid #eef1fb; margin-bottom:20px; overflow:hidden; }
+        .bk-card-header { padding:20px 28px; border-bottom:1px solid #eef1fb; display:flex; align-items:center; gap:12px; }
+        .bk-card-header-icon { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--blue),var(--navy-mid)); display:flex; align-items:center; justify-content:center; color:white; font-size:14px; flex-shrink:0; }
+        .bk-card-header h5 { font-family:'Playfair Display',serif; font-size:17px; font-weight:700; color:var(--navy); margin:0; }
+        .bk-card-body { padding:28px; }
+
+        /* PASSENGER FORM */
+        .pax-card { border:1.5px solid #eef1fb; border-radius:12px; padding:24px; margin-bottom:16px; background:#fafbff; transition:border-color 0.2s; }
+        .pax-card:hover { border-color:#c5d5f7; }
+        .pax-card-title { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+        .pax-name { font-weight:700; font-size:15px; color:var(--navy); }
+        .pax-badge { background:linear-gradient(135deg,var(--navy),var(--blue)); color:white; font-size:11px; padding:3px 10px; border-radius:50px; font-weight:600; }
+        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        .form-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px; }
+        @media(max-width:640px) { .form-grid { grid-template-columns:1fr; } .form-grid-3 { grid-template-columns:1fr 1fr; } }
+        .field-group { display:flex; flex-direction:column; }
+        .field-group.full { grid-column:1/-1; }
+        .field-lbl { font-size:12px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.7px; margin-bottom:7px; }
+        .field-lbl .req { color:var(--red); margin-left:2px; }
+        .field-input { padding:12px 14px; border:1.5px solid #e2e7f4; border-radius:10px; font-size:14px; color:var(--text-dark); font-family:'DM Sans',sans-serif; transition:all 0.2s; background:white; }
+        .field-input:focus { border-color:var(--blue); outline:none; box-shadow:0 0 0 4px rgba(0,87,217,0.08); }
+        .field-input.is-invalid { border-color:var(--red); }
+        .field-input.is-invalid ~ .invalid-msg { display:block; }
+        .invalid-msg { display:none; font-size:12px; color:var(--red); margin-top:5px; }
+        .hint-text { font-size:11.5px; color:var(--text-light); margin-top:5px; }
+
+        /* EXTRAS */
+        .extras-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        @media(max-width:640px) { .extras-grid { grid-template-columns:1fr; } }
+        .extra-card { border:1.5px solid #eef1fb; border-radius:12px; padding:18px; background:#fafbff; transition:all 0.2s; }
+        .extra-card:hover { border-color:#c5d5f7; background:white; }
+        .extra-label { font-size:13px; font-weight:700; color:var(--navy); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+        .extra-label i { color:var(--blue); }
+        .extra-select { width:100%; padding:10px 14px; border:1.5px solid #e2e7f4; border-radius:8px; font-size:13.5px; color:var(--text-dark); font-family:'DM Sans',sans-serif; background:white; transition:border-color 0.2s; }
+        .extra-select:focus { border-color:var(--blue); outline:none; }
+
+        /* EXTRAS SUMMARY */
+        .extras-summary { background:#f0f6ff; border:1px solid #cce0ff; border-radius:12px; padding:18px; margin-top:20px; }
+        .extras-row { display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:8px; color:var(--text-light); }
+        .extras-row strong { color:var(--text-dark); }
+        .extras-total-row { display:flex; justify-content:space-between; font-size:15px; font-weight:700; color:var(--navy); padding-top:12px; border-top:1px solid #c5d5f7; }
+
+        /* REVIEW */
+        .review-section { margin-bottom:20px; }
+        .review-section-title { font-size:13px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid #eef1fb; }
+        .review-row { display:flex; justify-content:space-between; font-size:14px; padding:8px 0; border-bottom:1px dotted #f0f2fa; }
+        .review-row:last-child { border-bottom:none; }
+        .review-row .label { color:var(--text-light); }
+        .review-row .value { font-weight:600; color:var(--text-dark); text-align:right; }
+
+        /* SIDEBAR SUMMARY CARD */
+        .summary-card { background:white; border-radius:16px; box-shadow:0 4px 20px rgba(0,24,69,0.08); border:1px solid #eef1fb; position:sticky; top:130px; overflow:hidden; }
+        .summary-header { background:linear-gradient(135deg,var(--navy),var(--blue)); color:white; padding:22px 24px; }
+        .summary-header h5 { font-family:'Playfair Display',serif; font-size:17px; font-weight:700; margin:0 0 4px; }
+        .summary-header p { font-size:13px; opacity:0.75; margin:0; }
+        .summary-body { padding:24px; }
+        .summary-flight-route { text-align:center; padding:16px 0; margin-bottom:16px; border-bottom:1px solid #eef1fb; }
+        .summary-route-label { font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:var(--navy); }
+        .summary-route-sub { font-size:12.5px; color:var(--text-light); margin-top:4px; }
+        .summary-detail { display:flex; justify-content:space-between; font-size:13.5px; padding:8px 0; border-bottom:1px dotted #f4f6fb; }
+        .summary-detail .s-label { color:var(--text-light); }
+        .summary-detail .s-value { font-weight:600; color:var(--text-dark); }
+        .summary-price-block { background:linear-gradient(135deg,#f0f6ff,#e8f0ff); border-radius:12px; padding:18px; margin-top:16px; text-align:center; }
+        .total-label { font-size:12px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+        .total-amount { font-family:'Playfair Display',serif; font-size:32px; font-weight:800; color:var(--navy); }
+        .total-sub { font-size:12px; color:var(--text-light); margin-top:4px; }
+
+        /* PROMO */
+        .promo-wrap { padding:0 24px 20px; }
+        .promo-input-row { display:flex; gap:8px; }
+        .promo-input { flex:1; padding:11px 14px; border:1.5px solid #e2e7f4; border-radius:10px; font-size:13.5px; font-family:'DM Sans',sans-serif; }
+        .promo-input:focus { border-color:var(--blue); outline:none; }
+        .btn-promo { background:linear-gradient(135deg,var(--navy),var(--blue)); color:white; border:none; padding:11px 20px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; transition:all 0.25s; white-space:nowrap; }
+        .btn-promo:hover { transform:translateY(-1px); }
+
+        /* ACTION BUTTONS */
+        .step-actions { display:flex; justify-content:space-between; align-items:center; padding:20px 28px; border-top:1px solid #eef1fb; background:#fafbff; }
+        .btn-back { background:transparent; border:1.5px solid #e2e7f4; color:var(--text-light); padding:12px 24px; border-radius:10px; font-weight:600; font-size:14px; cursor:pointer; transition:all 0.2s; }
+        .btn-back:hover { border-color:var(--text-dark); color:var(--text-dark); }
+        .btn-next { background:linear-gradient(135deg,var(--blue),var(--navy-mid)); color:white; border:none; padding:13px 32px; border-radius:10px; font-weight:700; font-size:14.5px; cursor:pointer; transition:all 0.25s; display:flex; align-items:center; gap:8px; }
+        .btn-next:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,87,217,0.35); }
+        .btn-confirm { background:linear-gradient(135deg,var(--green),#15803d); color:white; border:none; padding:13px 32px; border-radius:10px; font-weight:700; font-size:14.5px; cursor:pointer; transition:all 0.25s; display:flex; align-items:center; gap:8px; }
+        .btn-confirm:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(22,163,74,0.35); }
+
+        /* TRUST BADGES */
+        .trust-badges { display:flex; gap:12px; padding:16px 24px; border-top:1px solid #eef1fb; flex-wrap:wrap; }
+        .trust-item { display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-light); }
+        .trust-item i { color:var(--green); }
+
+        .pax-count-selector { display:flex; align-items:center; gap:16px; }
+        .pax-count-selector label { font-size:14px; font-weight:600; color:var(--navy); }
+        .pax-count-select { padding:10px 18px; border:1.5px solid #e2e7f4; border-radius:10px; font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text-dark); background:white; }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="/">SkyLink Airlines</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navMain">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" href="/"><i class="bi bi-house"></i> Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="/flights"><i class="bi bi-airplane"></i> Flights</a></li>
-                <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="bi bi-grid"></i> My Bookings</a></li>
-            </ul>
+        <a class="navbar-brand" href="/"><i class="fas fa-paper-plane me-2"></i>SKY<span>LINK</span></a>
+        <div class="d-flex align-items-center gap-3">
+            <a href="/" class="nav-link-custom"><i class="fas fa-home me-1"></i> Home</a>
+            <a href="/api/flight/all" class="nav-link-custom"><i class="fas fa-plane-departure me-1"></i> Flights</a>
+            <a href="/api/user/profile" class="nav-link-custom" th:if="${session.username != null}"><i class="fas fa-user me-1"></i> <span th:text="${session.username}">User</span></a>
         </div>
     </div>
 </nav>
-<div class="container py-4">
-    <div class="d-flex align-items-center gap-2 mb-3">
-        <span class="step active">1</span>
-        <span class="fw-semibold">Passenger Details</span>
-        <div class="flex-grow-1 border-top mx-2" style="opacity:.5"></div>
-        <span class="step inactive">2</span>
-        <span class="text-muted">Extras</span>
-        <div class="flex-grow-1 border-top mx-2" style="opacity:.5"></div>
-        <span class="step inactive">3</span>
-        <span class="text-muted">Review & Pay</span>
-    </div>
-    <div class="row g-4">
-        <div class="col-lg-8">
-            <form id="bookingForm" th:action="@{/api/booking/create-with-passengers}" th:object="${bookingRequest}" method="post">
-                <input type="hidden" id="flightId" name="flightId" th:value="${flight?.id}">
-                <input type="hidden" id="userId" name="userId" th:value="${session.userId}">
-                <input type="hidden" name="passengerCount" id="passengerCount" th:field="*{passengerCount}">
-                <input type="hidden" id="bookingExtras" name="bookingExtras" th:field="*{bookingExtras}">
-                <input type="hidden" id="promoCode" name="promoCode" th:field="*{promoCode}">
-                <input type="hidden" id="totalPrice" name="totalPrice">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                <!-- Passenger Count Selector -->
-                <div class="mb-3">
-                    <label for="passengerSelect" class="form-label required">Number of Passengers (1-5)</label>
-                    <select class="form-select" id="passengerSelect" onchange="updatePassengerForms()">
-                        <option value="1" selected>1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
-                </div>
-                <!-- Step 1: Passenger Details -->
-                <div class="card mb-3" id="stepPassenger">
-                    <div class="card-header bg-white">
-                        <strong><i class="bi bi-person"></i> Passenger Information</strong>
-                    </div>
-                    <div class="card-body" id="passengerContainer">
-                        <!-- Dynamic passenger forms will be generated here -->
-                    </div>
-                    <div class="card-footer bg-white text-end">
-                        <button type="button" class="btn btn-primary" onclick="goToExtras()">Continue to Extras</button>
-                    </div>
-                </div>
-                <!-- Step 2: Booking Extras -->
-                <div class="card mb-3 d-none" id="stepExtras">
-                    <div class="card-header bg-white">
-                        <strong><i class="bi bi-plus-circle"></i> Travel Extras</strong>
-                    </div>
-                    <div class="card-body">
-                        <div class="card mb-4" style="background-color: #f8f9fa; border-left: 4px solid #0d6efd;">
-                            <div class="card-body">
-                                <h6 class="card-title mb-3"><i class="bi bi-info-circle"></i> Booking Summary</h6>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-2">
-                                            <small class="text-muted">Booking Date</small>
-                                            <div class="fw-semibold" id="bookingDateDisplay"></div>
-                                        </div>
-                                        <div class="mb-2">
-                                            <small class="text-muted">Booking Status</small>
-                                            <div><span class="badge bg-warning">Pending</span></div>
-                                        </div>
-                                        <div class="mb-2">
-                                            <small class="text-muted">Passengers</small>
-                                            <div class="fw-semibold" id="passengerCountDisplay">1</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-2">
-                                            <small class="text-muted">Flight Number</small>
-                                            <div class="fw-semibold" id="flightNumberDisplay">FL123</div>
-                                        </div>
-                                        <div class="mb-2">
-                                            <small class="text-muted">Total Amount</small>
-                                            <div class="fw-semibold text-primary fs-5" id="totalAmountDisplay">Rs.0.00</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Checked Baggage</label>
-                                <select class="form-select" id="baggage" name="baggage" onchange="updateExtrasTotal()">
-                                    <option value="0">No extra baggage - Rs.0</option>
-                                    <option value="2000">1 bag (20kg) - Rs.2000</option>
-                                    <option value="3500">2 bags (20kg each) - Rs.3500</option>
-                                    <option value="5000">3 bags (20kg each) - Rs.5000</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Seat Preference</label>
-                                <select class="form-select" id="seatPref" name="seatPref" onchange="updateExtrasTotal()">
-                                    <option value="0">Standard Seat - Rs.0</option>
-                                    <option value="2500">Window Seat - Rs.2500</option>
-                                    <option value="2500">Aisle Seat - Rs.2500</option>
-                                    <option value="5000">Extra Legroom - Rs.5000</option>
-                                    <option value="7500">Premium Seat - Rs.7500</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Meal Preference</label>
-                                <select class="form-select" id="meal" name="meal" onchange="updateExtrasTotal()">
-                                    <option value="0">Standard Meal - Rs.0</option>
-                                    <option value="1500">Vegetarian - Rs.1500</option>
-                                    <option value="1500">Vegan - Rs.1500</option>
-                                    <option value="2000">Kosher - Rs.2000</option>
-                                    <option value="2000">Halal - Rs.2000</option>
-                                    <option value="3000">Premium Meal - Rs.3000</option>
-                                    <option value="4000">Gourmet Meal - Rs.4000</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Special Assistance</label>
-                                <select class="form-select" id="assistance" name="assistance" onchange="updateExtrasTotal()">
-                                    <option value="0">None - Rs.0</option>
-                                    <option value="3000">Wheelchair Assistance - Rs.3000</option>
-                                    <option value="5000">Unaccompanied Minor - Rs.5000</option>
-                                    <option value="4000">Special Medical Assistance - Rs.4000</option>
-                                    <option value="2500">Pet in Cabin - Rs.2500</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="alert alert-info mt-4" role="alert">
-                            <h6 class="alert-heading"><i class="bi bi-calculator"></i> Extras Summary</h6>
-                            <div id="extrasBreakdownDisplay" class="small">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <span>Baggage per passenger:</span>
-                                    <span id="baggagePrice">Rs.0.00</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-1">
-                                    <span>Seat Preference per passenger:</span>
-                                    <span id="seatPrice">Rs.0.00</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-1">
-                                    <span>Meal per passenger:</span>
-                                    <span id="mealPrice">Rs.0.00</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-1">
-                                    <span>Assistance per passenger:</span>
-                                    <span id="assistancePrice">Rs.0.00</span>
-                                </div>
-                                <hr class="my-2">
-                                <div class="d-flex justify-content-between">
-                                    <strong>Total for <span id="passengerCountText">1</span> passenger(s):</strong>
-                                    <strong class="text-primary" id="extrasGrandTotal">$0.00</strong>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
-                        <button type="button" class="btn btn-outline-secondary" onclick="backToPassenger()">Back</button>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="text-muted small">Extras Total:</span>
-                            <strong id="extrasTotal" class="me-2">$0.00</strong>
-                            <button type="button" class="btn btn-primary" onclick="goToReview()">Continue to Review</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Step 3: Review & Confirm -->
-                <div class="card mb-3 d-none" id="stepReview">
-                    <div class="card-header bg-white">
-                        <strong><i class="bi bi-receipt"></i> Review & Confirm</strong>
-                    </div>
-                    <div class="card-body" id="reviewContainer"></div>
-                    <div class="card-footer bg-white d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-secondary" onclick="backToExtras()">Back</button>
-                        <button type="submit" class="btn btn-success" id="confirmBtn">
-                            <i class="bi bi-credit-card"></i> Proceed to Payment
-                        </button>
-                    </div>
-                </div>
-            </form>
+
+<!-- STEP BAR -->
+<div class="step-bar">
+    <div class="step-inner">
+        <div class="step-item">
+            <div class="step-circle active" id="sc1">1</div>
+            <span class="step-label active" id="sl1">Passenger Details</span>
         </div>
-        <!-- Booking Summary Sidebar -->
-        <div class="col-lg-4">
-            <div class="card card-sticky">
-                <div class="card-header bg-white">
-                    <strong>Booking Summary</strong>
-                </div>
-                <div class="card-body" id="summaryCard">
-                    <!-- Summary will be rendered here -->
-                </div>
-                <!-- Promo Code Field -->
-                <div class="card-body">
-                    <label for="promoCodeInput" class="form-label">Apply Promo Code</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="promoCodeInput" placeholder="Enter code">
-                        <button class="btn btn-outline-primary" type="button" onclick="applyPromo()">Apply</button>
+        <div class="step-connector inactive" id="conn1"></div>
+        <div class="step-item">
+            <div class="step-circle inactive" id="sc2">2</div>
+            <span class="step-label inactive" id="sl2">Travel Extras</span>
+        </div>
+        <div class="step-connector inactive" id="conn2"></div>
+        <div class="step-item">
+            <div class="step-circle inactive" id="sc3">3</div>
+            <span class="step-label inactive" id="sl3">Review &amp; Pay</span>
+        </div>
+    </div>
+</div>
+
+<div class="booking-wrap">
+    <!-- LEFT COLUMN -->
+    <div>
+        <form id="bookingForm" th:action="@{/api/booking/create-with-passengers}" th:object="${bookingRequest}" method="post">
+            <input type="hidden" id="flightId" name="flightId" th:value="${flight?.id}">
+            <input type="hidden" id="userId" name="userId" th:value="${session.userId}">
+            <input type="hidden" name="passengerCount" id="passengerCount" th:field="*{passengerCount}">
+            <input type="hidden" id="bookingExtras" name="bookingExtras" th:field="*{bookingExtras}">
+            <input type="hidden" id="promoCode" name="promoCode" th:field="*{promoCode}">
+            <input type="hidden" id="totalPrice" name="totalPrice">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <!-- STEP 1: PASSENGER DETAILS -->
+            <div id="stepPassenger">
+                <!-- Passenger count selector -->
+                <div class="bk-card mb-4">
+                    <div class="bk-card-body">
+                        <div class="pax-count-selector">
+                            <label><i class="fas fa-users me-2" style="color:var(--blue);"></i>Number of Passengers</label>
+                            <select class="pax-count-select" id="passengerSelect" onchange="updatePassengerForms()">
+                                <option value="1">1 Passenger</option>
+                                <option value="2">2 Passengers</option>
+                                <option value="3">3 Passengers</option>
+                                <option value="4">4 Passengers</option>
+                                <option value="5">5 Passengers</option>
+                            </select>
+                        </div>
                     </div>
-                    <div id="promoFeedback" class="mt-2 small text-success d-none">Discount applied!</div>
                 </div>
+
+                <div class="bk-card">
+                    <div class="bk-card-header">
+                        <div class="bk-card-header-icon"><i class="fas fa-user"></i></div>
+                        <h5>Passenger Information</h5>
+                    </div>
+                    <div class="bk-card-body" id="passengerContainer"></div>
+                    <div class="step-actions">
+                        <div style="font-size:13px;color:var(--text-light);"><i class="fas fa-shield-alt me-1" style="color:var(--green);"></i> Your data is securely encrypted</div>
+                        <button type="button" class="btn-next" onclick="goToExtras()">Continue to Extras <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: EXTRAS -->
+            <div id="stepExtras" class="d-none">
+                <div class="bk-card">
+                    <div class="bk-card-header">
+                        <div class="bk-card-header-icon"><i class="fas fa-plus-circle"></i></div>
+                        <h5>Travel Extras</h5>
+                    </div>
+                    <div class="bk-card-body">
+                        <p style="font-size:14px;color:var(--text-light);margin-bottom:24px;">Enhance your journey with these optional add-ons. Prices shown are per passenger.</p>
+                        <div class="extras-grid">
+                            <div class="extra-card">
+                                <div class="extra-label"><i class="fas fa-suitcase-rolling"></i> Checked Baggage</div>
+                                <select class="extra-select" id="baggage" name="baggage" onchange="updateExtrasTotal()">
+                                    <option value="0">No extra baggage — Rs.0</option>
+                                    <option value="2000">1 bag (20kg) — Rs.2,000</option>
+                                    <option value="3500">2 bags (20kg each) — Rs.3,500</option>
+                                    <option value="5000">3 bags (20kg each) — Rs.5,000</option>
+                                </select>
+                            </div>
+                            <div class="extra-card">
+                                <div class="extra-label"><i class="fas fa-chair"></i> Seat Preference</div>
+                                <select class="extra-select" id="seatPref" name="seatPref" onchange="updateExtrasTotal()">
+                                    <option value="0">Standard Seat — Rs.0</option>
+                                    <option value="2500">Window Seat — Rs.2,500</option>
+                                    <option value="2500">Aisle Seat — Rs.2,500</option>
+                                    <option value="5000">Extra Legroom — Rs.5,000</option>
+                                    <option value="7500">Premium Seat — Rs.7,500</option>
+                                </select>
+                            </div>
+                            <div class="extra-card">
+                                <div class="extra-label"><i class="fas fa-utensils"></i> Meal Preference</div>
+                                <select class="extra-select" id="meal" name="meal" onchange="updateExtrasTotal()">
+                                    <option value="0">Standard Meal — Rs.0</option>
+                                    <option value="1500">Vegetarian — Rs.1,500</option>
+                                    <option value="1500">Vegan — Rs.1,500</option>
+                                    <option value="2000">Kosher — Rs.2,000</option>
+                                    <option value="2000">Halal — Rs.2,000</option>
+                                    <option value="3000">Premium Meal — Rs.3,000</option>
+                                    <option value="4000">Gourmet Meal — Rs.4,000</option>
+                                </select>
+                            </div>
+                            <div class="extra-card">
+                                <div class="extra-label"><i class="fas fa-wheelchair"></i> Special Assistance</div>
+                                <select class="extra-select" id="assistance" name="assistance" onchange="updateExtrasTotal()">
+                                    <option value="0">None — Rs.0</option>
+                                    <option value="3000">Wheelchair Assistance — Rs.3,000</option>
+                                    <option value="5000">Unaccompanied Minor — Rs.5,000</option>
+                                    <option value="4000">Special Medical Assistance — Rs.4,000</option>
+                                    <option value="2500">Pet in Cabin — Rs.2,500</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Extras summary inline -->
+                        <div class="extras-summary" id="extrasSummaryBlock">
+                            <div class="extras-row"><span>Baggage (per passenger)</span><span id="esBaggage">Rs.0</span></div>
+                            <div class="extras-row"><span>Seat preference (per passenger)</span><span id="esSeat">Rs.0</span></div>
+                            <div class="extras-row"><span>Meal (per passenger)</span><span id="esMeal">Rs.0</span></div>
+                            <div class="extras-row"><span>Assistance (per passenger)</span><span id="esAssist">Rs.0</span></div>
+                            <div class="extras-total-row">
+                                <span>Extras total for <span id="paxCountText">1</span> passenger(s)</span>
+                                <span id="esTotalAll">Rs.0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-actions">
+                        <button type="button" class="btn-back" onclick="backToPassenger()"><i class="fas fa-arrow-left me-2"></i>Back</button>
+                        <button type="button" class="btn-next" onclick="goToReview()">Review Booking <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: REVIEW -->
+            <div id="stepReview" class="d-none">
+                <div class="bk-card">
+                    <div class="bk-card-header">
+                        <div class="bk-card-header-icon"><i class="fas fa-receipt"></i></div>
+                        <h5>Review &amp; Confirm Booking</h5>
+                    </div>
+                    <div class="bk-card-body" id="reviewContainer"></div>
+                    <div class="step-actions">
+                        <button type="button" class="btn-back" onclick="backToExtras()"><i class="fas fa-arrow-left me-2"></i>Back</button>
+                        <button type="submit" class="btn-confirm" id="confirmBtn"><i class="fas fa-credit-card"></i> Proceed to Payment</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- RIGHT COLUMN - SUMMARY SIDEBAR -->
+    <div>
+        <div class="summary-card">
+            <div class="summary-header">
+                <h5>Booking Summary</h5>
+                <p>Your selected flight details</p>
+            </div>
+            <div class="summary-body">
+                <div class="summary-flight-route">
+                    <div class="summary-route-label" id="summaryRoute">— → —</div>
+                    <div class="summary-route-sub" id="summaryClass">Economy Class</div>
+                </div>
+                <div class="summary-detail"><span class="s-label">Flight Number</span><span class="s-value" id="summaryFlightNum">—</span></div>
+                <div class="summary-detail"><span class="s-label">Passengers</span><span class="s-value" id="summaryPax">1</span></div>
+                <div class="summary-detail"><span class="s-label">Flight Price</span><span class="s-value" id="summaryFlightPrice">Rs.0</span></div>
+                <div class="summary-detail" id="summaryDiscountRow" style="display:none;"><span class="s-label" style="color:var(--green);">Promo Discount</span><span class="s-value" style="color:var(--green);" id="summaryDiscount">–Rs.0</span></div>
+                <div class="summary-detail"><span class="s-label">Extras</span><span class="s-value" style="color:var(--blue);" id="summaryExtras">Rs.0</span></div>
+                <div class="summary-price-block">
+                    <div class="total-label">Total Amount</div>
+                    <div class="total-amount" id="summaryTotal">Rs.0</div>
+                    <div class="total-sub">Inclusive of all taxes & fees</div>
+                </div>
+            </div>
+            <!-- PROMO -->
+            <div class="promo-wrap">
+                <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;"><i class="fas fa-tag me-2" style="color:var(--gold);"></i>Apply Promo Code</div>
+                <div class="promo-input-row">
+                    <input type="text" class="promo-input" id="promoCodeInput" placeholder="Enter code (e.g. SUMMER30)">
+                    <button type="button" class="btn-promo" onclick="applyPromo()">Apply</button>
+                </div>
+                <div id="promoFeedback" class="mt-2 d-none" style="font-size:12.5px;font-weight:600;"></div>
+                <div style="margin-top:10px;font-size:11.5px;color:var(--text-light);">Try: SUMMER30 · FLYBACK25 · GROUP40</div>
+            </div>
+            <div class="trust-badges">
+                <div class="trust-item"><i class="fas fa-lock"></i> Secure payment</div>
+                <div class="trust-item"><i class="fas fa-check-circle"></i> Instant confirmation</div>
+                <div class="trust-item"><i class="fas fa-headset"></i> 24/7 support</div>
             </div>
         </div>
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Get values from hidden inputs
     const flightId = document.getElementById('flightId').value || '';
     const userId = document.getElementById('userId').value || '';
-    let passengerCount = parseInt(document.getElementById('passengerSelect').value) || 1;
-    // Flight data populated from server-side model with Thymeleaf
     const flightData = {
         flightNumber: "[[${flight?.flightNumber}]]" || "FL123",
-        origin: "[[${flight?.origin}]]" || "New York",
-        destination: "[[${flight?.destination}]]" || "London",
-        cabinClass: "[[${flight?.cabinClass}]]" || "Economy",
-        price: parseFloat("[[${flight?.price}]]") || 299.99
+        origin: "[[${flight?.origin}]]" || "Origin",
+        destination: "[[${flight?.destination}]]" || "Destination",
+        cabinClass: "[[${flight?.cabinClass}]]" || "ECONOMY",
+        price: parseFloat("[[${flight?.price}]]") || 0
     };
     const userEmail = "[[${userEmail}]]" || '';
     const destinationCity = "[[${destinationCity}]]" || '';
+    let passengerCount = 1;
     let bookingExtras = 0;
     let promoDiscount = 0;
     let currentStep = 1;
+
+    function fmt(n) { return 'Rs.' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
     function updatePassengerForms() {
         passengerCount = parseInt(document.getElementById('passengerSelect').value);
         document.getElementById('passengerCount').value = passengerCount;
@@ -258,411 +381,234 @@
         container.innerHTML = '';
         for (let i = 0; i < passengerCount; i++) {
             const isPrimary = i === 0;
-            // Pre-fill country for primary passenger if destination city is available
-            const countryValue = isPrimary && destinationCity ? destinationCity : '';
+            const countryVal = isPrimary && destinationCity ? destinationCity : '';
             container.innerHTML += `
-                <div class="border rounded-3 p-3 mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="mb-0">Passenger ${i + 1}
-                            ${isPrimary ? '<span class="badge bg-secondary ms-2">Primary</span>' : ''}
-                        </h6>
+            <div class="pax-card">
+                <div class="pax-card-title">
+                    <div class="pax-name"><i class="fas fa-user me-2" style="color:var(--blue);opacity:0.7;"></i>Passenger ${i+1}</div>
+                    ${isPrimary ? '<span class="pax-badge">Primary Traveller</span>' : ''}
+                </div>
+                <div class="form-grid">
+                    <div class="field-group">
+                        <label class="field-lbl">First Name<span class="req">*</span></label>
+                        <input class="field-input" name="passengers[${i}].firstName" required placeholder="e.g. John">
+                        <span class="invalid-msg">First name is required.</span>
                     </div>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label required">First Name</label>
-                            <input class="form-control" name="passengers[${i}].firstName" required>
-                            <div class="invalid-feedback">First name is required.</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label required">Last Name</label>
-                            <input class="form-control" name="passengers[${i}].lastName" required>
-                            <div class="invalid-feedback">Last name is required.</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label required">Email</label>
-                            <input type="email" class="form-control" name="passengers[${i}].email" value="${isPrimary ? userEmail : ''}" required>
-                            <div class="invalid-feedback">Valid email is required.</div>
-                            ${isPrimary ? '<small class="text-muted">Pre-filled with your account email (editable)</small>' : ''}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label required">Phone Number</label>
-                            <input type="tel" class="form-control" name="passengers[${i}].phone" required>
-                            <div class="invalid-feedback">Phone number is required.</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label required">Date of Birth</label>
-                            <input type="date" class="form-control" name="passengers[${i}].dateOfBirth" required max="2025-10-11">
-                            <div class="invalid-feedback">Date of birth is required.</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label required">Country</label>
-                            <input class="form-control" placeholder="e.g., Sri Lanka" name="passengers[${i}].country" value="${countryValue}" required>
-                            <div class="invalid-feedback">Country is required.</div>
-                            ${isPrimary && destinationCity ? '<small class="text-muted">Pre-filled with destination city (editable)</small>' : ''}
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Passport No.</label>
-                            <input class="form-control" name="passengers[${i}].passportNumber">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Passport Expiry</label>
-                            <input type="date" class="form-control" name="passengers[${i}].passportExpiry">
-                        </div>
+                    <div class="field-group">
+                        <label class="field-lbl">Last Name<span class="req">*</span></label>
+                        <input class="field-input" name="passengers[${i}].lastName" required placeholder="e.g. Smith">
+                        <span class="invalid-msg">Last name is required.</span>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-lbl">Email Address<span class="req">*</span></label>
+                        <input type="email" class="field-input" name="passengers[${i}].email" value="${isPrimary ? userEmail : ''}" required placeholder="your@email.com">
+                        ${isPrimary ? '<span class="hint-text"><i class="fas fa-info-circle me-1"></i>Pre-filled from your account — editable</span>' : ''}
+                        <span class="invalid-msg">Valid email is required.</span>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-lbl">Phone Number<span class="req">*</span></label>
+                        <input type="tel" class="field-input" name="passengers[${i}].phone" required placeholder="+94 77 123 4567">
+                        <span class="invalid-msg">Phone number is required.</span>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-lbl">Date of Birth<span class="req">*</span></label>
+                        <input type="date" class="field-input" name="passengers[${i}].dateOfBirth" required max="${new Date().toISOString().split('T')[0]}">
+                        <span class="invalid-msg">Date of birth is required.</span>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-lbl">Country<span class="req">*</span></label>
+                        <input class="field-input" name="passengers[${i}].country" value="${countryVal}" required placeholder="e.g. Sri Lanka">
+                        ${isPrimary && destinationCity ? '<span class="hint-text"><i class="fas fa-info-circle me-1"></i>Pre-filled with destination</span>' : ''}
+                        <span class="invalid-msg">Country is required.</span>
                     </div>
                 </div>
-            `;
+                <div class="form-grid-3" style="margin-top:16px;">
+                    <div class="field-group">
+                        <label class="field-lbl">Passport No.</label>
+                        <input class="field-input" name="passengers[${i}].passportNumber" placeholder="Optional">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-lbl">Passport Expiry</label>
+                        <input type="date" class="field-input" name="passengers[${i}].passportExpiry">
+                    </div>
+                </div>
+            </div>`;
         }
-        updateExtrasTotal();
         renderSummary();
+        updateExtrasTotal();
     }
+
     function updateExtrasTotal() {
-        const baggage = parseFloat(document.getElementById('baggage').value) || 0;
-        const seatPref = parseFloat(document.getElementById('seatPref').value) || 0;
+        const bag = parseFloat(document.getElementById('baggage').value) || 0;
+        const seat = parseFloat(document.getElementById('seatPref').value) || 0;
         const meal = parseFloat(document.getElementById('meal').value) || 0;
-        const assistance = parseFloat(document.getElementById('assistance').value) || 0;
-        bookingExtras = (baggage + seatPref + meal + assistance) * passengerCount;
-        document.getElementById('baggagePrice').textContent = 'Rs.' + baggage.toFixed(2);
-        document.getElementById('seatPrice').textContent = 'Rs.' + seatPref.toFixed(2);
-        document.getElementById('mealPrice').textContent = 'Rs.' + meal.toFixed(2);
-        document.getElementById('assistancePrice').textContent = 'Rs.' + assistance.toFixed(2);
-        document.getElementById('extrasGrandTotal').textContent = 'Rs.' + bookingExtras.toFixed(2);
-        document.getElementById('extrasTotal').textContent = 'Rs.' + bookingExtras.toFixed(2);
+        const assist = parseFloat(document.getElementById('assistance').value) || 0;
+        bookingExtras = (bag + seat + meal + assist) * passengerCount;
+        document.getElementById('esBaggage').textContent = fmt(bag);
+        document.getElementById('esSeat').textContent = fmt(seat);
+        document.getElementById('esMeal').textContent = fmt(meal);
+        document.getElementById('esAssist').textContent = fmt(assist);
+        document.getElementById('esTotalAll').textContent = fmt(bookingExtras);
+        document.getElementById('paxCountText').textContent = passengerCount;
         document.getElementById('bookingExtras').value = bookingExtras.toFixed(2);
-        document.getElementById('passengerCountText').textContent = passengerCount;
-        renderSummary();
-        updateBookingStatusCard();
-    }
-    function applyPromo() {
-        const code = document.getElementById('promoCodeInput').value.trim();
-        if (!code) {
-            alert('Please enter a promo code.');
-            return;
-        }
-        // Simulate promo validation (replace with AJAX call to backend if needed)
-        // For example, assume 'EARLY20' gives 20% off flight price
-        let discount = 0;
-        if (code === 'EARLY20') {
-            discount = 0.20; // 20%
-        } else if (code === 'BUSINESS50') {
-            discount = 0.50; // 50%
-        } else if (code === 'WEEKEND30') {
-            discount = 0.30; // 30%
-        } else {
-            alert('Invalid promo code.');
-            return;
-        }
-        promoDiscount = discount;
-        document.getElementById('promoCode').value = code;
-        document.getElementById('promoFeedback').classList.remove('d-none');
-        document.getElementById('promoFeedback').textContent = 'Promo applied: ' + (discount * 100) + '% off flight price!';
         renderSummary();
     }
+
     function renderSummary() {
-        const baseFlightPrice = flightData.price * passengerCount;
-        const discountAmount = baseFlightPrice * promoDiscount;
-        const flightPriceAfterDiscount = baseFlightPrice - discountAmount;
-        const totalPrice = flightPriceAfterDiscount + bookingExtras;
-        const baggage = parseFloat(document.getElementById('baggage')?.value || 0);
-        const seatPref = parseFloat(document.getElementById('seatPref')?.value || 0);
-        const meal = parseFloat(document.getElementById('meal')?.value || 0);
-        const assistance = parseFloat(document.getElementById('assistance')?.value || 0);
-        let extrasBreakdown = '';
-        if (bookingExtras > 0) {
-            extrasBreakdown = '<div class="mb-2"><small class="text-muted">Extras Breakdown:</small></div>';
-            if (baggage > 0) {
-                extrasBreakdown += '<div class="d-flex justify-content-between mb-1 small">' +
-                        '<span class="ms-2">• Baggage (×' + passengerCount + '):</span>' +
-                        '<span>Rs.' + (baggage * passengerCount).toFixed(2) + '</span>' +
-                    '</div>';
-            }
-            if (seatPref > 0) {
-                extrasBreakdown += '<div class="d-flex justify-content-between mb-1 small">' +
-                        '<span class="ms-2">• Seat Preference (×' + passengerCount + '):</span>' +
-                        '<span>Rs.' + (seatPref * passengerCount).toFixed(2) + '</span>' +
-                    '</div>';
-            }
-            if (meal > 0) {
-                extrasBreakdown += '<div class="d-flex justify-content-between mb-1 small">' +
-                        '<span class="ms-2">• Meal (×' + passengerCount + '):</span>' +
-                        '<span>Rs.' + (meal * passengerCount).toFixed(2) + '</span>' +
-                    '</div>';
-            }
-            if (assistance > 0) {
-                extrasBreakdown += '<div class="d-flex justify-content-between mb-1 small">' +
-                        '<span class="ms-2">• Assistance (×' + passengerCount + '):</span>' +
-                        '<span>Rs.' + (assistance * passengerCount).toFixed(2) + '</span>' +
-                    '</div>';
-            }
-        }
-        let promoSection = '';
+        const base = flightData.price * passengerCount;
+        const disc = base * promoDiscount;
+        const total = (base - disc) + bookingExtras;
+        document.getElementById('summaryRoute').textContent = flightData.origin + ' → ' + flightData.destination;
+        document.getElementById('summaryClass').textContent = flightData.cabinClass + ' Class';
+        document.getElementById('summaryFlightNum').textContent = flightData.flightNumber;
+        document.getElementById('summaryPax').textContent = passengerCount;
+        document.getElementById('summaryFlightPrice').textContent = fmt(base);
+        document.getElementById('summaryExtras').textContent = fmt(bookingExtras);
+        document.getElementById('summaryTotal').textContent = fmt(total);
+        document.getElementById('totalPrice').value = total.toFixed(2);
         if (promoDiscount > 0) {
-            promoSection = '<div class="d-flex justify-content-between mb-1 text-success">' +
-                    '<span>Promo Discount (' + (promoDiscount * 100) + '%):</span>' +
-                    '<span>-Rs.' + discountAmount.toFixed(2) + '</span>' +
-                '</div>';
+            document.getElementById('summaryDiscountRow').style.display = '';
+            document.getElementById('summaryDiscount').textContent = '–' + fmt(disc);
+        } else {
+            document.getElementById('summaryDiscountRow').style.display = 'none';
         }
-        document.getElementById('summaryCard').innerHTML = 
-                '<div class="mb-3">' +
-                    '<h6 class="text-muted mb-2">Flight Details</h6>' +
-                    '<div class="d-flex justify-content-between mb-1">' +
-                        '<span>Flight:</span>' +
-                        '<strong>' + flightData.flightNumber + '</strong>' +
-                    '</div>' +
-                    '<div class="d-flex justify-content-between mb-1">' +
-                        '<span>Route:</span>' +
-                        '<strong>' + flightData.origin + ' → ' + flightData.destination + '</strong>' +
-                    '</div>' +
-                    '<div class="d-flex justify-content-between mb-1">' +
-                        '<span>Class:</span>' +
-                        '<strong>' + flightData.cabinClass + '</strong>' +
-                    '</div>' +
-                '</div>' +
-                '<hr>' +
-                '<div class="mb-3">' +
-                    '<h6 class="text-muted mb-2">Pricing</h6>' +
-                    '<div class="d-flex justify-content-between mb-1">' +
-                        '<span>Passengers:</span>' +
-                        '<span>' + passengerCount + '</span>' +
-                    '</div>' +
-                    '<div class="d-flex justify-content-between mb-1">' +
-                        '<span>Flight Price:</span>' +
-                        '<span>Rs.' + baseFlightPrice.toFixed(2) + '</span>' +
-                    '</div>' +
-                    promoSection +
-                    '<div class="d-flex justify-content-between mb-2">' +
-                        '<span>Booking Extras:</span>' +
-                        '<span class="text-success fw-semibold">Rs.' + bookingExtras.toFixed(2) + '</span>' +
-                    '</div>' +
-                    extrasBreakdown +
-                '</div>' +
-                '<hr>' +
-                '<div class="d-flex justify-content-between">' +
-                    '<strong>Total Price:</strong>' +
-                    '<strong class="text-primary fs-5">Rs.' + totalPrice.toFixed(2) + '</strong>' +
-                '</div>';
-        document.getElementById('totalPrice').value = totalPrice.toFixed(2);
     }
-    function updateBookingStatusCard() {
-        const baseFlightPrice = flightData.price * passengerCount;
-        const discountAmount = baseFlightPrice * promoDiscount;
-        const flightPriceAfterDiscount = baseFlightPrice - discountAmount;
-        const totalPrice = flightPriceAfterDiscount + bookingExtras;
-        document.getElementById('bookingDateDisplay').textContent = new Date().toLocaleDateString();
-        document.getElementById('passengerCountDisplay').textContent = passengerCount;
-        document.getElementById('flightNumberDisplay').textContent = flightData.flightNumber;
-        document.getElementById('totalAmountDisplay').textContent = 'Rs.' + totalPrice.toFixed(2);
+
+    function applyPromo() {
+        const code = document.getElementById('promoCodeInput').value.trim().toUpperCase();
+        const fb = document.getElementById('promoFeedback');
+        const codes = { 'SUMMER30':0.30, 'FLYBACK25':0.25, 'GROUP40':0.40, 'WEEKEND35':0.35, 'EARLY20':0.20 };
+        if (!code) { fb.textContent='Please enter a promo code.'; fb.style.color='var(--red)'; fb.classList.remove('d-none'); return; }
+        if (codes[code]) {
+            promoDiscount = codes[code];
+            document.getElementById('promoCode').value = code;
+            fb.textContent = `✓ Code "${code}" applied — ${(promoDiscount*100).toFixed(0)}% off flight price!`;
+            fb.style.color = 'var(--green)';
+            fb.classList.remove('d-none');
+            renderSummary();
+        } else {
+            fb.textContent = '✗ Invalid promo code. Try SUMMER30, FLYBACK25, GROUP40.';
+            fb.style.color = 'var(--red)';
+            fb.classList.remove('d-none');
+        }
     }
+
+    function validateStep1() {
+        const inputs = document.querySelectorAll('#stepPassenger input[required]');
+        let valid = true;
+        inputs.forEach(inp => {
+            if (!inp.value.trim()) { inp.classList.add('is-invalid'); valid = false; }
+            else inp.classList.remove('is-invalid');
+        });
+        return valid;
+    }
+
     function goToExtras() {
-        const form = document.getElementById('bookingForm');
-        const inputs = form.querySelectorAll('#stepPassenger input[required]');
-        let allValid = true;
-        inputs.forEach(input => {
-            if (!input.value) {
-                allValid = false;
-                input.classList.add('is-invalid');
-            } else {
-                input.classList.remove('is-invalid');
-            }
-        });
-        if (!allValid) {
-            alert('Please fill in all required passenger fields');
-            return;
-        }
-        document.getElementById('stepPassenger').classList.add('d-none');
-        document.getElementById('stepExtras').classList.remove('d-none');
-        currentStep = 2;
-        updateStepIndicators();
-        updateExtrasTotal();
+        if (!validateStep1()) { alert('Please complete all required passenger fields.'); return; }
+        toggle(1, 2);
     }
-    function backToPassenger() {
-        document.getElementById('stepExtras').classList.add('d-none');
-        document.getElementById('stepPassenger').classList.remove('d-none');
-        currentStep = 1;
-        updateStepIndicators();
-    }
+    function backToPassenger() { toggle(2, 1); }
     function goToReview() {
-        const form = document.getElementById('bookingForm');
-        const inputs = form.querySelectorAll('#stepPassenger input[required]');
-        let allValid = true;
-        inputs.forEach(input => {
-            if (!input.value) {
-                allValid = false;
-                input.classList.add('is-invalid');
-            } else {
-                input.classList.remove('is-invalid');
-            }
-        });
-        if (!allValid) {
-            alert('Please fill in all required fields before proceeding to review.');
-            return;
-        }
-        document.getElementById('stepExtras').classList.add('d-none');
-        document.getElementById('stepReview').classList.remove('d-none');
-        currentStep = 3;
-        updateStepIndicators();
+        if (!validateStep1()) { alert('Please complete all required passenger fields.'); return; }
+        toggle(2, 3);
         renderReview();
     }
-    function backToExtras() {
-        document.getElementById('stepReview').classList.add('d-none');
-        document.getElementById('stepExtras').classList.remove('d-none');
-        currentStep = 2;
+    function backToExtras() { toggle(3, 2); }
+
+    function toggle(from, to) {
+        const steps = ['stepPassenger','stepExtras','stepReview'];
+        document.getElementById(steps[from-1]).classList.add('d-none');
+        document.getElementById(steps[to-1]).classList.remove('d-none');
+        currentStep = to;
         updateStepIndicators();
+        window.scrollTo({top:0, behavior:'smooth'});
     }
+
     function updateStepIndicators() {
-        document.querySelectorAll('.step').forEach((step, idx) => {
-            if (idx + 1 <= currentStep) {
-                step.classList.add('active');
-                step.classList.remove('inactive');
+        for (let i=1; i<=3; i++) {
+            const circle = document.getElementById('sc'+i);
+            const label = document.getElementById('sl'+i);
+            if (i < currentStep) {
+                circle.className='step-circle done'; circle.innerHTML='<i class="fas fa-check"></i>';
+                label.className='step-label done';
+            } else if (i === currentStep) {
+                circle.className='step-circle active'; circle.textContent=i;
+                label.className='step-label active';
             } else {
-                step.classList.remove('active');
-                step.classList.add('inactive');
+                circle.className='step-circle inactive'; circle.textContent=i;
+                label.className='step-label inactive';
             }
-        });
+            if (i < 3) {
+                const conn = document.getElementById('conn'+i);
+                conn.className = 'step-connector ' + (i < currentStep ? 'done' : 'inactive');
+            }
+        }
     }
+
     function renderReview() {
-        const baseFlightPrice = flightData.price * passengerCount;
-        const discountAmount = baseFlightPrice * promoDiscount;
-        const flightPriceAfterDiscount = baseFlightPrice - discountAmount;
-        const totalPrice = flightPriceAfterDiscount + bookingExtras;
-        const baggageEl = document.getElementById('baggage');
-        const seatPrefEl = document.getElementById('seatPref');
-        const mealEl = document.getElementById('meal');
-        const assistanceEl = document.getElementById('assistance');
-        const baggageText = baggageEl.options[baggageEl.selectedIndex].text;
-        const seatPrefText = seatPrefEl.options[seatPrefEl.selectedIndex].text;
-        const mealText = mealEl.options[mealEl.selectedIndex].text;
-        const assistanceText = assistanceEl.options[assistanceEl.selectedIndex].text;
-        let passengerDetails = '';
+        const base = flightData.price * passengerCount;
+        const disc = base * promoDiscount;
+        const total = (base - disc) + bookingExtras;
+        let paxHtml = '';
         for (let i = 0; i < passengerCount; i++) {
-            const firstName = document.querySelector(`input[name="passengers[${i}].firstName"]`).value || 'N/A';
-            const lastName = document.querySelector(`input[name="passengers[${i}].lastName"]`).value || 'N/A';
-            const email = document.querySelector(`input[name="passengers[${i}].email"]`).value || 'N/A';
-            const phone = document.querySelector(`input[name="passengers[${i}].phone"]`).value || 'N/A';
-            const dob = document.querySelector(`input[name="passengers[${i}].dateOfBirth"]`).value || 'N/A';
-            const country = document.querySelector(`input[name="passengers[${i}].country"]`).value || 'N/A';
-            const passportNumber = document.querySelector(`input[name="passengers[${i}].passportNumber"]`).value || 'N/A';
-            const passportExpiry = document.querySelector(`input[name="passengers[${i}].passportExpiry"]`).value || 'N/A';
-            passengerDetails += `
-                <div class="border rounded p-2 mb-2">
-                    <strong>Passenger ${i + 1}:</strong> ${firstName} ${lastName}<br>
-                    <small>
-                        Email: ${email}<br>
-                        Phone: ${phone}<br>
-                        DOB: ${dob}<br>
-                        Country: ${country}<br>
-                        Passport No.: ${passportNumber}<br>
-                        Passport Expiry: ${passportExpiry}
-                    </small>
-                </div>
-            `;
+            const fn = document.querySelector(`input[name="passengers[${i}].firstName"]`)?.value || '—';
+            const ln = document.querySelector(`input[name="passengers[${i}].lastName"]`)?.value || '—';
+            const em = document.querySelector(`input[name="passengers[${i}].email"]`)?.value || '—';
+            const ph = document.querySelector(`input[name="passengers[${i}].phone"]`)?.value || '—';
+            const dob = document.querySelector(`input[name="passengers[${i}].dateOfBirth"]`)?.value || '—';
+            const co = document.querySelector(`input[name="passengers[${i}].country"]`)?.value || '—';
+            const pp = document.querySelector(`input[name="passengers[${i}].passportNumber"]`)?.value || '—';
+            paxHtml += `<div style="background:#fafbff;border:1px solid #eef1fb;border-radius:10px;padding:16px;margin-bottom:12px;">
+                <div style="font-weight:700;color:var(--navy);margin-bottom:10px;"><i class="fas fa-user me-2" style="color:var(--blue);"></i>Passenger ${i+1}${i===0?' <span style="background:var(--navy);color:white;font-size:10px;padding:2px 8px;border-radius:50px;font-weight:600;margin-left:6px;">Primary</span>':''}</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;font-size:13.5px;">
+                    <div><span style="color:var(--text-light);">Name: </span><strong>${fn} ${ln}</strong></div>
+                    <div><span style="color:var(--text-light);">Email: </span><strong>${em}</strong></div>
+                    <div><span style="color:var(--text-light);">Phone: </span><strong>${ph}</strong></div>
+                    <div><span style="color:var(--text-light);">DOB: </span><strong>${dob}</strong></div>
+                    <div><span style="color:var(--text-light);">Country: </span><strong>${co}</strong></div>
+                    <div><span style="color:var(--text-light);">Passport: </span><strong>${pp}</strong></div>
+                </div></div>`;
         }
-        let promoSection = '';
-        if (promoDiscount > 0) {
-            promoSection = `
-                <div class="col-6"><strong>Promo Discount (${promoDiscount * 100}%):</strong></div>
-                <div class="col-6 text-success">-$${discountAmount.toFixed(2)}</div>
-            `;
-        }
+        const bagEl = document.getElementById('baggage');
+        const seatEl = document.getElementById('seatPref');
+        const mealEl = document.getElementById('meal');
+        const assEl = document.getElementById('assistance');
         document.getElementById('reviewContainer').innerHTML = `
-                <h6 class="mb-3">Passenger Details</h6>
-                ${passengerDetails}
-                <hr>
-                <h6 class="mb-3">Travel Extras</h6>
-                <div class="row mb-3">
-                    <div class="col-6"><strong>Baggage:</strong></div>
-                    <div class="col-6">${baggageText}</div>
-                    <div class="col-6"><strong>Seat Preference:</strong></div>
-                    <div class="col-6">${seatPrefText}</div>
-                    <div class="col-6"><strong>Meal Preference:</strong></div>
-                    <div class="col-6">${mealText}</div>
-                    <div class="col-6"><strong>Special Assistance:</strong></div>
-                    <div class="col-6">${assistanceText}</div>
+            <div class="review-section">
+                <div class="review-section-title"><i class="fas fa-plane me-2" style="color:var(--blue);"></i>Flight Details</div>
+                <div class="review-row"><span class="label">Flight Number</span><span class="value">${flightData.flightNumber}</span></div>
+                <div class="review-row"><span class="label">Route</span><span class="value">${flightData.origin} → ${flightData.destination}</span></div>
+                <div class="review-row"><span class="label">Class</span><span class="value">${flightData.cabinClass}</span></div>
+                <div class="review-row"><span class="label">Status</span><span class="value"><span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:50px;font-size:12px;">PENDING</span></span></div>
+            </div>
+            <div class="review-section">
+                <div class="review-section-title"><i class="fas fa-users me-2" style="color:var(--blue);"></i>Passenger Details</div>
+                ${paxHtml}
+            </div>
+            <div class="review-section">
+                <div class="review-section-title"><i class="fas fa-plus-circle me-2" style="color:var(--blue);"></i>Travel Extras</div>
+                <div class="review-row"><span class="label">Baggage</span><span class="value">${bagEl.options[bagEl.selectedIndex].text}</span></div>
+                <div class="review-row"><span class="label">Seat Preference</span><span class="value">${seatEl.options[seatEl.selectedIndex].text}</span></div>
+                <div class="review-row"><span class="label">Meal</span><span class="value">${mealEl.options[mealEl.selectedIndex].text}</span></div>
+                <div class="review-row"><span class="label">Assistance</span><span class="value">${assEl.options[assEl.selectedIndex].text}</span></div>
+            </div>
+            <div class="review-section">
+                <div class="review-section-title"><i class="fas fa-receipt me-2" style="color:var(--blue);"></i>Price Summary</div>
+                <div class="review-row"><span class="label">Flight Price (×${passengerCount})</span><span class="value">${fmt(base)}</span></div>
+                ${promoDiscount>0?`<div class="review-row"><span class="label" style="color:var(--green);">Promo Discount (${(promoDiscount*100).toFixed(0)}%)</span><span class="value" style="color:var(--green);">–${fmt(disc)}</span></div>`:''}
+                <div class="review-row"><span class="label">Extras Total</span><span class="value" style="color:var(--blue);">${fmt(bookingExtras)}</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:16px;background:linear-gradient(135deg,#f0f6ff,#e8f0ff);border-radius:12px;margin-top:12px;">
+                    <span style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--navy);">Total Amount</span>
+                    <span style="font-family:'Playfair Display',serif;font-size:26px;font-weight:800;color:var(--navy);">${fmt(total)}</span>
                 </div>
-                <hr>
-                <h6 class="mb-3">Booking Details</h6>
-                <div class="row">
-                    <div class="col-6"><strong>Booking Date:</strong></div>
-                    <div class="col-6">${new Date().toLocaleDateString()}</div>
-                    <div class="col-6"><strong>Flight Number:</strong></div>
-                    <div class="col-6">${flightData.flightNumber}</div>
-                    <div class="col-6"><strong>Passenger Count:</strong></div>
-                    <div class="col-6">${passengerCount}</div>
-                    <div class="col-6"><strong>Flight Price:</strong></div>
-                    <div class="col-6">$${baseFlightPrice.toFixed(2)}</div>
-                    ${promoSection}
-                    <div class="col-6"><strong>Extras Total:</strong></div>
-                    <div class="col-6 text-success">$${bookingExtras.toFixed(2)}</div>
-                    <div class="col-6"><strong>Status:</strong></div>
-                    <div class="col-6"><span class="badge bg-warning">PENDING</span></div>
-                </div>
-                <hr>
-                <div class="row">
-                    <div class="col-6"><strong class="fs-5">Total Price:</strong></div>
-                    <div class="col-6"><strong class="text-primary fs-5">Rs.${totalPrice.toFixed(2)}</strong></div>
-                </div>
-            `;
+            </div>`;
     }
-    document.addEventListener('DOMContentLoaded', function() {
-        updatePassengerForms(); // Initialize with default 1 passenger
-        updateExtrasTotal();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updatePassengerForms();
         renderSummary();
-        updateBookingStatusCard();
-        // Enhanced form submission handler
-        document.getElementById('bookingForm').addEventListener('submit', function(event) {
-            const form = document.getElementById('bookingForm');
-            const inputs = form.querySelectorAll('#stepPassenger input[required]');
-            let allValid = true;
-            // Validate required fields
-            inputs.forEach(input => {
-                if (!input.value) {
-                    allValid = false;
-                    input.classList.add('is-invalid');
-                } else {
-                    input.classList.remove('is-invalid');
-                }
-            });
-            // Validate email format
-            const emailInputs = form.querySelectorAll('input[type="email"]');
-            emailInputs.forEach(input => {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (input.value && !emailRegex.test(input.value)) {
-                    allValid = false;
-                    input.classList.add('is-invalid');
-                }
-            });
-            // Validate phone format (simple check)
-            const phoneInputs = form.querySelectorAll('input[type="tel"]');
-            phoneInputs.forEach(input => {
-                if (input.value && input.value.length < 7) {
-                    allValid = false;
-                    input.classList.add('is-invalid');
-                    const feedback = input.nextElementSibling;
-                    if (feedback) {
-                        feedback.textContent = 'Phone number must be at least 7 digits.';
-                    }
-                }
-            });
-            // Validate date of birth (not in future)
-            const dobInputs = form.querySelectorAll('input[name$=".dateOfBirth"]');
-            const today = new Date().toISOString().split('T')[0];
-            dobInputs.forEach(input => {
-                if (input.value && input.value > today) {
-                    allValid = false;
-                    input.classList.add('is-invalid');
-                    const feedback = input.nextElementSibling;
-                    if (feedback) {
-                        feedback.textContent = 'Date of birth cannot be in the future.';
-                    }
-                }
-            });
-            if (!allValid) {
-                event.preventDefault();
-                alert('Please correct the errors in the form before proceeding to payment.');
-                return;
-            }
-            // Log form data for debugging
-            const formData = new FormData(form);
-            console.log('Form Data:', Object.fromEntries(formData));
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            if (!validateStep1()) { e.preventDefault(); alert('Please complete all required fields.'); }
         });
     });
 </script>
