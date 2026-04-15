@@ -24,7 +24,6 @@ public class FeedbackService {
 
     @Transactional
     public FeedbackDTO createFeedback(FeedbackDTO feedbackDTO) {
-        // Validate required fields
         if (feedbackDTO.getRating() == null || feedbackDTO.getRating() < 1 || feedbackDTO.getRating() > 5) {
             throw new IllegalArgumentException("Invalid rating (must be between 1 and 5)");
         }
