@@ -334,10 +334,26 @@
 <div class="stats-strip">
     <div class="section-wrap">
         <div class="row text-center g-4">
-            <div class="col-6 col-md-3"><div class="stat-num">120<span>+</span></div><div class="stat-label">Destinations</div></div>
-            <div class="col-6 col-md-3"><div class="stat-num">2.4<span>M</span></div><div class="stat-label">Happy Travellers</div></div>
-            <div class="col-6 col-md-3"><div class="stat-num">98<span>%</span></div><div class="stat-label">On-time Performance</div></div>
-            <div class="col-6 col-md-3"><div class="stat-num">24<span>/7</span></div><div class="stat-label">Customer Support</div></div>
+            <div class="col-6 col-md-3">
+                <div class="stat-num" th:text="${statDestinations}">0</div>
+                <div class="stat-label">Destinations</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-num">
+                    <span th:if="${statHappyTravellers >= 1000000}" th:text="${#numbers.formatDecimal(statHappyTravellers / 1000000.0, 1, 1) + 'M'}">0</span>
+                    <span th:if="${statHappyTravellers >= 1000 and statHappyTravellers < 1000000}" th:text="${#numbers.formatDecimal(statHappyTravellers / 1000.0, 1, 1) + 'K'}">0</span>
+                    <span th:if="${statHappyTravellers < 1000}" th:text="${statHappyTravellers}">0</span>
+                </div>
+                <div class="stat-label">Happy Travellers</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-num"><span th:text="${statOnTime}">0</span><span>%</span></div>
+                <div class="stat-label">On-time Performance</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-num"><span th:text="${statUsers}">0</span></div>
+                <div class="stat-label">Registered Users</div>
+            </div>
         </div>
     </div>
 </div>
