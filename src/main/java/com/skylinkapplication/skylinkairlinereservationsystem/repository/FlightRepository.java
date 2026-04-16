@@ -30,6 +30,12 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
 	@Query("SELECT DISTINCT f.destination FROM Flight f")
 	List<String> findAllDestinations();
 
+	@Query("SELECT COUNT(DISTINCT f.destination) FROM Flight f")
+	long countDistinctDestinations();
+
+	@Query("SELECT COUNT(f) FROM Flight f WHERE f.status = 'ON_TIME' OR f.status = 'CONFIRMED'")
+	long countOnTimeFlights();
+
 	List<Flight> findByPriceLessThanEqual(Double price);
 	List<Flight> findByCabinClass(Flight.CabinClass cabinClass);
 	List<Flight> findBySeatsAvailableGreaterThan(Integer seats);

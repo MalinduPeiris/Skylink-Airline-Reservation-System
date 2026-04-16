@@ -3,6 +3,9 @@ package com.skylinkapplication.skylinkairlinereservationsystem.controller;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.FlightDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.PromotionDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.User;
+import com.skylinkapplication.skylinkairlinereservationsystem.repository.BookingRepository;
+import com.skylinkapplication.skylinkairlinereservationsystem.repository.FlightRepository;
+import com.skylinkapplication.skylinkairlinereservationsystem.repository.UserRepository;
 import com.skylinkapplication.skylinkairlinereservationsystem.service.AuthService;
 import com.skylinkapplication.skylinkairlinereservationsystem.service.FlightService;
 import com.skylinkapplication.skylinkairlinereservationsystem.service.PromotionService;
@@ -29,6 +32,15 @@ public class HomeController {
 	private FlightService flightService;
 
 	@Autowired
+	private FlightRepository flightRepository;
+
+	@Autowired
+	private BookingRepository bookingRepository;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
 	private PromotionService promotionService;
 
 	@Autowired
@@ -41,7 +53,7 @@ public class HomeController {
 		try {
 			// Test database connectivity
 			flightService.testDatabaseConnectivity();
-			
+
 			// Verify database data
 			flightService.verifyDatabaseData();
 
@@ -74,6 +86,25 @@ public class HomeController {
 			model.addAttribute("origins", origins);
 			model.addAttribute("destinations", destinations);
 
+			// --- LIVE STATS ---
+			// 1. Distinct destinations in the system
+			long destinationCount = flightRepository.countDistinctDestinations();
+			model.addAttribute("statDestinations", destinationCount);
+
+			// 2. Total confirmed passengers (happy travellers)
+			long happyTravellers = bookingRepository.sumConfirmedPassengers();
+			model.addAttribute("statHappyTravellers", happyTravellers);
+
+			// 3. On-time performance: confirmed / non-cancelled bookings * 100
+			long confirmed = bookingRepository.countConfirmedBookings();
+			long nonCancelled = bookingRepository.countNonCancelledBookings();
+			long onTimePercent = nonCancelled > 0 ? Math.round((confirmed * 100.0) / nonCancelled) : 100;
+			model.addAttribute("statOnTime", onTimePercent);
+
+			// 4. Total registered users (community size)
+			long totalUsers = userRepository.count();
+			model.addAttribute("statUsers", totalUsers);
+
 			// Check for user-specific promotions if logged in
 			Long userId = (Long) session.getAttribute("userId");
 			if (userId != null) {
@@ -101,6 +132,10 @@ public class HomeController {
 			model.addAttribute("topPromotions", List.of());
 			model.addAttribute("origins", List.of());
 			model.addAttribute("destinations", List.of());
+			model.addAttribute("statDestinations", 0);
+			model.addAttribute("statHappyTravellers", 0);
+			model.addAttribute("statOnTime", 0);
+			model.addAttribute("statUsers", 0);
 		}
 
 		return "index";
