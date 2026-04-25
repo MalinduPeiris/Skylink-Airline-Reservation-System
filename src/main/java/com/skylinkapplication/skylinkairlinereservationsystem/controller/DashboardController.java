@@ -233,6 +233,7 @@ public class DashboardController {
                     .sum() : 0.0;
 
             // Add attributes to model
+            model.addAttribute("baseUrl", "/dashboard/finance");
             model.addAttribute("payments", payments != null ? payments : Collections.emptyList());
             model.addAttribute("totalPayments", totalPayments);
             model.addAttribute("completedPayments", completedPayments);
@@ -246,6 +247,7 @@ public class DashboardController {
             return "finance-dashboard";
         } catch (Exception e) {
             logger.error("Error loading finance dashboard", e);
+            model.addAttribute("baseUrl", "/dashboard/finance");
             model.addAttribute("error", "Unable to load finance dashboard: " + e.getMessage());
             model.addAttribute("payments", Collections.emptyList());
             model.addAttribute("totalPayments", 0);
