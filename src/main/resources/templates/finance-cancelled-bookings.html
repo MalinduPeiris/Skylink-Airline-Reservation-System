@@ -1,374 +1,419 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkyLink — Cancelled Bookings</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root{--bg-void:#0a0d14;--bg-panel:#111621;--bg-card:#1a202e;--bg-elevated:#222b3d;--border-dim:rgba(212,175,55,.2);--accent-cyan:#d4af37;--accent-cyan-dim:rgba(212,175,55,.12);--accent-amber:#ffc107;--accent-amber-dim:rgba(255,193,7,.12);--accent-red:#e53935;--accent-red-dim:rgba(229,57,53,.12);--accent-green:#4caf50;--accent-green-dim:rgba(76,175,80,.12);--text-primary:#f8f9fa;--text-secondary:#b0bec5;--text-muted:#607d8b;--font-display:'Rajdhani',sans-serif;--font-mono:'JetBrains Mono',monospace;--font-body:'Barlow',sans-serif;}
-        *{box-sizing:border-box;margin:0;padding:0;}
-        body{font-family:var(--font-body);background:var(--bg-void);color:var(--text-primary);min-height:100vh;overflow-x:hidden;}
-        body::after{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(212,175,55,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
-        .topbar{background:var(--bg-panel);border-bottom:1px solid var(--border-dim);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-        .topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent-cyan),transparent);opacity:.4;}
-        .brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
-        .brand-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent-cyan),#8b6b1a);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;color:white;}
-        .brand-name{font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:3px;color:var(--text-primary);}
-        .brand-name span{color:var(--accent-cyan);}
-        .brand-sub{font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:2px;}
-        .topbar-right{display:flex;align-items:center;gap:16px;}
-        .sys-status{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);padding:6px 14px;border:1px solid var(--border-dim);border-radius:4px;background:var(--bg-card);}
-        .status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent-green);box-shadow:0 0 8px var(--accent-green);animation:pulse-dot 2s infinite;}
-        @keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:.4;}}
-        .user-chip{display:flex;align-items:center;gap:10px;padding:6px 14px 6px 8px;border:1px solid var(--border-dim);border-radius:40px;background:var(--bg-card);cursor:pointer;text-decoration:none;}
-        .user-chip:hover{border-color:var(--accent-cyan);}
-        .user-avatar{width:30px;height:30px;background:linear-gradient(135deg,var(--accent-cyan),#8b6b1a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:#000;}
-        .user-name{font-size:12px;font-weight:600;color:var(--text-primary);}
-        .user-role{font-size:10px;color:var(--text-muted);font-family:var(--font-mono);}
-        .dropdown-menu{background:var(--bg-elevated);border:1px solid var(--border-dim);border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.6);}
-        .dropdown-item{color:var(--text-secondary);font-size:13px;padding:8px 16px;}
-        .dropdown-item:hover{background:var(--accent-cyan-dim);color:var(--accent-cyan);}
-        .dropdown-divider{border-color:var(--border-dim);}
-        .layout{display:flex;min-height:calc(100vh - 64px);position:relative;z-index:1;}
-        .sidebar{width:220px;flex-shrink:0;background:var(--bg-panel);border-right:1px solid var(--border-dim);padding:24px 0;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;}
-        .sidebar-label{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;padding:0 8px;margin-bottom:8px;margin-top:20px;padding-left:24px;}
-        .sidebar-section{padding:0 16px;margin-bottom:6px;}
-        .nav-link-custom{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;color:var(--text-secondary);font-size:13px;font-weight:500;text-decoration:none;transition:all .2s;border:1px solid transparent;margin-bottom:2px;position:relative;}
-        .nav-link-custom i{width:16px;text-align:center;font-size:13px;color:var(--text-muted);}
-        .nav-link-custom:hover,.nav-link-custom.active{background:var(--accent-cyan-dim);color:var(--accent-cyan);border-color:rgba(212,175,55,.3);}
-        .nav-link-custom:hover i,.nav-link-custom.active i{color:var(--accent-cyan);}
-        .nav-link-custom.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--accent-cyan);border-radius:0 2px 2px 0;}
-        .main{flex:1;padding:32px;overflow-x:hidden;}
-        @keyframes fade-up{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-        .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;animation:fade-up .5s ease;}
-        .page-title{font-family:var(--font-display);font-size:30px;font-weight:700;letter-spacing:2px;color:var(--text-primary);}
-        .page-title span{color:var(--accent-cyan);}
-        .page-breadcrumb{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;margin-top:6px;}
-        .page-breadcrumb span{color:var(--accent-cyan);}
-        .page-sub{font-size:13px;color:var(--text-muted);margin-top:4px;}
-        .alert-custom{border-radius:6px;padding:12px 16px;font-size:13px;border:1px solid;display:flex;align-items:center;gap:10px;margin-bottom:20px;}
-        .alert-success-custom{background:var(--accent-green-dim);border-color:rgba(76,175,80,.3);color:var(--accent-green);}
-        .alert-danger-custom{background:var(--accent-red-dim);border-color:rgba(229,57,53,.3);color:var(--accent-red);}
-        /* BOOKING CARDS */
-        .bookings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;margin-bottom:24px;}
-        .booking-card{background:var(--bg-card);border:1px solid var(--border-dim);border-radius:10px;padding:20px;position:relative;overflow:hidden;transition:all .3s;animation:fade-up .5s ease both;}
-        .booking-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent-cyan),transparent);}
-        .booking-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.4);border-color:rgba(212,175,55,.3);}
-        .refund-badge-card{position:absolute;top:14px;right:14px;font-family:var(--font-mono);font-size:9px;letter-spacing:1px;padding:4px 10px;border-radius:3px;border:1px solid;display:inline-block;}
-        .badge-refunded{background:var(--accent-green-dim);border-color:rgba(76,175,80,.3);color:var(--accent-green);}
-        .badge-not-refunded{background:var(--accent-amber-dim);border-color:rgba(255,193,7,.3);color:var(--accent-amber);}
-        .badge-no-payment{background:rgba(96,125,139,.3);border-color:var(--border-dim);color:var(--text-muted);}
-        .card-title-fin{font-family:var(--font-display);font-size:17px;font-weight:600;letter-spacing:1px;color:var(--text-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-        .card-title-fin i{color:var(--accent-cyan);}
-        .section-header{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin:12px 0 8px 0;border-bottom:1px solid var(--border-dim);padding-bottom:4px;}
-        .section-header.blue{color:var(--accent-cyan);}
-        .section-header.info{color:var(--text-secondary);}
-        .section-header.amber{color:var(--accent-amber);}
-        .card-field{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(212,175,55,.1);font-size:12px;}
-        .card-field:last-of-type{border-bottom:none;}
-        .card-field-label{font-family:var(--font-mono);font-size:10px;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;}
-        .card-field-value{font-size:12px;color:var(--text-secondary);}
-        .card-field-value.amount{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--accent-cyan);}
-        .card-field-value.mono{font-family:var(--font-mono);font-size:11px;}
-        .card-actions{display:flex;flex-direction:column;gap:8px;margin-top:16px;}
-        .btn-fin-action{font-family:var(--font-mono);font-size:11px;padding:7px 12px;border-radius:4px;border:1px solid;cursor:pointer;transition:all .2s;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;}
-        .btn-fin-view{background:var(--accent-cyan-dim);border-color:rgba(212,175,55,.4);color:var(--accent-cyan);}
-        .btn-fin-view:hover{background:rgba(212,175,55,.2);border-color:var(--accent-cyan);color:var(--accent-cyan);}
-        .btn-fin-edit{background:var(--accent-amber-dim);border-color:rgba(255,193,7,.4);color:var(--accent-amber);}
-        .btn-fin-edit:hover{background:rgba(255,193,7,.2);border-color:var(--accent-amber);color:var(--accent-amber);}
-        /* BACK BUTTON */
-        .btn-industrial{font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:1.5px;padding:9px 20px;border-radius:4px;border:1px solid;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
-        .btn-back{background:var(--accent-cyan-dim);border-color:rgba(212,175,55,.4);color:var(--accent-cyan);}
-        .btn-back:hover{background:rgba(212,175,55,.2);border-color:var(--accent-cyan);color:var(--accent-cyan);}
-        /* EMPTY STATE */
-        .empty-state{text-align:center;padding:64px 40px;color:var(--text-muted);}
-        .empty-state i{font-size:52px;margin-bottom:16px;display:block;opacity:.3;}
-        .empty-state h4{font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:2px;color:var(--text-secondary);margin-bottom:8px;}
-        .empty-state p{font-family:var(--font-mono);font-size:11px;letter-spacing:1px;margin-bottom:24px;}
-        /* MODAL DARK THEME */
-        .modal-content{background:var(--bg-elevated);border:1px solid var(--border-dim);border-radius:10px;}
-        .modal-header{border-bottom:1px solid var(--border-dim);padding:16px 20px;}
-        .modal-header.red{background:var(--accent-red-dim);border-bottom-color:rgba(229,57,53,.3);}
-        .modal-header.amber{background:var(--accent-amber-dim);border-bottom-color:rgba(255,193,7,.3);}
-        .modal-header.cyan{background:var(--accent-cyan-dim);border-bottom-color:rgba(212,175,55,.3);}
-        .modal-title{font-family:var(--font-display);font-size:16px;font-weight:600;letter-spacing:1.5px;color:var(--text-primary);}
-        .modal-body{padding:20px;background:var(--bg-card);}
-        .modal-footer{padding:14px 20px;border-top:1px solid var(--border-dim);background:var(--bg-elevated);}
-        .form-label{font-family:var(--font-mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
-        .form-control,.form-select{background:var(--bg-panel);border:1px solid var(--border-dim);color:var(--text-primary);border-radius:4px;font-size:13px;padding:8px 12px;}
-        .form-control:focus,.form-select:focus{background:var(--bg-elevated);border-color:var(--accent-cyan);box-shadow:0 0 0 2px rgba(212,175,55,.1);color:var(--text-primary);}
-        .form-select option{background:var(--bg-panel);}
-        .modal-info-table{width:100%;border-collapse:collapse;}
-        .modal-info-table tr{border-bottom:1px solid rgba(212,175,55,.1);}
-        .modal-info-table tr:last-child{border-bottom:none;}
-        .modal-info-table td{padding:8px 4px;font-size:13px;}
-        .modal-info-table td:first-child{font-family:var(--font-mono);font-size:10px;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;padding-right:16px;width:40%;}
-        .modal-info-table td:last-child{color:var(--text-secondary);}
-        .modal-info-table td .amount-val{font-family:var(--font-mono);font-weight:700;color:var(--accent-cyan);}
-        .modal-note{background:var(--bg-panel);border:1px solid var(--border-dim);border-radius:6px;padding:10px 14px;font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;color:var(--text-muted);margin-top:14px;display:flex;align-items:center;gap:8px;}
-        .modal-warn{background:var(--accent-amber-dim);border:1px solid rgba(255,193,7,.3);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--accent-amber);margin-top:14px;display:flex;align-items:center;gap:8px;}
-        .section-divider{border:none;border-top:1px solid var(--border-dim);margin:14px 0;}
-        ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg-void);}::-webkit-scrollbar-thumb{background:var(--border-dim);border-radius:3px;}
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyLink — Cancelled Bookings</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sidebar-bg:#0f172a; --sidebar-active:#2563eb; --sidebar-text:#94a3b8;
+      --topbar-bg:#ffffff; --page-bg:#f1f5f9; --card-bg:#ffffff;
+      --border:#e2e8f0; --shadow:0 1px 4px rgba(15,23,42,.06),0 4px 16px rgba(15,23,42,.07);
+      --shadow-hover:0 4px 12px rgba(15,23,42,.1),0 12px 32px rgba(15,23,42,.1);
+      --blue:#2563eb; --blue-bg:#eff6ff; --blue-border:#bfdbfe;
+      --emerald:#059669; --emerald-bg:#ecfdf5; --emerald-border:#a7f3d0;
+      --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+      --red:#dc2626; --red-bg:#fef2f2; --red-border:#fecaca;
+      --violet:#7c3aed; --violet-bg:#f5f3ff; --violet-border:#ddd6fe;
+      --text:#0f172a; --text-2:#475569; --text-3:#94a3b8;
+      --font:'Inter',sans-serif; --r:12px; --r-sm:8px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:var(--font);background:var(--page-bg);color:var(--text);min-height:100vh;}
+
+    /* TOPBAR */
+    .topbar{background:#fff;border-bottom:1px solid var(--border);height:60px;padding:0 1.75rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(15,23,42,.04);}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.35);}
+    .brand-name{font-size:18px;font-weight:800;letter-spacing:-.3px;color:var(--text);}
+    .brand-name span{color:var(--blue);}
+    .brand-sub{font-size:10px;color:var(--text-3);letter-spacing:.5px;font-weight:500;}
+    .topbar-right{display:flex;align-items:center;gap:12px;}
+    .sys-pill{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#059669;background:#ecfdf5;border:1px solid #a7f3d0;padding:5px 12px;border-radius:20px;}
+    .sys-dot{width:7px;height:7px;border-radius:50%;background:#10b981;animation:blink 2s infinite;}
+    @keyframes blink{0%,100%{opacity:1;}50%{opacity:.4;}}
+    .user-chip{display:flex;align-items:center;gap:9px;padding:5px 14px 5px 6px;border:1px solid var(--border);border-radius:40px;background:#fff;cursor:pointer;text-decoration:none;transition:all .2s;}
+    .user-chip:hover{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+    .user-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700;}
+    .user-name{font-size:12px;font-weight:600;color:var(--text);}
+    .user-role{font-size:10px;color:var(--text-3);font-weight:500;}
+    .dropdown-menu{background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 32px rgba(15,23,42,.12);padding:6px;}
+    .dropdown-item{font-size:13px;color:var(--text-2);border-radius:6px;padding:9px 14px;font-weight:500;}
+    .dropdown-item:hover{background:var(--blue-bg);color:var(--blue);}
+    .dropdown-divider{border-color:var(--border);margin:4px 0;}
+
+    /* LAYOUT */
+    .layout{display:flex;min-height:calc(100vh - 60px);}
+
+    /* SIDEBAR */
+    .sidebar{width:232px;flex-shrink:0;background:var(--sidebar-bg);padding:16px 0;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;}
+    .sidebar-label{font-size:10px;font-weight:700;letter-spacing:1.5px;color:#475569;text-transform:uppercase;padding:0 16px 8px 20px;margin-top:12px;}
+    .sidebar-section{padding:0 10px;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--sidebar-text);font-size:13px;font-weight:500;text-decoration:none;transition:all .18s;margin-bottom:2px;}
+    .nav-item i{width:18px;text-align:center;font-size:14px;}
+    .nav-item:hover{background:rgba(37,99,235,.12);color:#e2e8f0;}
+    .nav-item.active{background:var(--sidebar-active);color:#fff;box-shadow:0 4px 14px rgba(37,99,235,.4);}
+
+    /* MAIN */
+    .main{flex:1;padding:28px 32px;overflow-x:hidden;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+    /* PAGE HEADER */
+    .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;animation:fadeUp .4s ease;}
+    .page-title{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.5px;}
+    .page-title span{color:var(--red);}
+    .page-crumb{font-size:12px;color:var(--text-3);font-weight:500;margin-top:4px;}
+    .page-crumb b{color:var(--blue);font-weight:600;}
+    .page-sub{font-size:13px;color:var(--text-2);margin-top:3px;}
+
+    .alert-bar{border-radius:var(--r-sm);padding:11px 16px;font-size:13px;border:1px solid;display:flex;align-items:center;gap:9px;margin-bottom:18px;font-weight:500;}
+    .alert-success{background:var(--emerald-bg);border-color:var(--emerald-border);color:var(--emerald);}
+    .alert-danger{background:var(--red-bg);border-color:var(--red-border);color:var(--red);}
+
+    /* BUTTONS */
+    .btn-primary-fin{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:var(--r-sm);border:none;background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s;text-decoration:none;box-shadow:0 4px 14px rgba(37,99,235,.3);}
+    .btn-primary-fin:hover{background:#1d4ed8;color:#fff;box-shadow:0 6px 20px rgba(37,99,235,.4);transform:translateY(-1px);}
+    .btn-outline-fin{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:#fff;color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;text-decoration:none;}
+    .btn-outline-fin:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg);}
+
+    /* BOOKING CARDS */
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px;margin-bottom:24px;}
+    .booking-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--r);padding:22px;position:relative;overflow:hidden;transition:all .25s;box-shadow:var(--shadow);animation:fadeUp .4s ease both;}
+    .booking-card::after{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#f87171,var(--red));}
+    .booking-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:#fecaca;}
+
+    /* REFUND STATUS BADGE */
+    .refund-badge{position:absolute;top:14px;right:14px;}
+    .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.4px;white-space:nowrap;border:1px solid;}
+    .badge-refunded    {background:var(--emerald-bg);color:var(--emerald);border-color:var(--emerald-border);}
+    .badge-not-refunded{background:var(--amber-bg);  color:var(--amber);  border-color:var(--amber-border);}
+    .badge-no-payment  {background:#f8fafc;           color:var(--text-3); border-color:var(--border);}
+
+    /* CARD FIELDS */
+    .card-id{font-size:15px;font-weight:800;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+    .card-id i{color:var(--red);}
+    .section-sep{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);border-bottom:1px solid #f1f5f9;padding-bottom:4px;margin:12px 0 8px 0;display:flex;align-items:center;gap:6px;}
+    .section-sep.blue i{color:var(--blue);}
+    .section-sep.violet i{color:var(--violet);}
+    .section-sep.amber i{color:var(--amber);}
+    .card-field{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f8fafc;font-size:12px;}
+    .card-field:last-of-type{border-bottom:none;}
+    .cf-label{font-size:10px;font-weight:700;letter-spacing:.6px;color:var(--text-3);text-transform:uppercase;}
+    .cf-val{font-size:12px;color:var(--text-2);font-weight:600;}
+    .cf-val.amount{font-family:'SF Mono','Fira Code',monospace;font-size:14px;font-weight:800;color:var(--red);}
+    .cf-val.mono{font-family:'SF Mono','Fira Code',monospace;font-size:11px;font-weight:500;}
+
+    /* CARD ACTIONS */
+    .card-actions{display:flex;flex-direction:column;gap:7px;margin-top:16px;}
+    .btn-card{display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 12px;border-radius:7px;border:1.5px solid;font-size:12px;font-weight:700;cursor:pointer;transition:all .18s;background:transparent;}
+    .btn-card-blue {border-color:var(--blue-border);  color:var(--blue);  background:var(--blue-bg);}
+    .btn-card-blue:hover  {border-color:var(--blue);  background:#dbeafe;}
+    .btn-card-amber{border-color:var(--amber-border); color:var(--amber); background:var(--amber-bg);}
+    .btn-card-amber:hover {border-color:var(--amber);  background:#fef3c7;}
+
+    /* EMPTY STATE */
+    .empty-state{text-align:center;padding:64px 40px;color:var(--text-3);animation:fadeUp .4s ease both;}
+    .empty-state i{font-size:48px;margin-bottom:14px;display:block;opacity:.3;}
+    .empty-state h4{font-size:18px;font-weight:800;color:var(--text-2);margin-bottom:8px;}
+    .empty-state p{font-size:13px;font-weight:500;margin-bottom:20px;}
+
+    /* MODALS */
+    .modal-content{background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 24px 60px rgba(15,23,42,.14);}
+    .modal-header{border-bottom:1px solid var(--border);padding:18px 22px;}
+    .modal-header.blue  {background:var(--blue-bg);  border-bottom-color:var(--blue-border);}
+    .modal-header.red   {background:var(--red-bg);   border-bottom-color:var(--red-border);}
+    .modal-header.amber {background:var(--amber-bg); border-bottom-color:var(--amber-border);}
+    .modal-title{font-size:15px;font-weight:800;color:var(--text);}
+    .modal-body{padding:22px;background:#fafafa;}
+    .modal-footer{padding:16px 22px;border-top:1px solid var(--border);background:#fff;}
+    .form-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-2);margin-bottom:6px;}
+    .form-control,.form-select{background:#fff;border:1.5px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-weight:500;padding:9px 12px;}
+    .form-control:focus,.form-select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.12);outline:none;}
+    .form-select option{background:#fff;}
+    .modal-table{width:100%;border-collapse:collapse;}
+    .modal-table tr{border-bottom:1px solid #f1f5f9;}
+    .modal-table tr:last-child{border-bottom:none;}
+    .modal-table td{padding:9px 4px;font-size:13px;}
+    .modal-table td:first-child{font-size:11px;font-weight:700;letter-spacing:.6px;color:var(--text-3);text-transform:uppercase;padding-right:16px;width:42%;}
+    .modal-table td:last-child{color:var(--text-2);font-weight:600;}
+    .modal-table .amount-val{font-family:'SF Mono','Fira Code',monospace;font-weight:800;color:var(--red);font-size:14px;}
+    .modal-note{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;font-weight:500;color:var(--text-3);margin-top:14px;display:flex;align-items:center;gap:8px;}
+    .modal-warn{background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:8px;padding:10px 14px;font-size:12px;font-weight:500;color:var(--amber);margin-top:14px;display:flex;align-items:center;gap:8px;}
+    .btn-modal{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s;border:1.5px solid;}
+    .btn-modal-primary{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.3);}
+    .btn-modal-primary:hover{background:#1d4ed8;}
+    .btn-modal-amber{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);}
+    .btn-modal-amber:hover{background:#fef3c7;border-color:var(--amber);}
+    .btn-modal-secondary{background:#fff;border-color:var(--border);color:var(--text-2);}
+    .btn-modal-secondary:hover{background:#f8fafc;border-color:var(--text-3);color:var(--text);}
+    .section-divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+
+    ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  </style>
 </head>
 <body>
-<!-- TOP NAV -->
+
+<!-- ── TOPBAR ── -->
 <nav class="topbar">
-    <a class="brand" th:href="@{/dashboard/finance}">
-        <div class="brand-icon"><i class="fas fa-plane-departure"></i></div>
-        <div><div class="brand-name">SKY<span>LINK</span></div><div class="brand-sub">Airline Operations Platform</div></div>
-    </a>
-    <div class="topbar-right">
-        <div class="sys-status"><div class="status-dot"></div>ALL SYSTEMS OPERATIONAL</div>
-        <div class="dropdown">
-            <div class="user-chip dropdown-toggle" data-bs-toggle="dropdown">
-                <div class="user-avatar"><i class="fas fa-chart-line" style="font-size:11px;"></i></div>
-                <div><div class="user-name">Finance Executive</div><div class="user-role">FINANCE ACCESS</div></div>
-            </div>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" th:href="@{/dashboard/finance}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-                <li><a class="dropdown-item" th:href="@{/dashboard/finance/all-payments}"><i class="fas fa-credit-card me-2"></i>All Payments</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" th:href="@{/api/auth/logout}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-            </ul>
-        </div>
+  <a class="brand" th:href="${baseUrl}">
+    <div class="brand-icon"><i class="fas fa-plane-departure"></i></div>
+    <div><div class="brand-name">SKY<span>LINK</span></div><div class="brand-sub">Airline Operations Platform</div></div>
+  </a>
+  <div class="topbar-right">
+    <div class="sys-pill"><div class="sys-dot"></div>All Systems Operational</div>
+    <div class="dropdown">
+      <div class="user-chip dropdown-toggle" data-bs-toggle="dropdown">
+        <div class="user-avatar"><i class="fas fa-chart-line" style="font-size:10px;"></i></div>
+        <div><div class="user-name">Finance Executive</div><div class="user-role">Finance Access</div></div>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item" th:href="${baseUrl}"><i class="fas fa-tachometer-alt me-2 text-primary"></i>Dashboard</a></li>
+        <li><a class="dropdown-item" th:href="${baseUrl + '/all-payments'}"><i class="fas fa-credit-card me-2 text-primary"></i>All Payments</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="/api/auth/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+      </ul>
     </div>
+  </div>
 </nav>
 
 <div class="layout">
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <div class="sidebar-label">Finance Panel</div>
-        <div class="sidebar-section">
-            <a th:href="@{/dashboard/finance}" class="nav-link-custom"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a th:href="@{/dashboard/finance/all-payments}" class="nav-link-custom"><i class="fas fa-list"></i> All Payments</a>
-            <a th:href="@{/dashboard/finance/completed}" class="nav-link-custom"><i class="fas fa-check-circle"></i> Completed</a>
-            <a th:href="@{/dashboard/finance/failed}" class="nav-link-custom"><i class="fas fa-times-circle"></i> Failed</a>
-            <a th:href="@{/dashboard/finance/refunded}" class="nav-link-custom"><i class="fas fa-undo"></i> Refunded</a>
-            <a th:href="@{/dashboard/finance/cancelled-bookings}" class="nav-link-custom active"><i class="fas fa-ban"></i> Cancelled Bookings</a>
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-label">Finance Panel</div>
+    <div class="sidebar-section">
+      <a th:href="${baseUrl}"                         class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a th:href="${baseUrl + '/all-payments'}"       class="nav-item"><i class="fas fa-list-ul"></i> All Payments</a>
+      <a th:href="${baseUrl + '/completed'}"          class="nav-item"><i class="fas fa-check-circle"></i> Completed</a>
+      <a th:href="${baseUrl + '/failed'}"             class="nav-item"><i class="fas fa-times-circle"></i> Failed</a>
+      <a th:href="${baseUrl + '/refunded'}"           class="nav-item"><i class="fas fa-undo-alt"></i> Refunded</a>
+      <a th:href="${baseUrl + '/cancelled-bookings'}" class="nav-item active"><i class="fas fa-ban"></i> Cancelled Bookings</a>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+    <div th:if="${success}" class="alert-bar alert-success"><i class="fas fa-check-circle"></i><span th:text="${success}"></span></div>
+    <div th:if="${error}"   class="alert-bar alert-danger"><i class="fas fa-exclamation-circle"></i><span th:text="${error}"></span></div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">Cancelled <span>Bookings</span></div>
+        <div class="page-crumb">SkyLink / Finance / <b>Cancelled Bookings</b></div>
+        <div class="page-sub">Showing <strong th:text="${#lists.size(bookings)}">0</strong> cancelled bookings for payment management</div>
+      </div>
+      <a th:href="${baseUrl}" class="btn-outline-fin"><i class="fas fa-arrow-left"></i> Dashboard</a>
+    </div>
+
+    <!-- Booking Cards -->
+    <div class="cards-grid" th:if="${!#lists.isEmpty(bookings)}">
+      <div class="booking-card" th:each="booking : ${bookings}">
+
+        <!-- Refund Status Badge -->
+        <div class="refund-badge">
+          <span class="badge badge-refunded"
+                th:if="${booking.paymentId != null and booking.payment != null and booking.payment.status == 'REFUNDED'}">
+            <i class="fas fa-check me-1"></i>Refunded
+          </span>
+          <span class="badge badge-not-refunded"
+                th:if="${booking.paymentId != null and (booking.payment == null or booking.payment.status != 'REFUNDED')}">
+            <i class="fas fa-clock me-1"></i>Pending Refund
+          </span>
+          <span class="badge badge-no-payment"
+                th:if="${booking.paymentId == null}">
+            <i class="fas fa-minus me-1"></i>No Payment
+          </span>
         </div>
-    </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="main">
-        <!-- Alerts -->
-        <div th:if="${success}" class="alert-custom alert-success-custom"><i class="fas fa-check-circle"></i><span th:text="${success}"></span></div>
-        <div th:if="${error}" class="alert-custom alert-danger-custom"><i class="fas fa-exclamation-triangle"></i><span th:text="${error}"></span></div>
+        <!-- Card Heading -->
+        <div class="card-id"><i class="fas fa-ticket-alt"></i> Booking #<span th:text="${booking.id}">1</span></div>
 
-        <!-- Page Header -->
-        <div class="page-header">
-            <div>
-                <div class="page-title">CANCELLED <span>BOOKINGS</span></div>
-                <div class="page-breadcrumb">SKYLINK / FINANCE / <span>CANCELLED BOOKINGS</span></div>
-                <div class="page-sub">Showing <span th:text="${#lists.size(bookings)}">0</span> cancelled bookings for payment management</div>
+        <!-- Flight Section -->
+        <div class="section-sep blue"><i class="fas fa-plane"></i> Flight</div>
+        <div class="card-field">
+          <span class="cf-label">Flight</span>
+          <span class="cf-val mono" th:text="${booking.flight != null ? booking.flight.flightNumber : 'N/A'}">—</span>
+        </div>
+        <div class="card-field">
+          <span class="cf-label">Route</span>
+          <span class="cf-val mono" th:text="${booking.flight != null ? booking.flight.origin + ' → ' + booking.flight.destination : 'N/A'}">—</span>
+        </div>
+        <div class="card-field">
+          <span class="cf-label">Departure</span>
+          <span class="cf-val mono" th:text="${(booking.flight != null and booking.flight.departureDate != null) ? #dates.format(booking.flight.departureDate,'dd MMM yyyy HH:mm') : 'N/A'}">—</span>
+        </div>
+
+        <!-- Booking Section -->
+        <div class="section-sep violet"><i class="fas fa-user"></i> Booking</div>
+        <div class="card-field">
+          <span class="cf-label">Passenger</span>
+          <span class="cf-val" th:text="${booking.user != null ? booking.user.username : 'N/A'}">—</span>
+        </div>
+        <div class="card-field">
+          <span class="cf-label">Passengers</span>
+          <span class="cf-val" th:text="${booking.passengers}">1</span>
+        </div>
+        <div class="card-field">
+          <span class="cf-label">Total Price</span>
+          <span class="cf-val amount">Rs.<span th:text="${#numbers.formatDecimal(booking.totalPrice,1,2)}">0.00</span></span>
+        </div>
+        <div class="card-field">
+          <span class="cf-label">Booked</span>
+          <span class="cf-val mono" th:text="${#dates.format(booking.bookingDate,'dd MMM yyyy')}">—</span>
+        </div>
+
+        <!-- Payment Section (if exists) -->
+        <div th:if="${booking.paymentId != null}">
+          <div class="section-sep amber"><i class="fas fa-rupee-sign"></i> Payment</div>
+          <div class="card-field">
+            <span class="cf-label">Payment ID</span>
+            <span class="cf-val mono">#<span th:text="${booking.paymentId}">1</span></span>
+          </div>
+          <div class="card-field" th:if="${booking.payment != null}">
+            <span class="cf-label">Status</span>
+            <span class="cf-val">
+              <span class="badge"
+                th:classappend="${booking.payment.status == 'REFUNDED'} ? 'badge-refunded' : 'badge-not-refunded'"
+                th:text="${booking.payment.status}">—</span>
+            </span>
+          </div>
+          <div class="card-field" th:if="${booking.payment != null}">
+            <span class="cf-label">Transaction</span>
+            <span class="cf-val mono" th:text="${booking.payment.transactionId}">—</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card-actions">
+          <button type="button" class="btn-card btn-card-blue"
+                  data-bs-toggle="modal" th:attr="data-bs-target='#view-' + ${booking.id}">
+            <i class="fas fa-eye"></i> View Full Details
+          </button>
+          <button type="button" class="btn-card btn-card-amber"
+                  data-bs-toggle="modal" th:attr="data-bs-target='#update-' + ${booking.id}"
+                  th:if="${booking.paymentId != null and booking.payment != null}">
+            <i class="fas fa-exchange-alt"></i> Update Payment Status
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${#lists.isEmpty(bookings)}" class="empty-state">
+      <i class="fas fa-ban"></i>
+      <h4>No Cancelled Bookings</h4>
+      <p>Cancelled bookings will appear here for payment management.</p>
+      <a th:href="${baseUrl}" class="btn-primary-fin"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </div>
+
+    <!-- Per-booking Modals -->
+    <div th:each="booking : ${bookings}">
+
+      <!-- View Modal -->
+      <div class="modal fade" th:id="'view-' + ${booking.id}" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header red">
+              <span class="modal-title"><i class="fas fa-ticket-alt me-2" style="color:var(--red);"></i>Cancelled Booking #<span th:text="${booking.id}">1</span></span>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <a th:href="@{/dashboard/finance}" class="btn-industrial btn-back">
-                <i class="fas fa-arrow-left"></i> DASHBOARD
-            </a>
-        </div>
-
-        <!-- Booking Cards Grid -->
-        <div class="bookings-grid" th:if="${!#lists.isEmpty(bookings)}">
-            <div class="booking-card" th:each="booking : ${bookings}">
-                <!-- Refund Status Badge -->
-                <span class="refund-badge-card badge-refunded"
-                      th:if="${booking.paymentId != null and booking.payment != null and booking.payment.status == 'REFUNDED'}">
-                    <i class="fas fa-check me-1"></i>REFUNDED
-                </span>
-                <span class="refund-badge-card badge-not-refunded"
-                      th:if="${booking.paymentId != null and (booking.payment == null or booking.payment.status != 'REFUNDED')}">
-                    <i class="fas fa-clock me-1"></i>NOT REFUNDED
-                </span>
-                <span class="refund-badge-card badge-no-payment"
-                      th:if="${booking.paymentId == null}">
-                    <i class="fas fa-minus-circle me-1"></i>NO PAYMENT
-                </span>
-
-                <div class="card-title-fin">
-                    <i class="fas fa-ticket-alt"></i>
-                    Booking #<span th:text="${booking.id}">1</span>
+            <div class="modal-body">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <div class="section-sep blue" style="margin-top:0;"><i class="fas fa-plane"></i> Flight Information</div>
+                  <table class="modal-table">
+                    <tr><td>Flight No.</td><td th:text="${booking.flight != null ? booking.flight.flightNumber : 'N/A'}">—</td></tr>
+                    <tr><td>Origin</td><td th:text="${booking.flight != null ? booking.flight.origin : 'N/A'}">—</td></tr>
+                    <tr><td>Destination</td><td th:text="${booking.flight != null ? booking.flight.destination : 'N/A'}">—</td></tr>
+                    <tr><td>Departure</td><td th:text="${(booking.flight != null and booking.flight.departureDate != null) ? #dates.format(booking.flight.departureDate,'dd MMM yyyy HH:mm') : 'N/A'}">—</td></tr>
+                    <tr><td>Arrival</td>  <td th:text="${(booking.flight != null and booking.flight.arrivalDate  != null) ? #dates.format(booking.flight.arrivalDate,  'dd MMM yyyy HH:mm') : 'N/A'}">—</td></tr>
+                  </table>
                 </div>
-
-                <!-- Flight Section -->
-                <div class="section-header blue"><i class="fas fa-plane me-1"></i>Flight Details</div>
-                <div class="card-field">
-                    <span class="card-field-label">Flight</span>
-                    <span class="card-field-value mono" th:text="${booking.flight != null ? booking.flight.flightNumber : 'N/A'}">FL123</span>
+                <div class="col-md-6">
+                  <div class="section-sep violet" style="margin-top:0;"><i class="fas fa-user"></i> Booking Information</div>
+                  <table class="modal-table">
+                    <tr><td>Booking ID</td><td>#<span th:text="${booking.id}">1</span></td></tr>
+                    <tr><td>User</td><td th:text="${booking.user != null ? booking.user.username : 'N/A'}">—</td></tr>
+                    <tr><td>Passengers</td><td th:text="${booking.passengers}">1</td></tr>
+                    <tr><td>Status</td><td><span class="badge" style="background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);">CANCELLED</span></td></tr>
+                    <tr><td>Booked On</td><td th:text="${#dates.format(booking.bookingDate,'dd MMM yyyy HH:mm')}">—</td></tr>
+                    <tr><td>Total Price</td><td><span class="amount-val">Rs.<span th:text="${#numbers.formatDecimal(booking.totalPrice,1,2)}">0.00</span></span></td></tr>
+                  </table>
                 </div>
-                <div class="card-field">
-                    <span class="card-field-label">Route</span>
-                    <span class="card-field-value mono" th:text="${booking.flight != null ? booking.flight.origin + ' → ' + booking.flight.destination : 'N/A'}">CMB → KAN</span>
-                </div>
-                <div class="card-field">
-                    <span class="card-field-label">Departure</span>
-                    <span class="card-field-value mono" th:text="${booking.flight != null ? #dates.format(booking.flight.departureDate, 'dd MMM yyyy HH:mm') : 'N/A'}">01 Jan 2024</span>
-                </div>
-
-                <!-- Booking Section -->
-                <div class="section-header info" style="margin-top:10px;"><i class="fas fa-info-circle me-1"></i>Booking Info</div>
-                <div class="card-field">
-                    <span class="card-field-label">User</span>
-                    <span class="card-field-value" th:text="${booking.user != null ? booking.user.username : 'N/A'}">user123</span>
-                </div>
-                <div class="card-field">
-                    <span class="card-field-label">Passengers</span>
-                    <span class="card-field-value" th:text="${booking.passengers}">1</span>
-                </div>
-                <div class="card-field">
-                    <span class="card-field-label">Total Price</span>
-                    <span class="card-field-value amount">Rs.<span th:text="${#numbers.formatDecimal(booking.totalPrice, 1, 2)}">0.00</span></span>
-                </div>
-                <div class="card-field">
-                    <span class="card-field-label">Booked On</span>
-                    <span class="card-field-value mono" th:text="${#dates.format(booking.bookingDate, 'dd MMM yyyy')}">01 Jan 2024</span>
-                </div>
-
-                <!-- Payment Section -->
-                <div class="section-header amber" style="margin-top:10px;" th:if="${booking.paymentId != null}"><i class="fas fa-rupee-sign me-1"></i>Payment Info</div>
-                <div th:if="${booking.paymentId != null}">
-                    <div class="card-field">
-                        <span class="card-field-label">Payment ID</span>
-                        <span class="card-field-value mono">#<span th:text="${booking.paymentId}">1</span></span>
-                    </div>
-                    <div class="card-field" th:if="${booking.payment != null}">
-                        <span class="card-field-label">Pay Status</span>
-                        <span class="card-field-value" th:text="${booking.payment.status}">STATUS</span>
-                    </div>
-                    <div class="card-field" th:if="${booking.payment != null}">
-                        <span class="card-field-label">Transaction</span>
-                        <span class="card-field-value mono" th:text="${booking.payment.transactionId}">TXN-123</span>
-                    </div>
-                </div>
-
-                <!-- Actions -->
-                <div class="card-actions">
-                    <button type="button" class="btn-fin-action btn-fin-view" data-bs-toggle="modal"
-                            th:attr="data-bs-target='#viewModal' + ${booking.id}">
-                        <i class="fas fa-eye"></i> VIEW FULL DETAILS
-                    </button>
-                    <button type="button" class="btn-fin-action btn-fin-edit" data-bs-toggle="modal"
-                            th:attr="data-bs-target='#updateStatusModal' + ${booking.id}"
-                            th:if="${booking.paymentId != null and booking.payment != null}">
-                        <i class="fas fa-exchange-alt"></i> UPDATE PAYMENT STATUS
-                    </button>
-                </div>
+              </div>
+              <hr class="section-divider">
+              <div class="section-sep amber" style="margin-top:0;"><i class="fas fa-rupee-sign"></i> Payment Information</div>
+              <div th:if="${booking.paymentId != null}">
+                <table class="modal-table">
+                  <tr><td>Payment ID</td><td>#<span th:text="${booking.paymentId}">1</span></td></tr>
+                  <tr><td>Amount</td><td><span class="amount-val">Rs.<span th:text="${booking.payment != null ? #numbers.formatDecimal(booking.payment.amount,1,2) : '0.00'}">0.00</span></span></td></tr>
+                  <tr><td>Status</td><td th:text="${booking.payment != null ? booking.payment.status : '—'}">—</td></tr>
+                  <tr th:if="${booking.payment != null}"><td>Transaction ID</td><td th:text="${booking.payment.transactionId}">—</td></tr>
+                  <tr th:if="${booking.payment != null and booking.payment.paymentDate != null}">
+                    <td>Payment Date</td>
+                    <td th:text="${#dates.format(booking.payment.paymentDate,'dd MMM yyyy HH:mm')}">—</td>
+                  </tr>
+                </table>
+              </div>
+              <div th:if="${booking.paymentId == null}">
+                <div class="modal-note"><i class="fas fa-info-circle"></i>No payment is associated with this cancelled booking.</div>
+              </div>
+              <div class="modal-note" style="margin-top:12px;"><i class="fas fa-info-circle"></i>Read-only view — use "Update Payment Status" to make changes.</div>
             </div>
-        </div>
-
-        <!-- Empty State -->
-        <div th:if="${#lists.isEmpty(bookings)}" class="empty-state">
-            <i class="fas fa-ban"></i>
-            <h4>NO CANCELLED BOOKINGS</h4>
-            <p>CANCELLED BOOKINGS WILL APPEAR HERE FOR PAYMENT MANAGEMENT.</p>
-            <a th:href="@{/dashboard/finance}" class="btn-industrial btn-back"><i class="fas fa-arrow-left"></i> BACK TO DASHBOARD</a>
-        </div>
-
-        <!-- PER-BOOKING MODALS -->
-        <div th:each="booking : ${bookings}">
-
-            <!-- View Modal -->
-            <div class="modal fade" th:id="'viewModal' + ${booking.id}" tabindex="-1">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header red">
-                            <span class="modal-title"><i class="fas fa-ticket-alt me-2"></i>CANCELLED BOOKING #<span th:text="${booking.id}">1</span></span>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="section-header blue" style="margin-top:0"><i class="fas fa-plane me-1"></i>Flight Information</div>
-                                    <table class="modal-info-table">
-                                        <tr><td>Flight Number</td><td th:text="${booking.flight != null ? booking.flight.flightNumber : 'N/A'}">FL123</td></tr>
-                                        <tr><td>Origin</td><td th:text="${booking.flight != null ? booking.flight.origin : 'N/A'}">CMB</td></tr>
-                                        <tr><td>Destination</td><td th:text="${booking.flight != null ? booking.flight.destination : 'N/A'}">KAN</td></tr>
-                                        <tr><td>Departure</td><td th:text="${booking.flight != null ? #dates.format(booking.flight.departureDate, 'dd MMM yyyy HH:mm') : 'N/A'}">Date</td></tr>
-                                        <tr><td>Arrival</td><td th:text="${booking.flight != null ? #dates.format(booking.flight.arrivalDate, 'dd MMM yyyy HH:mm') : 'N/A'}">Date</td></tr>
-                                    </table>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="section-header info" style="margin-top:0"><i class="fas fa-info-circle me-1"></i>Booking Information</div>
-                                    <table class="modal-info-table">
-                                        <tr><td>Booking ID</td><td>#<span th:text="${booking.id}">1</span></td></tr>
-                                        <tr><td>User</td><td th:text="${booking.user != null ? booking.user.username : 'N/A'}">user123</td></tr>
-                                        <tr><td>Passengers</td><td th:text="${booking.passengers}">1</td></tr>
-                                        <tr><td>Status</td><td><span style="color:var(--accent-red);font-family:var(--font-mono);font-size:11px;" th:text="${booking.status}">CANCELLED</span></td></tr>
-                                        <tr><td>Booking Date</td><td th:text="${#dates.format(booking.bookingDate, 'dd MMM yyyy HH:mm')}">Date</td></tr>
-                                        <tr><td>Total Price</td><td><span class="amount-val">Rs.<span th:text="${#numbers.formatDecimal(booking.totalPrice, 1, 2)}">0.00</span></span></td></tr>
-                                    </table>
-                                </div>
-                            </div>
-                            <hr class="section-divider">
-                            <div class="section-header amber" style="margin-top:0"><i class="fas fa-rupee-sign me-1"></i>Payment Information</div>
-                            <div th:if="${booking.paymentId != null}">
-                                <table class="modal-info-table">
-                                    <tr><td>Payment ID</td><td>#<span th:text="${booking.paymentId}">1</span></td></tr>
-                                    <tr><td>Amount</td><td><span class="amount-val">Rs.<span th:text="${booking.payment != null ? #numbers.formatDecimal(booking.payment.amount, 1, 2) : '0.00'}">0.00</span></span></td></tr>
-                                    <tr><td>Status</td><td th:text="${booking.payment != null ? booking.payment.status : 'UNKNOWN'}">STATUS</td></tr>
-                                    <tr th:if="${booking.payment != null}"><td>Transaction ID</td><td th:text="${booking.payment.transactionId}">TXN-123</td></tr>
-                                    <tr th:if="${booking.payment != null}"><td>Payment Date</td><td th:text="${#dates.format(booking.payment.paymentDate, 'dd MMM yyyy HH:mm:ss')}">Date</td></tr>
-                                </table>
-                            </div>
-                            <div th:if="${booking.paymentId == null}">
-                                <div class="modal-note"><i class="fas fa-info-circle"></i>No payment is associated with this cancelled booking.</div>
-                            </div>
-                            <div class="modal-note" style="margin-top:14px;"><i class="fas fa-info-circle"></i>Read-only view. Use "Update Payment Status" to make changes.</div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn-fin-action btn-fin-view" data-bs-dismiss="modal" style="width:auto;padding:8px 20px;">Close</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="modal-footer">
+              <button type="button" class="btn-modal btn-modal-secondary" data-bs-dismiss="modal">Close</button>
             </div>
-
-            <!-- Update Payment Status Modal -->
-            <div class="modal fade" th:id="'updateStatusModal' + ${booking.id}" tabindex="-1"
-                 th:if="${booking.paymentId != null and booking.payment != null}">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header amber">
-                            <span class="modal-title"><i class="fas fa-exchange-alt me-2"></i>UPDATE PAYMENT STATUS</span>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                        </div>
-                        <form th:action="@{/dashboard/finance/booking/update-payment-status/{paymentId}(paymentId=${booking.paymentId})}" method="post">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                            <div class="modal-body">
-                                <p style="font-family:var(--font-mono);font-size:10px;letter-spacing:1px;color:var(--text-muted);margin-bottom:12px;">CURRENT PAYMENT DETAILS</p>
-                                <table class="modal-info-table">
-                                    <tr><td>Payment ID</td><td>#<span th:text="${booking.paymentId}">1</span></td></tr>
-                                    <tr><td>Booking ID</td><td>#<span th:text="${booking.id}">1</span></td></tr>
-                                    <tr><td>Amount</td><td><span class="amount-val">Rs.<span th:text="${#numbers.formatDecimal(booking.payment.amount, 1, 2)}">0.00</span></span></td></tr>
-                                    <tr><td>Current Status</td><td th:text="${booking.payment.status}">STATUS</td></tr>
-                                    <tr><td>User</td><td th:text="${booking.user != null ? booking.user.username : 'N/A'}">user123</td></tr>
-                                </table>
-                                <hr class="section-divider">
-                                <div class="mb-3">
-                                    <label class="form-label">New Payment Status <span style="color:var(--accent-red)">*</span></label>
-                                    <select class="form-select" name="status" required>
-                                        <option value="">Select New Status</option>
-                                        <option value="COMPLETED" th:selected="${booking.payment.status == 'COMPLETED'}">COMPLETED</option>
-                                        <option value="REFUNDED" th:selected="${booking.payment.status == 'REFUNDED'}">REFUNDED</option>
-                                        <option value="FAILED" th:selected="${booking.payment.status == 'FAILED'}">FAILED</option>
-                                    </select>
-                                </div>
-                                <div class="modal-warn"><i class="fas fa-exclamation-triangle"></i>Changing the payment status will update the payment record in the database.</div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn-fin-action btn-fin-view" data-bs-dismiss="modal" style="width:auto;padding:8px 20px;">Cancel</button>
-                                <button type="submit" class="btn-fin-action btn-fin-edit" style="width:auto;padding:8px 20px;">
-                                    <i class="fas fa-save"></i> UPDATE STATUS
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
+          </div>
         </div>
-    </main>
+      </div>
+
+      <!-- Update Payment Status Modal -->
+      <div class="modal fade" th:id="'update-' + ${booking.id}" tabindex="-1"
+           th:if="${booking.paymentId != null and booking.payment != null}">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header amber">
+              <span class="modal-title"><i class="fas fa-exchange-alt me-2" style="color:var(--amber);"></i>Update Payment #<span th:text="${booking.paymentId}">1</span></span>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{${baseUrl + '/booking/update-payment-status/' + booking.paymentId}}" method="post">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+              <div class="modal-body">
+                <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-3);margin-bottom:10px;">Current Payment Details</p>
+                <table class="modal-table">
+                  <tr><td>Payment ID</td><td>#<span th:text="${booking.paymentId}">1</span></td></tr>
+                  <tr><td>Booking ID</td><td>#<span th:text="${booking.id}">1</span></td></tr>
+                  <tr><td>Amount</td><td><span class="amount-val">Rs.<span th:text="${#numbers.formatDecimal(booking.payment.amount,1,2)}">0.00</span></span></td></tr>
+                  <tr><td>Current Status</td><td th:text="${booking.payment.status}">—</td></tr>
+                  <tr><td>User</td><td th:text="${booking.user != null ? booking.user.username : 'N/A'}">—</td></tr>
+                </table>
+                <hr class="section-divider">
+                <div class="mb-3">
+                  <label class="form-label">New Payment Status <span style="color:var(--red);">*</span></label>
+                  <select class="form-select" name="status" required>
+                    <option value="">— Select New Status —</option>
+                    <option value="COMPLETED" th:selected="${booking.payment.status == 'COMPLETED'}">COMPLETED</option>
+                    <option value="REFUNDED"  th:selected="${booking.payment.status == 'REFUNDED'}">REFUNDED</option>
+                    <option value="FAILED"    th:selected="${booking.payment.status == 'FAILED'}">FAILED</option>
+                  </select>
+                </div>
+                <div class="modal-warn"><i class="fas fa-exclamation-triangle"></i>Changing the payment status updates the record in the database.</div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn-modal btn-modal-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn-modal btn-modal-amber"><i class="fas fa-save"></i> Update Status</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- end per-booking modals -->
+
+  </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
