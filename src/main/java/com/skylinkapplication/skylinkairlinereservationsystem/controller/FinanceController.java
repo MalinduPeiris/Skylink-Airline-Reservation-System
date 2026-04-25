@@ -35,6 +35,7 @@ public class FinanceController {
     public String showAllPayments(Model model) {
         try {
             List<PaymentDTO> allPayments = paymentService.getAllPayments();
+            model.addAttribute("baseUrl", "/dashboard/finance");
             model.addAttribute("payments", allPayments);
             model.addAttribute("activeTab", "all");
 
@@ -42,6 +43,7 @@ public class FinanceController {
             return "finance-payments-tab";
         } catch (Exception e) {
             logger.error("Error loading all payments", e);
+            model.addAttribute("baseUrl", "/dashboard/finance");
             model.addAttribute("error", "Unable to load payments: " + e.getMessage());
             model.addAttribute("payments", List.of());
             model.addAttribute("activeTab", "all");
@@ -57,6 +59,7 @@ public class FinanceController {
     public String showCompletedPayments(Model model) {
         try {
             List<PaymentDTO> completedPayments = paymentService.getPaymentsByStatus("COMPLETED");
+            model.addAttribute("baseUrl", "/dashboard/finance");
             model.addAttribute("payments", completedPayments);
             model.addAttribute("activeTab", "completed");
 
@@ -64,6 +67,7 @@ public class FinanceController {
             return "finance-payments-tab";
         } catch (Exception e) {
             logger.error("Error loading completed payments", e);
+            model.addAttribute("baseUrl", "/dashboard/finance");
             model.addAttribute("error", "Unable to load completed payments: " + e.getMessage());
             model.addAttribute("payments", List.of());
             model.addAttribute("activeTab", "completed");
@@ -79,6 +83,7 @@ public class FinanceController {
     public String showFailedPayments(Model model) {
         try {
             List<PaymentDTO> failedPayments = paymentService.getPaymentsByStatus("FAILED");
+            model.addAttribute("baseUrl", "/dashboard/finance");
             model.addAttribute("payments", failedPayments);
             model.addAttribute("activeTab", "failed");
 
@@ -86,6 +91,7 @@ public class FinanceController {
             return "finance-payments-tab";
         } catch (Exception e) {
             logger.error("Error loading failed payments", e);
+            model.addAttribute("baseUrl", "/dashboard/finance");
             model.addAttribute("error", "Unable to load failed payments: " + e.getMessage());
             model.addAttribute("payments", List.of());
             model.addAttribute("activeTab", "failed");
@@ -101,6 +107,7 @@ public class FinanceController {
     public String showRefundedPayments(Model model) {
         try {
             List<PaymentDTO> refundedPayments = paymentService.getPaymentsByStatus("REFUNDED");
+            model.addAttribute("baseUrl", "/dashboard/finance");
             model.addAttribute("payments", refundedPayments);
             model.addAttribute("activeTab", "refunded");
 
@@ -108,6 +115,7 @@ public class FinanceController {
             return "finance-payments-tab";
         } catch (Exception e) {
             logger.error("Error loading refunded payments", e);
+            model.addAttribute("baseUrl", "/dashboard/finance");
             model.addAttribute("error", "Unable to load refunded payments: " + e.getMessage());
             model.addAttribute("payments", List.of());
             model.addAttribute("activeTab", "refunded");
@@ -136,6 +144,7 @@ public class FinanceController {
                 }
             }
 
+            model.addAttribute("baseUrl", "/dashboard/finance");
             model.addAttribute("bookings", cancelledBookings);
             model.addAttribute("activeTab", "cancelled");
 
@@ -143,6 +152,7 @@ public class FinanceController {
             return "finance-cancelled-bookings";
         } catch (Exception e) {
             logger.error("Error loading cancelled bookings", e);
+            model.addAttribute("baseUrl", "/dashboard/finance");
             model.addAttribute("error", "Unable to load cancelled bookings: " + e.getMessage());
             model.addAttribute("bookings", List.of());
             model.addAttribute("activeTab", "cancelled");

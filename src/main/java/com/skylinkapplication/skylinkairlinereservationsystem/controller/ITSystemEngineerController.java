@@ -507,6 +507,7 @@ public class ITSystemEngineerController {
                     .sum() : 0.0;
 
             // Add attributes to model
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer/finance");
             model.addAttribute("payments", payments != null ? payments : Collections.emptyList());
             model.addAttribute("totalPayments", totalPayments);
             model.addAttribute("completedPayments", completedPayments);
@@ -520,6 +521,7 @@ public class ITSystemEngineerController {
             return "finance-dashboard";
         } catch (Exception e) {
             logger.error("Error loading finance dashboard for IT System Engineer", e);
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer/finance");
             model.addAttribute("error", "Unable to load finance dashboard: " + e.getMessage());
             model.addAttribute("payments", Collections.emptyList());
             model.addAttribute("totalPayments", 0);
@@ -538,6 +540,7 @@ public class ITSystemEngineerController {
     public String showAllFinancePayments(Model model) {
         try {
             List<PaymentDTO> allPayments = paymentService.getAllPayments();
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer/finance");
             model.addAttribute("payments", allPayments);
             model.addAttribute("activeTab", "all");
 
@@ -545,6 +548,7 @@ public class ITSystemEngineerController {
             return "finance-payments-tab";
         } catch (Exception e) {
             logger.error("Error loading all payments for IT System Engineer", e);
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer/finance");
             model.addAttribute("error", "Unable to load payments: " + e.getMessage());
             model.addAttribute("payments", List.of());
             model.addAttribute("activeTab", "all");
@@ -558,6 +562,7 @@ public class ITSystemEngineerController {
     public String showCompletedFinancePayments(Model model) {
         try {
             List<PaymentDTO> completedPayments = paymentService.getPaymentsByStatus("COMPLETED");
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer/finance");
             model.addAttribute("payments", completedPayments);
             model.addAttribute("activeTab", "completed");
 
@@ -565,6 +570,7 @@ public class ITSystemEngineerController {
             return "finance-payments-tab";
         } catch (Exception e) {
             logger.error("Error loading completed payments for IT System Engineer", e);
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer/finance");
             model.addAttribute("error", "Unable to load completed payments: " + e.getMessage());
             model.addAttribute("payments", List.of());
             model.addAttribute("activeTab", "completed");
@@ -578,6 +584,7 @@ public class ITSystemEngineerController {
     public String showFailedFinancePayments(Model model) {
         try {
             List<PaymentDTO> failedPayments = paymentService.getPaymentsByStatus("FAILED");
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer/finance");
             model.addAttribute("payments", failedPayments);
             model.addAttribute("activeTab", "failed");
 
@@ -585,6 +592,7 @@ public class ITSystemEngineerController {
             return "finance-payments-tab";
         } catch (Exception e) {
             logger.error("Error loading failed payments for IT System Engineer", e);
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer/finance");
             model.addAttribute("error", "Unable to load failed payments: " + e.getMessage());
             model.addAttribute("payments", List.of());
             model.addAttribute("activeTab", "failed");
@@ -598,6 +606,7 @@ public class ITSystemEngineerController {
     public String showRefundedFinancePayments(Model model) {
         try {
             List<PaymentDTO> refundedPayments = paymentService.getPaymentsByStatus("REFUNDED");
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer/finance");
             model.addAttribute("payments", refundedPayments);
             model.addAttribute("activeTab", "refunded");
 
@@ -605,6 +614,7 @@ public class ITSystemEngineerController {
             return "finance-payments-tab";
         } catch (Exception e) {
             logger.error("Error loading refunded payments for IT System Engineer", e);
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer/finance");
             model.addAttribute("error", "Unable to load refunded payments: " + e.getMessage());
             model.addAttribute("payments", List.of());
             model.addAttribute("activeTab", "refunded");
@@ -631,6 +641,7 @@ public class ITSystemEngineerController {
                 }
             }
 
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer/finance");
             model.addAttribute("bookings", cancelledBookings);
             model.addAttribute("activeTab", "cancelled");
 
@@ -638,6 +649,7 @@ public class ITSystemEngineerController {
             return "finance-cancelled-bookings";
         } catch (Exception e) {
             logger.error("Error loading cancelled bookings for IT System Engineer", e);
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer/finance");
             model.addAttribute("error", "Unable to load cancelled bookings: " + e.getMessage());
             model.addAttribute("bookings", List.of());
             model.addAttribute("activeTab", "cancelled");
