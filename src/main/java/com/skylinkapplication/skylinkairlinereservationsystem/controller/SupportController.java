@@ -172,7 +172,7 @@ public class SupportController {
     }
 
     @PostMapping("/respond")
-    public String respondToTicket(@RequestParam Long ticketId, @RequestParam String response, Model model) {
+    public String respondToTicket(@RequestParam(name = "ticketId") Long ticketId, @RequestParam(name = "response") String response, Model model) {
         try {
             if (ticketId == null || ticketId <= 0 || response == null || response.trim().isEmpty()) {
                 logger.warn("Invalid ticketId or response provided: ticketId={}, response={}", ticketId, response);
@@ -193,7 +193,7 @@ public class SupportController {
     }
 
     @PostMapping("/update/{id}")
-    public String updateTicket(@PathVariable Long id, @ModelAttribute SupportTicketDTO ticketDTO, RedirectAttributes redirectAttributes) {
+    public String updateTicket(@PathVariable(name = "id") Long id, @ModelAttribute SupportTicketDTO ticketDTO, RedirectAttributes redirectAttributes) {
         try {
             supportService.updateSupportTicket(id, ticketDTO);
             logger.info("Ticket updated successfully for ID: {}", id);
@@ -207,7 +207,7 @@ public class SupportController {
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteTicket(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteTicket(@PathVariable(name = "id") Long id, RedirectAttributes redirectAttributes) {
         try {
             supportService.deleteSupportTicket(id);
             logger.info("Ticket deleted successfully for ID: {}", id);

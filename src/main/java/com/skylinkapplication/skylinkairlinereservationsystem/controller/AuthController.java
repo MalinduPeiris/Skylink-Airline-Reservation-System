@@ -33,10 +33,10 @@ public class AuthController {
     private UserRepository userRepository;
 
     @GetMapping("/login")
-    public String showLoginPage(@RequestParam(required = false) String error,
-                                @RequestParam(required = false) String logout,
-                                @RequestParam(required = false) String expired,
-                                @RequestParam(required = false) String deleted,
+    public String showLoginPage(@RequestParam(name = "error", required = false) String error,
+                                @RequestParam(name = "logout", required = false) String logout,
+                                @RequestParam(name = "expired", required = false) String expired,
+                                @RequestParam(name = "deleted", required = false) String deleted,
                                 Model model) {
         logger.info("Accessing login page");
 
@@ -238,8 +238,8 @@ public class AuthController {
     }
 
     @PostMapping("/password-reset")
-    public String resetPassword(@RequestParam String email,
-                                @RequestParam String newPassword,
+    public String resetPassword(@RequestParam(name = "email") String email,
+                                @RequestParam(name = "newPassword") String newPassword,
                                 Model model,
                                 RedirectAttributes redirectAttributes) {
         try {
@@ -349,7 +349,7 @@ public class AuthController {
      */
     @PostMapping("/clear-failed-attempts")
     @ResponseBody
-    public ResponseEntity<?> clearFailedAttempts(@RequestParam String identifier) {
+    public ResponseEntity<?> clearFailedAttempts(@RequestParam(name = "identifier") String identifier) {
         UserRegistrationManager registrationManager = UserRegistrationManager.getInstance();
         registrationManager.clearFailedAttempts(identifier);
         return ResponseEntity.ok("Failed attempts cleared for: " + identifier);

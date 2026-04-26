@@ -88,12 +88,12 @@ public class BookingController {
      */
     @PreAuthorize("hasRole('RESERVATION_MANAGER')")
     @PostMapping("/create-booking")
-    public String createBooking(@RequestParam Long flightId,
-                                @RequestParam Long userId,
-                                @RequestParam Integer passengers,
-                                @RequestParam(required = false) Double bookingExtras,
-                                @RequestParam(required = false) String promoCode,
-                                @RequestParam String status,
+    public String createBooking(@RequestParam(name = "flightId") Long flightId,
+                                @RequestParam(name = "userId") Long userId,
+                                @RequestParam(name = "passengers") Integer passengers,
+                                @RequestParam(name = "bookingExtras", required = false) Double bookingExtras,
+                                @RequestParam(name = "promoCode", required = false) String promoCode,
+                                @RequestParam(name = "status") String status,
                                 RedirectAttributes redirectAttributes,
                                 Model model) {
         try {
@@ -155,9 +155,9 @@ public class BookingController {
      */
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/page")
-    public String showBookingPage(@RequestParam Long flightId,
-                                  @RequestParam(defaultValue = "1") Integer passengers,
-                                  @RequestParam(required = false) String destination,
+    public String showBookingPage(@RequestParam(name = "flightId") Long flightId,
+                                  @RequestParam(name = "passengers", defaultValue = "1") Integer passengers,
+                                  @RequestParam(name = "destination", required = false) String destination,
                                   Model model,
                                   Authentication authentication) {
         try {
@@ -346,9 +346,9 @@ public class BookingController {
      */
     @PreAuthorize("hasRole('RESERVATION_MANAGER')")
     @PostMapping("/update/{id}")
-    public String updateBooking(@PathVariable Long id,
-                                @RequestParam Integer passengers,
-                                @RequestParam String status,
+    public String updateBooking(@PathVariable(name = "id") Long id,
+                                @RequestParam(name = "passengers") Integer passengers,
+                                @RequestParam(name = "status") String status,
                                 RedirectAttributes redirectAttributes) {
         try {
             if (id == null || id <= 0) {
@@ -386,7 +386,7 @@ public class BookingController {
      */
     @PreAuthorize("hasRole('RESERVATION_MANAGER')")
     @PostMapping("/delete/{id}")
-    public String deleteBooking(@PathVariable Long id,
+    public String deleteBooking(@PathVariable(name = "id") Long id,
                                 RedirectAttributes redirectAttributes) {
         try {
             if (id == null || id <= 0) {
@@ -416,8 +416,8 @@ public class BookingController {
      */
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/cancel")
-    public String cancelBooking(@RequestParam Long bookingId,
-                                @RequestParam Long userId,
+    public String cancelBooking(@RequestParam(name = "bookingId") Long bookingId,
+                                @RequestParam(name = "userId") Long userId,
                                 RedirectAttributes redirectAttributes) {
         try {
             if (bookingId == null || bookingId <= 0) {
@@ -442,7 +442,7 @@ public class BookingController {
      */
     @PreAuthorize("hasRole('RESERVATION_MANAGER')")
     @GetMapping("/{id}")
-    public ResponseEntity<BookingDTO> getBookingById(@PathVariable Long id) {
+    public ResponseEntity<BookingDTO> getBookingById(@PathVariable(name = "id") Long id) {
         try {
             BookingDTO booking = bookingService.getBookingById(id);
             return ResponseEntity.ok(booking);
@@ -458,7 +458,7 @@ public class BookingController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/user/booking-details/{id}")
     @ResponseBody
-    public ResponseEntity<BookingDTO> getUserBookingDetails(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<BookingDTO> getUserBookingDetails(@PathVariable(name = "id") Long id, Authentication authentication) {
         try {
             // Get the current user
             String username = authentication.getName();
@@ -501,9 +501,9 @@ public class BookingController {
     @PreAuthorize("hasRole('RESERVATION_MANAGER')")
     @PostMapping("/update-ajax")
     @ResponseBody
-    public ResponseEntity<Map<String, String>> updateBookingAjax(@RequestParam Long bookingId,
-                                                                 @RequestParam Integer passengers,
-                                                                 @RequestParam String status) {
+    public ResponseEntity<Map<String, String>> updateBookingAjax(@RequestParam(name = "bookingId") Long bookingId,
+                                                                 @RequestParam(name = "passengers") Integer passengers,
+                                                                 @RequestParam(name = "status") String status) {
         try {
             if (bookingId == null || bookingId <= 0) {
                 logger.warn("Invalid bookingId provided for update: {}", bookingId);
@@ -535,7 +535,7 @@ public class BookingController {
     @PreAuthorize("hasRole('RESERVATION_MANAGER')")
     @PostMapping("/delete-ajax")
     @ResponseBody
-    public ResponseEntity<Map<String, String>> deleteBookingAjax(@RequestParam Long bookingId) {
+    public ResponseEntity<Map<String, String>> deleteBookingAjax(@RequestParam(name = "bookingId") Long bookingId) {
         try {
             if (bookingId == null || bookingId <= 0) {
                 logger.warn("Invalid bookingId provided for deletion: {}", bookingId);

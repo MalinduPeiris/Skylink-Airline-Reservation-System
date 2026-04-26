@@ -51,9 +51,9 @@ public class PaymentController {
     @PostMapping("/create")
     @PreAuthorize("hasRole('FINANCE_EXECUTIVE')")
     public String createPayment(
-            @RequestParam Long bookingId,
-            @RequestParam Double amount,
-            @RequestParam String status,
+            @RequestParam(name = "bookingId") Long bookingId,
+            @RequestParam(name = "amount") Double amount,
+            @RequestParam(name = "status") String status,
             RedirectAttributes redirectAttributes) {
         try {
             // Validate inputs
@@ -107,9 +107,9 @@ public class PaymentController {
     @PostMapping("/update/{id}")
     @PreAuthorize("hasRole('FINANCE_EXECUTIVE')")
     public String updatePayment(
-            @PathVariable Long id,
-            @RequestParam Double amount,
-            @RequestParam String status,
+            @PathVariable(name = "id") Long id,
+            @RequestParam(name = "amount") Double amount,
+            @RequestParam(name = "status") String status,
             RedirectAttributes redirectAttributes) {
         try {
             // Validate inputs
@@ -319,12 +319,13 @@ public class PaymentController {
             // Process payment
             PaymentDTO processedPayment = paymentService.processPayment(paymentDTO);
 
-            logger.info("Payment processed successfully: ID={}, TxnID={}",
+            logger.info("Payment submitted (PENDING): ID={}, TxnID={}",
                     processedPayment.getId(), processedPayment.getTransactionId());
 
-            // Redirect to confirmation page with success message
+            // Redirect to confirmation page with pending message
             redirectAttributes.addFlashAttribute("success",
-                    "Payment completed successfully! Transaction ID: " + processedPayment.getTransactionId());
+                    "Payment submitted successfully! Transaction ID: " + processedPayment.getTransactionId()
+                    + " — Your payment is pending Finance Executive review. Your booking will be confirmed once approved.");
             redirectAttributes.addFlashAttribute("transactionId", processedPayment.getTransactionId());
             redirectAttributes.addFlashAttribute("bookingId", paymentDTO.getBookingId());
             redirectAttributes.addFlashAttribute("amount", processedPayment.getAmount());
