@@ -264,9 +264,9 @@ public class DashboardController {
     @GetMapping("/flight-admin")
     @PreAuthorize("hasRole('IT_SYSTEM_ENGINEER')")
     public String flightAdminDashboard(
-            @RequestParam(required = false) String dateFilter,
-            @RequestParam(required = false) String statusFilter,
-            @RequestParam(required = false) String routeFilter,
+            @RequestParam(name = "dateFilter", required = false) String dateFilter,
+            @RequestParam(name = "statusFilter", required = false) String statusFilter,
+            @RequestParam(name = "routeFilter", required = false) String routeFilter,
             Model model) {
         try {
             List<FlightDTO> flights;
@@ -357,15 +357,15 @@ public class DashboardController {
     @PostMapping("/flight-admin")
     @PreAuthorize("hasRole('IT_SYSTEM_ENGINEER')")
     public String createFlight(
-            @RequestParam String flightNumber,
-            @RequestParam(required = false) String aircraftType,
-            @RequestParam String origin,
-            @RequestParam String destination,
-            @RequestParam String departureDate,
-            @RequestParam String arrivalDate,
-            @RequestParam Double price,
-            @RequestParam String cabinClass,
-            @RequestParam Integer seatsAvailable,
+            @RequestParam(name = "flightNumber") String flightNumber,
+            @RequestParam(name = "aircraftType", required = false) String aircraftType,
+            @RequestParam(name = "origin") String origin,
+            @RequestParam(name = "destination") String destination,
+            @RequestParam(name = "departureDate") String departureDate,
+            @RequestParam(name = "arrivalDate") String arrivalDate,
+            @RequestParam(name = "price") Double price,
+            @RequestParam(name = "cabinClass") String cabinClass,
+            @RequestParam(name = "seatsAvailable") Integer seatsAvailable,
             Model model) {
         try {
             // Validate inputs
@@ -434,17 +434,17 @@ public class DashboardController {
     @PostMapping("/flight-admin/update/{id}")
     @PreAuthorize("hasRole('IT_SYSTEM_ENGINEER')")
     public String updateFlight(
-            @PathVariable Long id,
-            @RequestParam String flightNumber,
-            @RequestParam(required = false) String aircraftType,
-            @RequestParam String origin,
-            @RequestParam String destination,
-            @RequestParam String departureDate,
-            @RequestParam String arrivalDate,
-            @RequestParam Double price,
-            @RequestParam String cabinClass,
-            @RequestParam Integer seatsAvailable,
-            @RequestParam String status,
+            @PathVariable(name = "id") Long id,
+            @RequestParam(name = "flightNumber") String flightNumber,
+            @RequestParam(name = "aircraftType", required = false) String aircraftType,
+            @RequestParam(name = "origin") String origin,
+            @RequestParam(name = "destination") String destination,
+            @RequestParam(name = "departureDate") String departureDate,
+            @RequestParam(name = "arrivalDate") String arrivalDate,
+            @RequestParam(name = "price") Double price,
+            @RequestParam(name = "cabinClass") String cabinClass,
+            @RequestParam(name = "seatsAvailable") Integer seatsAvailable,
+            @RequestParam(name = "status") String status,
             Model model) {
         try {
             // Validate inputs
@@ -514,7 +514,7 @@ public class DashboardController {
     }
     @PostMapping("/flight-admin/delete/{id}")
     @PreAuthorize("hasRole('IT_SYSTEM_ENGINEER')")
-    public String deleteFlight(@PathVariable Long id, Model model) {
+    public String deleteFlight(@PathVariable(name = "id") Long id, Model model) {
         try {
             if (id == null) {
                 throw new IllegalArgumentException("Flight ID cannot be null.");

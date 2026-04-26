@@ -170,12 +170,12 @@ public class UserController {
     }
 
     @PostMapping("/update")
-    public String updateProfile(@RequestParam Long id,
-                                @RequestParam String username,
-                                @RequestParam String email,
-                                @RequestParam String phonenumber,
-                                @RequestParam String address,
-                                @RequestParam(required = false) String password,
+    public String updateProfile(@RequestParam(name = "id") Long id,
+                                @RequestParam(name = "username") String username,
+                                @RequestParam(name = "email") String email,
+                                @RequestParam(name = "phonenumber") String phonenumber,
+                                @RequestParam(name = "address") String address,
+                                @RequestParam(name = "password", required = false) String password,
                                 RedirectAttributes redirectAttributes,
                                 HttpSession session,
                                 Authentication authentication) {
@@ -265,7 +265,7 @@ public class UserController {
     }
 
     @PostMapping("/delete")
-    public String deleteProfile(@RequestParam Long id,
+    public String deleteProfile(@RequestParam(name = "id") Long id,
                                 RedirectAttributes redirectAttributes,
                                 HttpSession session,
                                 Authentication authentication) {

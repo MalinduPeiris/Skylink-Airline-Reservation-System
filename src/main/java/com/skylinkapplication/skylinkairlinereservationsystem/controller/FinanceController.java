@@ -52,8 +52,29 @@ public class FinanceController {
     }
 
     /**
-     * Completed Payments Tab
+     * Pending Payments Tab - Payments submitted by users awaiting review
      */
+    @GetMapping("/pending")
+    @PreAuthorize("hasAnyRole('FINANCE_EXECUTIVE', 'IT_SYSTEM_ENGINEER')")
+    public String showPendingPayments(Model model) {
+        try {
+            List<PaymentDTO> pendingPayments = paymentService.getPaymentsByStatus("PENDING");
+            model.addAttribute("baseUrl", "/dashboard/finance");
+            model.addAttribute("payments", pendingPayments);
+            model.addAttribute("activeTab", "pending");
+
+            logger.info("Loaded {} pending payments", pendingPayments.size());
+            return "finance-payments-tab";
+        } catch (Exception e) {
+            logger.error("Error loading pending payments", e);
+            model.addAttribute("baseUrl", "/dashboard/finance");
+            model.addAttribute("error", "Unable to load pending payments: " + e.getMessage());
+            model.addAttribute("payments", List.of());
+            model.addAttribute("activeTab", "pending");
+            return "finance-payments-tab";
+        }
+    }
+
     @GetMapping("/completed")
     @PreAuthorize("hasAnyRole('FINANCE_EXECUTIVE', 'IT_SYSTEM_ENGINEER')")
     public String showCompletedPayments(Model model) {
@@ -161,49 +182,51 @@ public class FinanceController {
     }
 
     /**
-     * Create Payment
+     * Accept Payment - sets status to COMPLETED, confirms the booking
      */
-    @PostMapping("/payment/create")
+    @PostMapping("/payment/accept/{id}")
     @PreAuthorize("hasAnyRole('FINANCE_EXECUTIVE', 'IT_SYSTEM_ENGINEER')")
-    public String createPayment(
-            @RequestParam Long bookingId,
-            @RequestParam Double amount,
-            @RequestParam String status,
-            @RequestParam String activeTab,
+    public String acceptPayment(
+            @PathVariable(name = "id") Long id,
+            @RequestParam(name = "activeTab", defaultValue = "pending") String activeTab,
             RedirectAttributes redirectAttributes) {
         try {
-            if (bookingId == null || bookingId <= 0) {
-                redirectAttributes.addFlashAttribute("error", "Invalid booking ID");
-                return "redirect:/dashboard/finance/" + activeTab;
-            }
-            if (amount == null || amount <= 0) {
-                redirectAttributes.addFlashAttribute("error", "Amount must be greater than zero");
-                return "redirect:/dashboard/finance/" + activeTab;
-            }
-
-            // Validate status enum
-            try {
-                Payment.Status.valueOf(status);
-            } catch (IllegalArgumentException e) {
-                redirectAttributes.addFlashAttribute("error", "Invalid status");
-                return "redirect:/dashboard/finance/" + activeTab;
-            }
-
             PaymentDTO paymentDTO = new PaymentDTO();
-            paymentDTO.setBookingId(bookingId);
-            paymentDTO.setAmount(amount);
-            paymentDTO.setStatus(status);
+            paymentDTO.setStatus("COMPLETED");
+            paymentService.updatePayment(id, paymentDTO);
 
-            PaymentDTO createdPayment = paymentService.createPayment(paymentDTO);
-
-            logger.info("Payment created successfully: id={}", createdPayment.getId());
+            logger.info("Payment accepted: id={}", id);
             redirectAttributes.addFlashAttribute("success",
-                    "Payment #" + createdPayment.getId() + " created successfully!");
-
+                    "Payment #" + id + " accepted — booking confirmed!");
             return "redirect:/dashboard/finance/" + activeTab;
         } catch (RuntimeException e) {
-            logger.error("Error creating payment", e);
-            redirectAttributes.addFlashAttribute("error", "Error creating payment: " + e.getMessage());
+            logger.error("Error accepting payment: id={}", id, e);
+            redirectAttributes.addFlashAttribute("error", "Error accepting payment: " + e.getMessage());
+            return "redirect:/dashboard/finance/" + activeTab;
+        }
+    }
+
+    /**
+     * Cancel Payment - sets status to FAILED, cancels the booking
+     */
+    @PostMapping("/payment/cancel/{id}")
+    @PreAuthorize("hasAnyRole('FINANCE_EXECUTIVE', 'IT_SYSTEM_ENGINEER')")
+    public String cancelPayment(
+            @PathVariable(name = "id") Long id,
+            @RequestParam(name = "activeTab", defaultValue = "pending") String activeTab,
+            RedirectAttributes redirectAttributes) {
+        try {
+            PaymentDTO paymentDTO = new PaymentDTO();
+            paymentDTO.setStatus("FAILED");
+            paymentService.updatePayment(id, paymentDTO);
+
+            logger.info("Payment cancelled: id={}", id);
+            redirectAttributes.addFlashAttribute("success",
+                    "Payment #" + id + " cancelled — booking has been cancelled.");
+            return "redirect:/dashboard/finance/" + activeTab;
+        } catch (RuntimeException e) {
+            logger.error("Error cancelling payment: id={}", id, e);
+            redirectAttributes.addFlashAttribute("error", "Error cancelling payment: " + e.getMessage());
             return "redirect:/dashboard/finance/" + activeTab;
         }
     }
@@ -214,11 +237,11 @@ public class FinanceController {
     @PostMapping("/payment/update/{id}")
     @PreAuthorize("hasAnyRole('FINANCE_EXECUTIVE', 'IT_SYSTEM_ENGINEER')")
     public String updatePayment(
-            @PathVariable Long id,
-            @RequestParam Double amount,
-            @RequestParam String status,
-            @RequestParam String transactionId,
-            @RequestParam String activeTab,
+            @PathVariable(name = "id") Long id,
+            @RequestParam(name = "amount") Double amount,
+            @RequestParam(name = "status") String status,
+            @RequestParam(name = "transactionId") String transactionId,
+            @RequestParam(name = "activeTab") String activeTab,
             RedirectAttributes redirectAttributes) {
         try {
             if (amount == null || amount <= 0) {
@@ -258,8 +281,8 @@ public class FinanceController {
     @PostMapping("/payment/delete/{id}")
     @PreAuthorize("hasAnyRole('FINANCE_EXECUTIVE', 'IT_SYSTEM_ENGINEER')")
     public String deletePayment(
-            @PathVariable Long id,
-            @RequestParam String activeTab,
+            @PathVariable(name = "id") Long id,
+            @RequestParam(name = "activeTab") String activeTab,
             RedirectAttributes redirectAttributes) {
         try {
             paymentService.deletePayment(id);
@@ -281,8 +304,8 @@ public class FinanceController {
     @PostMapping("/booking/update-payment-status/{paymentId}")
     @PreAuthorize("hasAnyRole('FINANCE_EXECUTIVE', 'IT_SYSTEM_ENGINEER')")
     public String updatePaymentStatus(
-            @PathVariable Long paymentId,
-            @RequestParam String status,
+            @PathVariable(name = "paymentId") Long paymentId,
+            @RequestParam(name = "status") String status,
             RedirectAttributes redirectAttributes) {
         try {
             // Validate status enum
