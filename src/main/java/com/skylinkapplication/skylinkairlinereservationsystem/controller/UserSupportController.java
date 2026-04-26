@@ -56,11 +56,11 @@ public class UserSupportController {
     }
 
     @PostMapping("/submit-ticket")
-    public String submitSupportTicket(@RequestParam String name,
-                                      @RequestParam String email,
-                                      @RequestParam String issueTitle,
-                                      @RequestParam String issueDescription,
-                                      @RequestParam(required = false) Long userId,
+    public String submitSupportTicket(@RequestParam(name = "name") String name,
+                                      @RequestParam(name = "email") String email,
+                                      @RequestParam(name = "issueTitle") String issueTitle,
+                                      @RequestParam(name = "issueDescription") String issueDescription,
+                                      @RequestParam(name = "userId", required = false) Long userId,
                                       Model model,
                                       Authentication authentication) {
         try {
@@ -103,11 +103,11 @@ public class UserSupportController {
     }
 
     @PostMapping("/submit-feedback")
-    public String submitFeedback(@RequestParam String name,
-                                 @RequestParam String email,
-                                 @RequestParam Integer rating,
-                                 @RequestParam(required = false) String comments,
-                                 @RequestParam(required = false) Long userId,
+    public String submitFeedback(@RequestParam(name = "name") String name,
+                                 @RequestParam(name = "email") String email,
+                                 @RequestParam(name = "rating") Integer rating,
+                                 @RequestParam(name = "comments", required = false) String comments,
+                                 @RequestParam(name = "userId", required = false) Long userId,
                                  Model model,
                                  Authentication authentication) {
         try {

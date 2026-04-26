@@ -178,12 +178,12 @@ public class ITSystemEngineerController {
 
     // Update user
     @PostMapping("/user/update")
-    public String updateUser(@RequestParam Long id,
-                             @RequestParam String username,
-                             @RequestParam String email,
-                             @RequestParam(required = false) String phonenumber,
-                             @RequestParam(required = false) String address,
-                             @RequestParam String role,
+    public String updateUser(@RequestParam(name = "id") Long id,
+                             @RequestParam(name = "username") String username,
+                             @RequestParam(name = "email") String email,
+                             @RequestParam(name = "phonenumber", required = false) String phonenumber,
+                             @RequestParam(name = "address", required = false) String address,
+                             @RequestParam(name = "role") String role,
                              RedirectAttributes redirectAttributes) {
         try {
             User user = userRepository.findById(id)
@@ -218,7 +218,7 @@ public class ITSystemEngineerController {
 
     // Delete user
     @PostMapping("/user/delete")
-    public String deleteUser(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+    public String deleteUser(@RequestParam(name = "id") Long id, RedirectAttributes redirectAttributes) {
         try {
             // Check if user has bookings
             List<Booking> userBookings = bookingRepository.findByUser_Id(id);
@@ -239,12 +239,12 @@ public class ITSystemEngineerController {
 
     // Create user
     @PostMapping("/user/create")
-    public String createUser(@RequestParam String username,
-                             @RequestParam String email,
-                             @RequestParam String password,
-                             @RequestParam(required = false) String phonenumber,
-                             @RequestParam(required = false) String address,
-                             @RequestParam String role,
+    public String createUser(@RequestParam(name = "username") String username,
+                             @RequestParam(name = "email") String email,
+                             @RequestParam(name = "password") String password,
+                             @RequestParam(name = "phonenumber", required = false) String phonenumber,
+                             @RequestParam(name = "address", required = false) String address,
+                             @RequestParam(name = "role") String role,
                              RedirectAttributes redirectAttributes) {
         try {
             // Check if username or email already exists
@@ -661,10 +661,10 @@ public class ITSystemEngineerController {
     @PreAuthorize("hasAnyRole('IT_SYSTEM_ENGINEER', 'FINANCE_EXECUTIVE')")
     @PostMapping("/finance/payment/create")
     public String createFinancePayment(
-            @RequestParam Long bookingId,
-            @RequestParam Double amount,
-            @RequestParam String status,
-            @RequestParam String activeTab,
+            @RequestParam(name = "bookingId") Long bookingId,
+            @RequestParam(name = "amount") Double amount,
+            @RequestParam(name = "status") String status,
+            @RequestParam(name = "activeTab") String activeTab,
             RedirectAttributes redirectAttributes) {
         try {
             if (bookingId == null || bookingId <= 0) {
@@ -707,11 +707,11 @@ public class ITSystemEngineerController {
     @PreAuthorize("hasAnyRole('IT_SYSTEM_ENGINEER', 'FINANCE_EXECUTIVE')")
     @PostMapping("/finance/payment/update/{id}")
     public String updateFinancePayment(
-            @PathVariable Long id,
-            @RequestParam Double amount,
-            @RequestParam String status,
-            @RequestParam String transactionId,
-            @RequestParam String activeTab,
+            @PathVariable(name = "id") Long id,
+            @RequestParam(name = "amount") Double amount,
+            @RequestParam(name = "status") String status,
+            @RequestParam(name = "transactionId") String transactionId,
+            @RequestParam(name = "activeTab") String activeTab,
             RedirectAttributes redirectAttributes) {
         try {
             if (amount == null || amount <= 0) {
@@ -749,8 +749,8 @@ public class ITSystemEngineerController {
     @PreAuthorize("hasAnyRole('IT_SYSTEM_ENGINEER', 'FINANCE_EXECUTIVE')")
     @PostMapping("/finance/payment/delete/{id}")
     public String deleteFinancePayment(
-            @PathVariable Long id,
-            @RequestParam String activeTab,
+            @PathVariable(name = "id") Long id,
+            @RequestParam(name = "activeTab") String activeTab,
             RedirectAttributes redirectAttributes) {
         try {
             paymentService.deletePayment(id);
@@ -770,8 +770,8 @@ public class ITSystemEngineerController {
     @PreAuthorize("hasAnyRole('IT_SYSTEM_ENGINEER', 'FINANCE_EXECUTIVE')")
     @PostMapping("/finance/booking/update-payment-status/{paymentId}")
     public String updateFinancePaymentStatus(
-            @PathVariable Long paymentId,
-            @RequestParam String status,
+            @PathVariable(name = "paymentId") Long paymentId,
+            @RequestParam(name = "status") String status,
             RedirectAttributes redirectAttributes) {
         try {
             // Validate status enum

@@ -74,17 +74,9 @@ public class PaymentService {
 
 		payment.setTransactionId("TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
 
-		boolean paymentSuccess = simulatePaymentGateway(paymentDTO);
-
-		if (paymentSuccess) {
-			payment.setStatus(Payment.Status.COMPLETED);
-			booking.setStatus(Booking.Status.CONFIRMED);
-			logger.info("Payment successful for booking ID: {}", booking.getId());
-		} else {
-			payment.setStatus(Payment.Status.FAILED);
-			logger.warn("Payment failed for booking ID: {}", booking.getId());
-			throw new RuntimeException("Payment processing failed. Please check your payment details and try again.");
-		}
+		// Payment is always saved as PENDING — Finance Executive must accept it
+		payment.setStatus(Payment.Status.PENDING);
+		logger.info("Payment submitted as PENDING for booking ID: {}", booking.getId());
 
 		Payment savedPayment = paymentRepository.save(payment);
 
@@ -93,15 +85,13 @@ public class PaymentService {
 
 		auditLogger.logAction(
 				booking.getUser().getId().toString(),
-				"PAYMENT_PROCESSED",
+				"PAYMENT_SUBMITTED",
 				"Payment-" + savedPayment.getId(),
-				String.format("Method: %s, Amount: Rs.%.2f, Booking: BK-%d",
+				String.format("Method: %s, Amount: Rs.%.2f, Booking: BK-%d — awaiting Finance Executive approval",
 						payment.getPaymentMethod(), payment.getAmount(), booking.getId())
 		);
 
-		sendPaymentConfirmationNotification(booking, savedPayment);
-
-		logger.info("Payment processed successfully: PaymentID={}, TxnID={}, BookingID={}",
+		logger.info("Payment submitted: PaymentID={}, TxnID={}, BookingID={} — status PENDING",
 				savedPayment.getId(), savedPayment.getTransactionId(), booking.getId());
 
 		return convertToDTO(savedPayment);
@@ -352,9 +342,11 @@ public class PaymentService {
 			payment.setAmount(paymentDTO.getAmount());
 		}
 
+		Payment.Status newStatus = null;
 		if (paymentDTO.getStatus() != null && !paymentDTO.getStatus().trim().isEmpty()) {
 			try {
-				payment.setStatus(Payment.Status.valueOf(paymentDTO.getStatus().toUpperCase().trim()));
+				newStatus = Payment.Status.valueOf(paymentDTO.getStatus().toUpperCase().trim());
+				payment.setStatus(newStatus);
 			} catch (IllegalArgumentException e) {
 				throw new IllegalArgumentException("Invalid payment status: " + paymentDTO.getStatus());
 			}
@@ -365,6 +357,24 @@ public class PaymentService {
 		}
 
 		Payment updatedPayment = paymentRepository.save(payment);
+
+		// Keep booking status in sync with payment status
+		if (newStatus != null) {
+			Booking booking = updatedPayment.getBooking();
+			if (booking != null) {
+				if (newStatus == Payment.Status.COMPLETED) {
+					booking.setStatus(Booking.Status.CONFIRMED);
+					bookingRepository.save(booking);
+					logger.info("Booking BK-{} confirmed after payment acceptance", booking.getId());
+					sendPaymentConfirmationNotification(booking, updatedPayment);
+				} else if (newStatus == Payment.Status.FAILED) {
+					booking.setStatus(Booking.Status.CANCELLED);
+					bookingRepository.save(booking);
+					logger.info("Booking BK-{} cancelled after payment rejection", booking.getId());
+				}
+			}
+		}
+
 		return convertToDTO(updatedPayment);
 	}
 
