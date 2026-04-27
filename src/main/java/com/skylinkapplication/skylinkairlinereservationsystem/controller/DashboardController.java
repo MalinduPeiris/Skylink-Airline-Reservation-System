@@ -1,6 +1,7 @@
 package com.skylinkapplication.skylinkairlinereservationsystem.controller;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.*;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.Payment;
+import com.skylinkapplication.skylinkairlinereservationsystem.model.User;
 import com.skylinkapplication.skylinkairlinereservationsystem.repository.PaymentRepository;
 import com.skylinkapplication.skylinkairlinereservationsystem.service.*;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Collections;
@@ -39,6 +41,9 @@ public class DashboardController {
 
     @Autowired
     private PaymentRepository paymentRepository;
+
+    @Autowired
+    private AuthService authService;
 
     @GetMapping("/admin")
     @PreAuthorize("hasRole('IT_SYSTEM_ENGINEER')")
@@ -345,6 +350,16 @@ public class DashboardController {
             model.addAttribute("ticketCount", ticketCount);
             model.addAttribute("resolvedCount", resolvedCount);
             model.addAttribute("pendingCount", pendingCount);
+
+            // Load all users for user management tab
+            List<User> allUsers = new ArrayList<>();
+            try {
+                allUsers = authService.getAllUsers();
+            } catch (Exception ex) {
+                logger.warn("Failed to load users for support dashboard: {}", ex.getMessage());
+            }
+            model.addAttribute("allUsers", allUsers);
+            model.addAttribute("userCount", allUsers.size());
 
             logger.info("Customer support dashboard accessed successfully");
             return "customer-support-manage-dashboard";
