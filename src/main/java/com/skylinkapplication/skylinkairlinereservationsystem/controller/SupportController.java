@@ -8,7 +8,9 @@ import com.skylinkapplication.skylinkairlinereservationsystem.service.SupportSer
 import com.skylinkapplication.skylinkairlinereservationsystem.service.FeedbackService;
 import com.skylinkapplication.skylinkairlinereservationsystem.service.PaymentService;
 import com.skylinkapplication.skylinkairlinereservationsystem.service.BookingService;
+import com.skylinkapplication.skylinkairlinereservationsystem.service.AuthService;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.User;
+import com.skylinkapplication.skylinkairlinereservationsystem.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -40,6 +42,9 @@ public class SupportController {
 
     @Autowired
     private BookingService bookingService;
+
+    @Autowired
+    private AuthService authService;
 
     @GetMapping("/dashboard")
     public String customerSupportDashboard(Model model, Authentication authentication) {
@@ -87,6 +92,16 @@ public class SupportController {
             long pendingCount = tickets != null ? tickets.stream()
                     .filter(ticket -> "OPEN".equals(ticket.getStatus()))
                     .count() : 0;
+
+            // Load all users grouped by role
+            List<User> allUsers = new ArrayList<>();
+            try {
+                allUsers = authService.getAllUsers();
+            } catch (Exception e) {
+                logger.warn("Failed to load users: {}", e.getMessage());
+            }
+            model.addAttribute("allUsers", allUsers);
+            model.addAttribute("userCount", allUsers.size());
 
             // Add attributes to model
             model.addAttribute("tickets", tickets != null ? tickets : new ArrayList<>());
@@ -218,5 +233,56 @@ public class SupportController {
             redirectAttributes.addFlashAttribute("error", "Unable to delete ticket. Please try again.");
             return "redirect:/dashboard/customer-support";
         }
+    }
+
+    // ─── USER MANAGEMENT ───────────────────────────────────────────────────────
+
+    @PostMapping("/user/update/{id}")
+    public String updateUser(
+            @PathVariable(name = "id") Long id,
+            @RequestParam(name = "username") String username,
+            @RequestParam(name = "email") String email,
+            @RequestParam(name = "phonenumber", required = false) String phonenumber,
+            @RequestParam(name = "address", required = false) String address,
+            @RequestParam(name = "role") String role,
+            @RequestParam(name = "password", required = false) String password,
+            RedirectAttributes redirectAttributes) {
+        try {
+            User existing = authService.getUserById(id);
+            User updated = new User();
+            updated.setId(id);
+            updated.setUsername(username.trim());
+            updated.setEmail(email.trim());
+            updated.setPhonenumber(phonenumber);
+            updated.setAddress(address);
+            updated.setRole(Role.valueOf(role));
+            if (password != null && !password.trim().isEmpty()) {
+                updated.setPassword(password.trim());
+            } else {
+                updated.setPassword(existing.getPassword()); // keep existing encoded password
+            }
+            authService.updateUser(id, updated);
+            logger.info("Admin updated user ID: {}", id);
+            redirectAttributes.addFlashAttribute("success", "User #" + id + " updated successfully.");
+        } catch (Exception e) {
+            logger.error("Error updating user ID: {}", id, e);
+            redirectAttributes.addFlashAttribute("error", "Failed to update user: " + e.getMessage());
+        }
+        return "redirect:/dashboard/customer-support";
+    }
+
+    @PostMapping("/user/delete/{id}")
+    public String deleteUser(
+            @PathVariable(name = "id") Long id,
+            RedirectAttributes redirectAttributes) {
+        try {
+            authService.deleteUser(id);
+            logger.info("Admin deleted user ID: {}", id);
+            redirectAttributes.addFlashAttribute("success", "User #" + id + " deleted successfully.");
+        } catch (Exception e) {
+            logger.error("Error deleting user ID: {}", id, e);
+            redirectAttributes.addFlashAttribute("error", "Failed to delete user: " + e.getMessage());
+        }
+        return "redirect:/dashboard/customer-support";
     }
 }
