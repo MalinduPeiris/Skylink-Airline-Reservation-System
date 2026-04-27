@@ -9,25 +9,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-void: #050709;
-            --bg-primary: #080c12;
-            --bg-panel: #0c1220;
-            --bg-card: #101828;
-            --bg-elevated: #162033;
-            --border-dim: rgba(30, 60, 100, 0.4);
-            --border-glow: rgba(0, 170, 255, 0.3);
-            --accent-cyan: #00aaff;
-            --accent-cyan-dim: rgba(0, 170, 255, 0.12);
-            --accent-electric: #00e5ff;
-            --accent-amber: #ffb800;
-            --accent-amber-dim: rgba(255, 184, 0, 0.12);
-            --accent-red: #ff3d57;
-            --accent-red-dim: rgba(255, 61, 87, 0.12);
-            --accent-green: #00e676;
-            --accent-green-dim: rgba(0, 230, 118, 0.12);
-            --text-primary: #e8f0fe;
-            --text-secondary: #7a9cc4;
-            --text-muted: #3d5a7a;
+            --bg-void: #f0f5fb;
+            --bg-primary: #e8eef6;
+            --bg-panel: #ffffff;
+            --bg-card: #ffffff;
+            --bg-elevated: #f4f8fd;
+            --border-dim: rgba(100, 140, 200, 0.18);
+            --border-glow: rgba(0, 119, 204, 0.3);
+            --accent-cyan: #0077cc;
+            --accent-cyan-dim: rgba(0, 119, 204, 0.08);
+            --accent-electric: #0099ee;
+            --accent-amber: #d97706;
+            --accent-amber-dim: rgba(217, 119, 6, 0.08);
+            --accent-red: #dc2626;
+            --accent-red-dim: rgba(220, 38, 38, 0.08);
+            --accent-green: #059669;
+            --accent-green-dim: rgba(5, 150, 105, 0.08);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
             --font-display: 'Rajdhani', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
             --font-body: 'Barlow', sans-serif;
@@ -43,33 +43,6 @@
             overflow-x: hidden;
         }
 
-        /* Scanline overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: repeating-linear-gradient(
-                    0deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(0, 0, 0, 0.03) 2px,
-                    rgba(0, 0, 0, 0.03) 4px
-            );
-            pointer-events: none;
-            z-index: 9999;
-        }
-
-        /* Grid dot background */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: radial-gradient(circle, rgba(0, 170, 255, 0.08) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
         /* TOP NAV */
         .topbar {
             background: var(--bg-panel);
@@ -82,7 +55,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(12px);
+            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
         }
 
         .topbar::after {
@@ -204,10 +177,10 @@
         .user-role { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); letter-spacing: 1px; }
 
         .dropdown-menu {
-            background: var(--bg-elevated);
+            background: #ffffff;
             border: 1px solid var(--border-dim);
             border-radius: 8px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
         }
 
         .dropdown-item { color: var(--text-secondary); font-size: 13px; padding: 8px 16px; }
@@ -398,6 +371,7 @@
             overflow: hidden;
             transition: all 0.3s;
             animation: fade-up 0.5s ease both;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         .metric-card:nth-child(1) { animation-delay: 0.1s; }
@@ -418,9 +392,9 @@
         .metric-card.red::before { background: linear-gradient(90deg, transparent, var(--accent-red), transparent); }
 
         .metric-card:hover {
-            border-color: rgba(0, 170, 255, 0.3);
+            border-color: rgba(0, 119, 204, 0.3);
             transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
         }
 
         .metric-glow {
@@ -431,10 +405,10 @@
             opacity: 0.08;
         }
 
-        .metric-card.cyan .metric-glow { background: var(--accent-cyan); box-shadow: 0 0 30px 10px var(--accent-cyan); }
-        .metric-card.green .metric-glow { background: var(--accent-green); box-shadow: 0 0 30px 10px var(--accent-green); }
-        .metric-card.amber .metric-glow { background: var(--accent-amber); box-shadow: 0 0 30px 10px var(--accent-amber); }
-        .metric-card.red .metric-glow { background: var(--accent-red); box-shadow: 0 0 30px 10px var(--accent-red); }
+        .metric-card.cyan .metric-glow { background: var(--accent-cyan); opacity: 0.05; }
+        .metric-card.green .metric-glow { background: var(--accent-green); opacity: 0.05; }
+        .metric-card.amber .metric-glow { background: var(--accent-amber); opacity: 0.05; }
+        .metric-card.red .metric-glow { background: var(--accent-red); opacity: 0.05; }
 
         .metric-label {
             font-family: var(--font-mono);
@@ -498,6 +472,7 @@
             border-radius: 10px;
             overflow: hidden;
             animation: fade-up 0.5s ease 0.3s both;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         .panel-header {
@@ -589,6 +564,7 @@
             border-radius: 10px;
             padding: 20px;
             animation: fade-up 0.5s ease 0.4s both;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         .qa-title {
@@ -630,7 +606,7 @@
             border-color: var(--accent-cyan);
             background: var(--accent-cyan-dim);
             transform: translateY(-3px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
         }
 
         .qa-icon {
@@ -673,6 +649,7 @@
             border: 1px solid var(--border-dim);
             border-radius: 10px;
             padding: 18px 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         .stat-bar-label {

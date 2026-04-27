@@ -611,7 +611,7 @@
             </div>
             <form id="editUserForm" method="post">
                 <div class="modal-body">
-                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                    <input type="hidden" name="_csrf" id="eu-csrf-token"/>
                     <input type="hidden" id="eu-id" name="userId">
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -684,6 +684,28 @@
 
     let _currentEditUser = {};
 
+    // Read XSRF-TOKEN cookie set by Spring Security CookieCsrfTokenRepository
+    function getCsrfToken() {
+        const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/);
+        return match ? decodeURIComponent(match[1]) : '';
+    }
+
+    function injectCsrf() {
+        const token = getCsrfToken();
+        const el = document.getElementById('eu-csrf-token');
+        if (el) el.value = token;
+    }
+
+    // Auto-inject CSRF on form submit as a safety net
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('editUserForm');
+        if (form) {
+            form.addEventListener('submit', function () {
+                injectCsrf();
+            });
+        }
+    });
+
     function openViewUser(btn) {
         _currentEditUser = btn.dataset;
         document.getElementById('vu-id').textContent = btn.dataset.id;
@@ -708,6 +730,7 @@
             document.getElementById('eu-role').value = d.role;
             document.getElementById('eu-password').value = '';
             document.getElementById('editUserForm').action = '/api/support/user/update/' + d.id;
+            injectCsrf();
             new bootstrap.Modal(document.getElementById('editUserModal')).show();
         }, 350);
     }
@@ -721,6 +744,7 @@
         document.getElementById('eu-role').value = btn.dataset.role;
         document.getElementById('eu-password').value = '';
         document.getElementById('editUserForm').action = '/api/support/user/update/' + btn.dataset.id;
+        injectCsrf();
         new bootstrap.Modal(document.getElementById('editUserModal')).show();
     }
 
