@@ -96,6 +96,9 @@ public class SecurityConfig {
                          .requestMatchers("/api/booking/**").authenticated()
                         .requestMatchers("/api/payment/**").authenticated()
                         .requestMatchers("/api/user/**").authenticated()
+                        .requestMatchers("/api/support/user/**")
+                        .hasAnyRole("CUSTOMER_SUPPORT_OFFICER", "IT_SYSTEM_ENGINEER")
+
                         .requestMatchers("/api/support/**").authenticated()
                         .requestMatchers("/api/feedback/**").authenticated()
                         .requestMatchers("/api/marketing/**").authenticated()
