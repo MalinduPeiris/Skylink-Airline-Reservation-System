@@ -1,11 +1,14 @@
 package com.skylinkapplication.skylinkairlinereservationsystem.dto;
 
 import java.util.Date;
+import org.springframework.format.annotation.DateTimeFormat;
 
 public class PromotionDTO {
     private Long id;
     private Double discount;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date validityStart;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date validityEnd;
     private String targetCriteria; // e.g., travel history-based targeting
     private String promoCode;

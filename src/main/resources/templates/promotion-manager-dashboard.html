@@ -9,18 +9,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-void:#050709;--bg-panel:#0c1220;--bg-card:#101828;--bg-elevated:#162033;
-            --border-dim:rgba(30,60,100,.4);--accent-cyan:#00aaff;--accent-cyan-dim:rgba(0,170,255,.12);
-            --accent-amber:#ffb800;--accent-amber-dim:rgba(255,184,0,.12);
-            --accent-red:#ff3d57;--accent-red-dim:rgba(255,61,87,.12);
-            --accent-green:#00e676;--accent-green-dim:rgba(0,230,118,.12);
-            --text-primary:#e8f0fe;--text-secondary:#7a9cc4;--text-muted:#3d5a7a;
-            --font-display:'Rajdhani',sans-serif;--font-mono:'JetBrains Mono',monospace;--font-body:'Barlow',sans-serif;
+            --bg-void: #f0f5fb;
+            --bg-primary: #e8eef6;
+            --bg-panel: #ffffff;
+            --bg-card: #ffffff;
+            --bg-elevated: #f4f8fd;
+            --border-dim: rgba(100, 140, 200, 0.18);
+            --border-glow: rgba(0, 119, 204, 0.3);
+            --accent-cyan: #0077cc;
+            --accent-cyan-dim: rgba(0, 119, 204, 0.08);
+            --accent-amber: #d97706;
+            --accent-amber-dim: rgba(217, 119, 6, 0.08);
+            --accent-red: #dc2626;
+            --accent-red-dim: rgba(220, 38, 38, 0.08);
+            --accent-green: #059669;
+            --accent-green-dim: rgba(5, 150, 105, 0.08);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --font-display: 'Rajdhani', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-body: 'Barlow', sans-serif;
         }
         *{box-sizing:border-box;margin:0;padding:0;}
         body{font-family:var(--font-body);background:var(--bg-void);color:var(--text-primary);min-height:100vh;overflow-x:hidden;}
-        body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:9999;}
-        body::after{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(0,170,255,.06) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
 
         .topbar{background:var(--bg-panel);border-bottom:1px solid var(--border-dim);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
         .topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent-cyan),transparent);opacity:.4;}
@@ -38,7 +50,7 @@
         .user-avatar{width:30px;height:30px;background:linear-gradient(135deg,var(--accent-cyan),#0060aa);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:white;}
         .user-name{font-size:12px;font-weight:600;color:var(--text-primary);}
         .user-role{font-size:10px;color:var(--text-muted);font-family:var(--font-mono);}
-        .dropdown-menu{background:var(--bg-elevated);border:1px solid var(--border-dim);border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+        .dropdown-menu{background:var(--bg-elevated);border:1px solid var(--border-dim);border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,.12);}
         .dropdown-item{color:var(--text-secondary);font-size:13px;padding:8px 16px;}
         .dropdown-item:hover{background:var(--accent-cyan-dim);color:var(--accent-cyan);}
         .dropdown-divider{border-color:var(--border-dim);}
@@ -66,8 +78,31 @@
         .alert-success-custom{background:var(--accent-green-dim);border-color:rgba(0,230,118,.3);color:var(--accent-green);}
         .alert-danger-custom{background:var(--accent-red-dim);border-color:rgba(255,61,87,.3);color:var(--accent-red);}
 
+        /* METRIC CARDS */
+        .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+        .metric-card{background:var(--bg-card);border:1px solid var(--border-dim);border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;transition:all .3s;animation:fade-up .5s ease both;}
+        .metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+        .metric-card.cyan::before{background:linear-gradient(90deg,transparent,var(--accent-cyan),transparent);}
+        .metric-card.red::before{background:linear-gradient(90deg,transparent,var(--accent-red),transparent);}
+        .metric-card.green::before{background:linear-gradient(90deg,transparent,var(--accent-green),transparent);}
+        .metric-card.amber::before{background:linear-gradient(90deg,transparent,var(--accent-amber),transparent);}
+        .metric-card:hover{border-color:rgba(0,119,204,.3);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08);}
+        .metric-card:nth-child(1){animation-delay:.1s;}.metric-card:nth-child(2){animation-delay:.15s;}.metric-card:nth-child(3){animation-delay:.2s;}.metric-card:nth-child(4){animation-delay:.25s;}
+        .metric-label{font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;}
+        .metric-value{font-family:var(--font-display);font-size:42px;font-weight:700;line-height:1;margin-bottom:6px;}
+        .metric-card.cyan .metric-value{color:var(--accent-cyan);}
+        .metric-card.red .metric-value{color:var(--accent-red);}
+        .metric-card.green .metric-value{color:var(--accent-green);}
+        .metric-card.amber .metric-value{color:var(--accent-amber);}
+        .metric-sub{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:5px;}
+        .metric-icon{position:absolute;top:18px;right:18px;font-size:24px;opacity:.18;}
+        .metric-card.cyan .metric-icon{color:var(--accent-cyan);}
+        .metric-card.red .metric-icon{color:var(--accent-red);}
+        .metric-card.green .metric-icon{color:var(--accent-green);}
+        .metric-card.amber .metric-icon{color:var(--accent-amber);}
+
         /* PROMO COUNT BADGE */
-        .count-chip{font-family:var(--font-mono);font-size:10px;padding:4px 12px;border-radius:4px;background:var(--accent-amber-dim);border:1px solid rgba(255,184,0,.3);color:var(--accent-amber);}
+        .count-chip{font-family:var(--font-mono);font-size:10px;padding:4px 12px;border-radius:4px;background:var(--accent-amber-dim);border:1px solid rgba(217,119,6,.3);color:var(--accent-amber);}
 
         /* PROMO LIST */
         .promo-list{display:flex;flex-direction:column;gap:14px;max-height:calc(100vh - 260px);overflow-y:auto;padding-right:4px;}
@@ -76,9 +111,9 @@
 
         .promo-card{background:var(--bg-card);border:1px solid var(--border-dim);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;transition:all .25s;animation:fade-up .4s ease both;}
         .promo-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent-cyan);}
-        .promo-card:hover{border-color:rgba(0,170,255,.3);transform:translateX(4px);box-shadow:0 8px 30px rgba(0,0,0,.4);}
+        .promo-card:hover{border-color:rgba(0,119,204,.3);transform:translateX(4px);box-shadow:0 8px 30px rgba(0,0,0,.08);}
 
-        .promo-discount-badge{position:absolute;top:14px;right:14px;background:var(--accent-amber);color:#000;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:1px;padding:4px 12px;border-radius:3px;}
+        .promo-discount-badge{position:absolute;top:14px;right:14px;background:var(--accent-amber);color:#fff;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:1px;padding:4px 12px;border-radius:3px;}
 
         .promo-title{font-family:var(--font-display);font-size:16px;font-weight:700;letter-spacing:1px;color:var(--accent-cyan);margin-bottom:10px;}
 
@@ -88,21 +123,21 @@
         .promo-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
         .promo-discount-line{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);}
         .promo-discount-dot{width:8px;height:8px;border-radius:50%;}
-        .dot-high{background:var(--accent-green);box-shadow:0 0 6px var(--accent-green);}
-        .dot-medium{background:var(--accent-amber);box-shadow:0 0 6px var(--accent-amber);}
-        .dot-low{background:var(--accent-red);box-shadow:0 0 6px var(--accent-red);}
-        .active-badge{font-family:var(--font-mono);font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:3px;background:var(--accent-green-dim);border:1px solid rgba(0,230,118,.3);color:var(--accent-green);}
+        .dot-high{background:var(--accent-green);box-shadow:0 0 6px rgba(5,150,105,.4);}
+        .dot-medium{background:var(--accent-amber);box-shadow:0 0 6px rgba(217,119,6,.4);}
+        .dot-low{background:var(--accent-red);box-shadow:0 0 6px rgba(220,38,38,.4);}
+        .active-badge{font-family:var(--font-mono);font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:3px;background:var(--accent-green-dim);border:1px solid rgba(5,150,105,.3);color:var(--accent-green);}
 
         .promo-dates{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
         .promo-dates i{color:var(--accent-cyan);}
 
         .promo-actions{display:flex;gap:8px;}
         .btn-promo{font-size:11px;padding:5px 12px;border-radius:4px;border:1px solid;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);background:transparent;text-decoration:none;}
-        .btn-view{border-color:rgba(0,170,255,.3);color:var(--accent-cyan);}
+        .btn-view{border-color:rgba(0,119,204,.3);color:var(--accent-cyan);}
         .btn-view:hover{background:var(--accent-cyan-dim);border-color:var(--accent-cyan);color:var(--accent-cyan);}
-        .btn-edit-p{border-color:rgba(255,184,0,.3);color:var(--accent-amber);}
+        .btn-edit-p{border-color:rgba(217,119,6,.3);color:var(--accent-amber);}
         .btn-edit-p:hover{background:var(--accent-amber-dim);border-color:var(--accent-amber);}
-        .btn-del{border-color:rgba(255,61,87,.3);color:var(--accent-red);}
+        .btn-del{border-color:rgba(220,38,38,.3);color:var(--accent-red);}
         .btn-del:hover{background:var(--accent-red-dim);border-color:var(--accent-red);}
 
         .empty-state{text-align:center;padding:40px;color:var(--text-muted);}
@@ -118,23 +153,23 @@
         .form-panel-body{padding:22px;}
         .form-label{font-family:var(--font-mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;display:block;}
         .form-control,.form-select{background:var(--bg-elevated);border:1px solid var(--border-dim);border-radius:6px;color:var(--text-primary);font-family:var(--font-body);font-size:13px;padding:10px 14px;transition:border-color .2s;width:100%;}
-        .form-control:focus,.form-select:focus{background:var(--bg-elevated);border-color:var(--accent-amber);box-shadow:0 0 0 3px rgba(255,184,0,.08);color:var(--text-primary);outline:none;}
+        .form-control:focus,.form-select:focus{background:var(--bg-elevated);border-color:var(--accent-amber);box-shadow:0 0 0 3px rgba(217,119,6,.08);color:var(--text-primary);outline:none;}
         .form-control::placeholder{color:var(--text-muted);}
-        input[type="date"].form-control::-webkit-calendar-picker-indicator{filter:invert(.4);}
+        input[type="date"].form-control::-webkit-calendar-picker-indicator{filter:opacity(0.6);}
         .input-group-pct{display:flex;gap:0;}
         .input-group-pct .form-control{border-radius:6px 0 0 6px;}
         .pct-label{background:var(--bg-elevated);border:1px solid var(--border-dim);border-left:none;border-radius:0 6px 6px 0;padding:0 14px;display:flex;align-items:center;font-family:var(--font-mono);font-size:13px;color:var(--accent-amber);}
         .form-actions{display:flex;justify-content:space-between;margin-top:20px;gap:10px;}
         .btn-reset{font-family:var(--font-display);font-size:12px;font-weight:600;letter-spacing:1.5px;padding:9px 18px;border-radius:4px;border:1px solid var(--border-dim);background:transparent;color:var(--text-muted);cursor:pointer;transition:all .2s;}
         .btn-reset:hover{border-color:var(--text-muted);color:var(--text-secondary);}
-        .btn-create{font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:1.5px;padding:9px 22px;border-radius:4px;border:1px solid rgba(255,184,0,.5);background:var(--accent-amber-dim);color:var(--accent-amber);cursor:pointer;transition:all .2s;flex:1;}
-        .btn-create:hover{background:rgba(255,184,0,.2);border-color:var(--accent-amber);box-shadow:0 0 16px rgba(255,184,0,.2);}
+        .btn-create{font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:1.5px;padding:9px 22px;border-radius:4px;border:1px solid rgba(217,119,6,.5);background:var(--accent-amber-dim);color:var(--accent-amber);cursor:pointer;transition:all .2s;flex:1;}
+        .btn-create:hover{background:rgba(217,119,6,.2);border-color:var(--accent-amber);box-shadow:0 0 16px rgba(217,119,6,.15);}
 
         /* TIPS */
         .tips-panel{background:var(--bg-card);border:1px solid var(--border-dim);border-radius:10px;padding:18px;margin-top:16px;}
         .tips-title{font-family:var(--font-display);font-size:13px;font-weight:600;letter-spacing:1.5px;color:var(--text-secondary);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
         .tips-title i{color:var(--accent-amber);}
-        .tip-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text-muted);padding:6px 0;border-bottom:1px solid rgba(30,60,100,.2);}
+        .tip-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--text-muted);padding:6px 0;border-bottom:1px solid var(--border-dim);}
         .tip-item:last-child{border-bottom:none;}
         .tip-item i{color:var(--accent-green);margin-top:2px;font-size:11px;flex-shrink:0;}
 
@@ -157,8 +192,8 @@
         <div class="sys-status"><div class="status-dot"></div>ALL SYSTEMS OPERATIONAL</div>
         <div class="dropdown">
             <div class="user-chip dropdown-toggle" data-bs-toggle="dropdown">
-                <div class="user-avatar"><i class="fas fa-user-shield"></i></div>
-                <div><div class="user-name">IT System Engineer</div><div class="user-role">SUPER ACCESS</div></div>
+                <div class="user-avatar"><i class="fas fa-bullhorn"></i></div>
+                <div><div class="user-name">Marketing Executive</div><div class="user-role">MARKETING ACCESS</div></div>
             </div>
             <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" href="/api/user/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
@@ -174,15 +209,14 @@
     <aside class="sidebar">
         <div class="sidebar-label">Navigation</div>
         <div class="sidebar-section">
-            <a href="/dashboard/it-system-engineer/dashboard" class="nav-link-custom"><i class="fas fa-th-large"></i> Dashboard</a>
-            <a href="/dashboard/flight-admin" class="nav-link-custom"><i class="fas fa-route"></i> Flight Schedule</a>
-            <a href="/dashboard/it-system-engineer/user-management" class="nav-link-custom"><i class="fas fa-users-cog"></i> User Management</a>
+            <a th:href="${dashboardUrl}" class="nav-link-custom"><i class="fas fa-th-large"></i> Dashboard</a>
         </div>
         <div class="sidebar-label">Operations</div>
         <div class="sidebar-section">
-            <a href="/dashboard/it-system-engineer/promotions" class="nav-link-custom active"><i class="fas fa-tags"></i> Promotions</a>
-            <a href="/dashboard/it-system-engineer/support-tickets" class="nav-link-custom"><i class="fas fa-headset"></i> Support Tickets</a>
-            <a href="/dashboard/it-system-engineer/finance" class="nav-link-custom"><i class="fas fa-chart-line"></i> Finance</a>
+            <a th:href="${baseUrl} + '/promotions'" class="nav-link-custom active"><i class="fas fa-tags"></i> Promotions</a>
+            <a th:if="${baseUrl == '/dashboard/it-system-engineer'}" href="/dashboard/it-system-engineer/support-tickets" class="nav-link-custom"><i class="fas fa-headset"></i> Support Tickets</a>
+            <a th:if="${baseUrl == '/dashboard/it-system-engineer'}" href="/dashboard/it-system-engineer/finance" class="nav-link-custom"><i class="fas fa-chart-line"></i> Finance</a>
+            <a th:if="${baseUrl == '/dashboard/it-system-engineer'}" href="/dashboard/it-system-engineer/user-management" class="nav-link-custom"><i class="fas fa-users-cog"></i> User Management</a>
         </div>
         <div class="sidebar-label">System</div>
         <div class="sidebar-section">
@@ -198,7 +232,35 @@
         <div class="page-header">
             <div>
                 <div class="page-title">PROMOTION <span>MANAGEMENT</span></div>
-                <div class="page-breadcrumb">SKYLINK / IT-SYSTEM-ENGINEER / <span>PROMOTIONS</span></div>
+                <div class="page-breadcrumb">SKYLINK / <span>PROMOTIONS</span></div>
+            </div>
+        </div>
+
+        <!-- METRICS -->
+        <div class="metrics-grid">
+            <div class="metric-card cyan">
+                <div class="metric-icon"><i class="fas fa-tags"></i></div>
+                <div class="metric-label">Total Promotions</div>
+                <div class="metric-value" th:text="${promotions != null ? promotions.size() : 0}">0</div>
+                <div class="metric-sub"><i class="fas fa-list"></i> All Time Created</div>
+            </div>
+            <div class="metric-card green">
+                <div class="metric-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="metric-label">Active Campaigns</div>
+                <div class="metric-value" th:text="${promotions != null ? promotions.size() : 0}">0</div>
+                <div class="metric-sub"><i class="fas fa-play"></i> Currently Running</div>
+            </div>
+            <div class="metric-card amber">
+                <div class="metric-icon"><i class="fas fa-percent"></i></div>
+                <div class="metric-label">Average Discount</div>
+                <div class="metric-value">-</div>
+                <div class="metric-sub"><i class="fas fa-chart-line"></i> Across Active</div>
+            </div>
+            <div class="metric-card red">
+                <div class="metric-icon"><i class="fas fa-clock"></i></div>
+                <div class="metric-label">Expiring Soon</div>
+                <div class="metric-value">0</div>
+                <div class="metric-sub"><i class="fas fa-exclamation-circle"></i> Needs Attention</div>
             </div>
         </div>
 
@@ -236,13 +298,13 @@
                             <span th:text="${#dates.format(promo.validityStart, 'MMM dd, yyyy')} + ' — ' + ${#dates.format(promo.validityEnd, 'MMM dd, yyyy')}">Date range</span>
                         </div>
                         <div class="promo-actions">
-                            <a th:href="@{/dashboard/it-system-engineer/promotions/{id}(id=${promo.id})}" class="btn-promo btn-view">
+                            <a th:href="${baseUrl} + '/promotion/' + ${promo.id}" class="btn-promo btn-view">
                                 <i class="fas fa-eye"></i> VIEW
                             </a>
-                            <a th:href="@{/dashboard/it-system-engineer/promotions/{id}/edit(id=${promo.id})}" class="btn-promo btn-edit-p">
+                            <a th:href="${baseUrl} + '/promotion/' + ${promo.id} + '/edit'" class="btn-promo btn-edit-p">
                                 <i class="fas fa-pen"></i> EDIT
                             </a>
-                            <form th:action="@{/dashboard/it-system-engineer/promotions/delete/{id}(id=${promo.id})}" method="post" style="display:inline;">
+                            <form th:action="${baseUrl} + '/delete/' + ${promo.id}" method="post" style="display:inline;">
                                 <input type="hidden" name="_csrf" th:value="${_csrf != null ? _csrf.token : ''}"/>
                                 <button type="submit" class="btn-promo btn-del" onclick="return confirm('Delete this promotion?')">
                                     <i class="fas fa-trash"></i> DELETE
@@ -260,7 +322,7 @@
                         <div class="form-panel-title"><i class="fas fa-plus-circle"></i> CREATE NEW PROMOTION</div>
                     </div>
                     <div class="form-panel-body">
-                        <form th:action="@{/dashboard/it-system-engineer/promotions/create}" method="post">
+                        <form th:action="${baseUrl} + '/create'" method="post">
                             <input type="hidden" name="_csrf" th:value="${_csrf != null ? _csrf.token : ''}"/>
                             <div class="mb-3">
                                 <label class="form-label">Promotion Name / Target Criteria</label>

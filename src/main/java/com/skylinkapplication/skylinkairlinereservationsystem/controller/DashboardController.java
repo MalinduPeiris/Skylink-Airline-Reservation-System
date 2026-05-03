@@ -314,12 +314,16 @@ public class DashboardController {
         try {
             List<PromotionDTO> promotions = promotionService.getAllPromotions();
             model.addAttribute("promotions", promotions);
+            model.addAttribute("baseUrl", "/api/marketing");
+            model.addAttribute("dashboardUrl", "/dashboard/marketing-manager");
             logger.info("Marketing manager dashboard accessed with {} promotions", promotions.size());
             return "promotion-manager-dashboard";
         } catch (Exception e) {
             logger.error("Error loading promotions for marketing manager dashboard", e);
             model.addAttribute("error", "Unable to load promotions: " + e.getMessage());
             model.addAttribute("promotions", Collections.emptyList());
+            model.addAttribute("baseUrl", "/api/marketing");
+            model.addAttribute("dashboardUrl", "/dashboard/marketing-manager");
             return "promotion-manager-dashboard";
         }
     }

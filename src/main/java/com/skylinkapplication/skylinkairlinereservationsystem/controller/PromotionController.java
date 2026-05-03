@@ -30,12 +30,16 @@ public class PromotionController {
         try {
             List<PromotionDTO> promotions = promotionService.getAllPromotions();
             model.addAttribute("promotions", promotions);
+            model.addAttribute("baseUrl", "/api/marketing");
+            model.addAttribute("dashboardUrl", "/dashboard/marketing-manager");
             logger.info("Promotion list retrieved: {} promotions found", promotions.size());
-            return "promotion-manager-dashboard"; // Returns the marketing manager dashboard template
+            return "promotion-manager-dashboard";
         } catch (RuntimeException e) {
             logger.error("Error retrieving promotions", e);
             model.addAttribute("error", "Unable to load promotions. Please try again.");
-            return "error";
+            model.addAttribute("baseUrl", "/api/marketing");
+            model.addAttribute("dashboardUrl", "/dashboard/marketing-manager");
+            return "promotion-manager-dashboard";
         }
     }
 
@@ -44,8 +48,9 @@ public class PromotionController {
         try {
             PromotionDTO promotion = promotionService.getPromotionById(id);
             model.addAttribute("promotion", promotion);
+            model.addAttribute("baseUrl", "/api/marketing");
             logger.info("Promotion details retrieved: ID {}", id);
-            return "promotion-details"; // Returns Thymeleaf template for promotion details
+            return "promotion-details";
         } catch (RuntimeException e) {
             logger.error("Error retrieving promotion with ID: {}", id, e);
             model.addAttribute("error", "Unable to load promotion details. Please try again.");
@@ -58,8 +63,9 @@ public class PromotionController {
         try {
             PromotionDTO promotion = promotionService.getPromotionById(id);
             model.addAttribute("promotion", promotion);
+            model.addAttribute("baseUrl", "/api/marketing");
             logger.info("Editing promotion: ID {}", id);
-            return "promotion-form"; // Returns Thymeleaf template for promotion edit form
+            return "promotion-form";
         } catch (RuntimeException e) {
             logger.error("Error retrieving promotion for editing with ID: {}", id, e);
             model.addAttribute("error", "Unable to load promotion for editing. Please try again.");
