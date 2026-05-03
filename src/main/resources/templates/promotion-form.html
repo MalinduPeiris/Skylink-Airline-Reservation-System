@@ -101,7 +101,7 @@
             <div class="form-container">
                 <h3 class="mb-4">Edit Promotion</h3>
 
-                <form th:action="@{/dashboard/it-system-engineer/promotions/update/{id}(id=${promotion.id})}" method="post">
+                <form th:action="${baseUrl} + '/update/' + ${promotion.id}" method="post">
                     <input type="hidden" name="id" th:value="${promotion.id}">
 
                     <div class="form-group">
@@ -133,7 +133,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between mt-4">
-                        <a th:href="@{/dashboard/it-system-engineer/promotions}" class="btn btn-secondary">
+                        <a th:href="${baseUrl} + '/promotions'" class="btn btn-secondary">
                             <i class="fas fa-arrow-left mr-1"></i>Cancel
                         </a>
                         <button type="submit" class="btn btn-primary">
