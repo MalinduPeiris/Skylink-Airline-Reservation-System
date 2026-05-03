@@ -283,12 +283,16 @@ public class ITSystemEngineerController {
         try {
             List<PromotionDTO> promotions = promotionService.getAllPromotions();
             model.addAttribute("promotions", promotions);
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer");
+            model.addAttribute("dashboardUrl", "/dashboard/it-system-engineer/dashboard");
             logger.info("IT System Engineer accessing promotions dashboard with {} promotions", promotions.size());
             return "promotion-manager-dashboard";
         } catch (Exception e) {
             logger.error("Error loading promotions for IT System Engineer", e);
             model.addAttribute("error", "Unable to load promotions: " + e.getMessage());
             model.addAttribute("promotions", Collections.emptyList());
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer");
+            model.addAttribute("dashboardUrl", "/dashboard/it-system-engineer/dashboard");
             return "promotion-manager-dashboard";
         }
     }
@@ -300,6 +304,7 @@ public class ITSystemEngineerController {
         try {
             PromotionDTO promotion = promotionService.getPromotionById(id);
             model.addAttribute("promotion", promotion);
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer");
             logger.info("IT System Engineer viewing promotion details: ID {}", id);
             return "promotion-details";
         } catch (RuntimeException e) {
@@ -316,6 +321,7 @@ public class ITSystemEngineerController {
         try {
             PromotionDTO promotion = promotionService.getPromotionById(id);
             model.addAttribute("promotion", promotion);
+            model.addAttribute("baseUrl", "/dashboard/it-system-engineer");
             logger.info("IT System Engineer editing promotion: ID {}", id);
             return "promotion-form";
         } catch (RuntimeException e) {
