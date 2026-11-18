@@ -205,6 +205,12 @@ body.booking-page {
 .booking-page .review-row:last-child { border-bottom: 0; }
 .booking-page .review-row .label { color: var(--text-light); }
 .booking-page .review-row .value { color: var(--text-dark); font-weight: 700; text-align: right; overflow-wrap: anywhere; }
+.booking-page .review-passenger { margin-bottom: 12px; padding: 16px; border: 1px solid var(--border); border-radius: 10px; background: #fbfcfd; }
+.booking-page .review-passenger-title { margin-bottom: 8px; color: var(--navy); font-size: 13px; font-weight: 750; }
+.booking-page .review-passenger .review-row { padding: 6px 0; }
+.booking-page .review-total { align-items: center; margin-top: 12px; padding: 15px; border: 1px solid #d9e6eb; border-radius: 10px; background: #f3f8fa; }
+.booking-page .review-total .label { color: var(--navy); font-weight: 750; }
+.booking-page .review-total .value { color: var(--navy); font-size: 20px; font-weight: 800; }
 
 .booking-page .summary-card { position: sticky; top: 96px; max-height: calc(100vh - 112px); overflow-y: auto; }
 .booking-page .summary-header { position: relative; overflow: hidden; padding: 26px 26px 23px; background: linear-gradient(125deg, #10253f, #1b4163); color: #fff; }
@@ -275,7 +281,6 @@ body.booking-page {
     .booking-page .form-grid,
     .booking-page .form-grid-3,
     .booking-page .extras-grid { grid-template-columns: minmax(0, 1fr); gap: 15px; }
-    .booking-page #reviewContainer div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: minmax(0, 1fr) !important; }
     .booking-page .extra-card { padding: 16px; }
     .booking-page .step-actions { flex-wrap: wrap; padding: 17px 18px; }
     .booking-page .step-actions > div { width: 100%; }

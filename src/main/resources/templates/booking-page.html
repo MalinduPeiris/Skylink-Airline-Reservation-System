@@ -63,7 +63,7 @@
                 <div class="bk-card mb-4">
                     <div class="bk-card-body">
                         <div class="pax-count-selector">
-                            <label><i class="fas fa-users me-2" style="color:var(--blue);"></i>Number of Passengers</label>
+                            <label for="passengerSelect"><i class="fas fa-users me-2" style="color:var(--blue);"></i>Number of Passengers</label>
                             <select class="pax-count-select" id="passengerSelect" onchange="updatePassengerForms()">
                                 <option value="1">1 Passenger</option>
                                 <option value="2">2 Passengers</option>
@@ -99,7 +99,7 @@
                         <p style="font-size:14px;color:var(--text-light);margin-bottom:24px;">Enhance your journey with these optional add-ons. Prices shown are per passenger.</p>
                         <div class="extras-grid">
                             <div class="extra-card">
-                                <div class="extra-label"><i class="fas fa-suitcase-rolling"></i> Checked Baggage</div>
+                                <label class="extra-label" for="baggage"><i class="fas fa-suitcase-rolling"></i> Checked Baggage</label>
                                 <select class="extra-select" id="baggage" name="baggage" onchange="updateExtrasTotal()">
                                     <option value="0">No extra baggage — Rs.0</option>
                                     <option value="2000">1 bag (20kg) — Rs.2,000</option>
@@ -108,7 +108,7 @@
                                 </select>
                             </div>
                             <div class="extra-card">
-                                <div class="extra-label"><i class="fas fa-chair"></i> Seat Preference</div>
+                                <label class="extra-label" for="seatPref"><i class="fas fa-chair"></i> Seat Preference</label>
                                 <select class="extra-select" id="seatPref" name="seatPref" onchange="updateExtrasTotal()">
                                     <option value="0">Standard Seat — Rs.0</option>
                                     <option value="2500">Window Seat — Rs.2,500</option>
@@ -118,7 +118,7 @@
                                 </select>
                             </div>
                             <div class="extra-card">
-                                <div class="extra-label"><i class="fas fa-utensils"></i> Meal Preference</div>
+                                <label class="extra-label" for="meal"><i class="fas fa-utensils"></i> Meal Preference</label>
                                 <select class="extra-select" id="meal" name="meal" onchange="updateExtrasTotal()">
                                     <option value="0">Standard Meal — Rs.0</option>
                                     <option value="1500">Vegetarian — Rs.1,500</option>
@@ -130,7 +130,7 @@
                                 </select>
                             </div>
                             <div class="extra-card">
-                                <div class="extra-label"><i class="fas fa-wheelchair"></i> Special Assistance</div>
+                                <label class="extra-label" for="assistance"><i class="fas fa-wheelchair"></i> Special Assistance</label>
                                 <select class="extra-select" id="assistance" name="assistance" onchange="updateExtrasTotal()">
                                     <option value="0">None — Rs.0</option>
                                     <option value="3000">Wheelchair Assistance — Rs.3,000</option>
@@ -219,22 +219,23 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
+<script th:inline="javascript">
     const flightId = document.getElementById('flightId').value || '';
     const userId = document.getElementById('userId').value || '';
     const flightData = {
-        flightNumber: "[[${flight?.flightNumber}]]" || "FL123",
-        origin: "[[${flight?.origin}]]" || "Origin",
-        destination: "[[${flight?.destination}]]" || "Destination",
-        cabinClass: "[[${flight?.cabinClass}]]" || "ECONOMY",
-        price: parseFloat("[[${flight?.price}]]") || 0
+        flightNumber: /*[[${flight?.flightNumber}]]*/ "FL123",
+        origin: /*[[${flight?.origin}]]*/ "Origin",
+        destination: /*[[${flight?.destination}]]*/ "Destination",
+        cabinClass: /*[[${flight?.cabinClass}]]*/ "ECONOMY",
+        price: /*[[${flight?.price}]]*/ 0
     };
-    const userEmail = "[[${userEmail}]]" || '';
-    const destinationCity = "[[${destinationCity}]]" || '';
-    let passengerCount = 1;
+    const userEmail = /*[[${userEmail}]]*/ '';
+    const destinationCity = /*[[${destinationCity}]]*/ '';
+    let passengerCount = Math.max(1, Math.min(5, parseInt(document.getElementById('passengerCount').value, 10) || 1));
     let bookingExtras = 0;
     let promoDiscount = 0;
     let currentStep = 1;
+    const passengerValues = new Map();
 
     function fmt(n) { return 'Rs.' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
 
@@ -242,11 +243,11 @@
         passengerCount = parseInt(document.getElementById('passengerSelect').value);
         document.getElementById('passengerCount').value = passengerCount;
         const container = document.getElementById('passengerContainer');
+        container.querySelectorAll('input[name]').forEach(input => passengerValues.set(input.name, input.value));
         container.innerHTML = '';
         for (let i = 0; i < passengerCount; i++) {
             const isPrimary = i === 0;
-            const countryVal = isPrimary && destinationCity ? destinationCity : '';
-            container.innerHTML += `
+            container.insertAdjacentHTML('beforeend', `
             <div class="pax-card">
                 <div class="pax-card-title">
                     <div class="pax-name"><i class="fas fa-user me-2" style="color:var(--blue);opacity:0.7;"></i>Passenger ${i+1}</div>
@@ -254,50 +255,59 @@
                 </div>
                 <div class="form-grid">
                     <div class="field-group">
-                        <label class="field-lbl">First Name<span class="req">*</span></label>
-                        <input class="field-input" name="passengers[${i}].firstName" required placeholder="e.g. John">
+                        <label class="field-lbl" for="passenger-${i}-firstName">First Name<span class="req">*</span></label>
+                        <input class="field-input" id="passenger-${i}-firstName" name="passengers[${i}].firstName" required placeholder="e.g. John">
                         <span class="invalid-msg">First name is required.</span>
                     </div>
                     <div class="field-group">
-                        <label class="field-lbl">Last Name<span class="req">*</span></label>
-                        <input class="field-input" name="passengers[${i}].lastName" required placeholder="e.g. Smith">
+                        <label class="field-lbl" for="passenger-${i}-lastName">Last Name<span class="req">*</span></label>
+                        <input class="field-input" id="passenger-${i}-lastName" name="passengers[${i}].lastName" required placeholder="e.g. Smith">
                         <span class="invalid-msg">Last name is required.</span>
                     </div>
                     <div class="field-group">
-                        <label class="field-lbl">Email Address<span class="req">*</span></label>
-                        <input type="email" class="field-input" name="passengers[${i}].email" value="${isPrimary ? userEmail : ''}" required placeholder="your@email.com">
+                        <label class="field-lbl" for="passenger-${i}-email">Email Address<span class="req">*</span></label>
+                        <input type="email" class="field-input" id="passenger-${i}-email" name="passengers[${i}].email" required placeholder="your@email.com">
                         ${isPrimary ? '<span class="hint-text"><i class="fas fa-info-circle me-1"></i>Pre-filled from your account — editable</span>' : ''}
                         <span class="invalid-msg">Valid email is required.</span>
                     </div>
                     <div class="field-group">
-                        <label class="field-lbl">Phone Number<span class="req">*</span></label>
-                        <input type="tel" class="field-input" name="passengers[${i}].phone" required placeholder="+94 77 123 4567">
+                        <label class="field-lbl" for="passenger-${i}-phone">Phone Number<span class="req">*</span></label>
+                        <input type="tel" class="field-input" id="passenger-${i}-phone" name="passengers[${i}].phone" required placeholder="+94 77 123 4567">
                         <span class="invalid-msg">Phone number is required.</span>
                     </div>
                     <div class="field-group">
-                        <label class="field-lbl">Date of Birth<span class="req">*</span></label>
-                        <input type="date" class="field-input" name="passengers[${i}].dateOfBirth" required max="${new Date().toISOString().split('T')[0]}">
+                        <label class="field-lbl" for="passenger-${i}-dateOfBirth">Date of Birth<span class="req">*</span></label>
+                        <input type="date" class="field-input" id="passenger-${i}-dateOfBirth" name="passengers[${i}].dateOfBirth" required max="${new Date().toISOString().split('T')[0]}">
                         <span class="invalid-msg">Date of birth is required.</span>
                     </div>
                     <div class="field-group">
-                        <label class="field-lbl">Country<span class="req">*</span></label>
-                        <input class="field-input" name="passengers[${i}].country" value="${countryVal}" required placeholder="e.g. Sri Lanka">
+                        <label class="field-lbl" for="passenger-${i}-country">Country<span class="req">*</span></label>
+                        <input class="field-input" id="passenger-${i}-country" name="passengers[${i}].country" required placeholder="e.g. Sri Lanka">
                         ${isPrimary && destinationCity ? '<span class="hint-text"><i class="fas fa-info-circle me-1"></i>Pre-filled with destination</span>' : ''}
                         <span class="invalid-msg">Country is required.</span>
                     </div>
                 </div>
                 <div class="form-grid-3" style="margin-top:16px;">
                     <div class="field-group">
-                        <label class="field-lbl">Passport No.</label>
-                        <input class="field-input" name="passengers[${i}].passportNumber" placeholder="Optional">
+                        <label class="field-lbl" for="passenger-${i}-passportNumber">Passport No.</label>
+                        <input class="field-input" id="passenger-${i}-passportNumber" name="passengers[${i}].passportNumber" placeholder="Optional">
                     </div>
                     <div class="field-group">
-                        <label class="field-lbl">Passport Expiry</label>
-                        <input type="date" class="field-input" name="passengers[${i}].passportExpiry">
+                        <label class="field-lbl" for="passenger-${i}-passportExpiry">Passport Expiry</label>
+                        <input type="date" class="field-input" id="passenger-${i}-passportExpiry" name="passengers[${i}].passportExpiry">
                     </div>
                 </div>
-            </div>`;
+            </div>`);
         }
+        container.querySelectorAll('input[name]').forEach(input => {
+            if (passengerValues.has(input.name)) {
+                input.value = passengerValues.get(input.name);
+            } else if (input.name === 'passengers[0].email') {
+                input.value = userEmail || '';
+            } else if (input.name === 'passengers[0].country') {
+                input.value = destinationCity || '';
+            }
+        });
         renderSummary();
         updateExtrasTotal();
     }
@@ -357,23 +367,33 @@
         }
     }
 
-    function validateStep1() {
+    function validateStep1(focusInvalid = true) {
         const inputs = document.querySelectorAll('#stepPassenger input[required]');
-        let valid = true;
+        let firstInvalid = null;
         inputs.forEach(inp => {
-            if (!inp.value.trim()) { inp.classList.add('is-invalid'); valid = false; }
-            else inp.classList.remove('is-invalid');
+            const invalid = !inp.value.trim() || !inp.checkValidity();
+            inp.classList.toggle('is-invalid', invalid);
+            inp.setAttribute('aria-invalid', String(invalid));
+            if (invalid && !firstInvalid) firstInvalid = inp;
         });
-        return valid;
+        if (firstInvalid && focusInvalid) {
+            firstInvalid.focus();
+            firstInvalid.reportValidity();
+        }
+        return !firstInvalid;
     }
 
     function goToExtras() {
-        if (!validateStep1()) { alert('Please complete all required passenger fields.'); return; }
+        if (!validateStep1()) return;
         toggle(1, 2);
     }
     function backToPassenger() { toggle(2, 1); }
     function goToReview() {
-        if (!validateStep1()) { alert('Please complete all required passenger fields.'); return; }
+        if (!validateStep1(false)) {
+            toggle(2, 1);
+            validateStep1();
+            return;
+        }
         toggle(2, 3);
         renderReview();
     }
@@ -409,70 +429,88 @@
         }
     }
 
+    function reviewSection(container, title) {
+        const section = document.createElement('div');
+        section.className = 'review-section';
+        const heading = document.createElement('div');
+        heading.className = 'review-section-title';
+        heading.textContent = title;
+        section.appendChild(heading);
+        container.appendChild(section);
+        return section;
+    }
+
+    function reviewRow(section, label, value) {
+        const row = document.createElement('div');
+        row.className = 'review-row';
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'label';
+        labelSpan.textContent = label;
+        const valueSpan = document.createElement('span');
+        valueSpan.className = 'value';
+        valueSpan.textContent = value;
+        row.append(labelSpan, valueSpan);
+        section.appendChild(row);
+        return row;
+    }
+
+    function passengerValue(index, field) {
+        return document.getElementById(`passenger-${index}-${field}`)?.value || '—';
+    }
+
     function renderReview() {
-        const base = flightData.price * passengerCount;
-        const disc = base * promoDiscount;
-        const total = (base - disc) + bookingExtras;
-        let paxHtml = '';
+        const container = document.getElementById('reviewContainer');
+        container.replaceChildren();
+        const flightSection = reviewSection(container, 'Flight Details');
+        reviewRow(flightSection, 'Flight Number', flightData.flightNumber);
+        reviewRow(flightSection, 'Route', `${flightData.origin} → ${flightData.destination}`);
+        reviewRow(flightSection, 'Class', flightData.cabinClass);
+        reviewRow(flightSection, 'Status', 'PENDING');
+
+        const passengerSection = reviewSection(container, 'Passenger Details');
         for (let i = 0; i < passengerCount; i++) {
-            const fn = document.querySelector(`input[name="passengers[${i}].firstName"]`)?.value || '—';
-            const ln = document.querySelector(`input[name="passengers[${i}].lastName"]`)?.value || '—';
-            const em = document.querySelector(`input[name="passengers[${i}].email"]`)?.value || '—';
-            const ph = document.querySelector(`input[name="passengers[${i}].phone"]`)?.value || '—';
-            const dob = document.querySelector(`input[name="passengers[${i}].dateOfBirth"]`)?.value || '—';
-            const co = document.querySelector(`input[name="passengers[${i}].country"]`)?.value || '—';
-            const pp = document.querySelector(`input[name="passengers[${i}].passportNumber"]`)?.value || '—';
-            paxHtml += `<div style="background:#fafbff;border:1px solid #eef1fb;border-radius:10px;padding:16px;margin-bottom:12px;">
-                <div style="font-weight:700;color:var(--navy);margin-bottom:10px;"><i class="fas fa-user me-2" style="color:var(--blue);"></i>Passenger ${i+1}${i===0?' <span style="background:var(--navy);color:white;font-size:10px;padding:2px 8px;border-radius:50px;font-weight:600;margin-left:6px;">Primary</span>':''}</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;font-size:13.5px;">
-                    <div><span style="color:var(--text-light);">Name: </span><strong>${fn} ${ln}</strong></div>
-                    <div><span style="color:var(--text-light);">Email: </span><strong>${em}</strong></div>
-                    <div><span style="color:var(--text-light);">Phone: </span><strong>${ph}</strong></div>
-                    <div><span style="color:var(--text-light);">DOB: </span><strong>${dob}</strong></div>
-                    <div><span style="color:var(--text-light);">Country: </span><strong>${co}</strong></div>
-                    <div><span style="color:var(--text-light);">Passport: </span><strong>${pp}</strong></div>
-                </div></div>`;
+            const card = document.createElement('div');
+            card.className = 'review-passenger';
+            const title = document.createElement('div');
+            title.className = 'review-passenger-title';
+            title.textContent = `Passenger ${i + 1}${i === 0 ? ' · Primary' : ''}`;
+            card.appendChild(title);
+            reviewRow(card, 'Name', `${passengerValue(i, 'firstName')} ${passengerValue(i, 'lastName')}`);
+            reviewRow(card, 'Email', passengerValue(i, 'email'));
+            reviewRow(card, 'Phone', passengerValue(i, 'phone'));
+            reviewRow(card, 'DOB', passengerValue(i, 'dateOfBirth'));
+            reviewRow(card, 'Country', passengerValue(i, 'country'));
+            reviewRow(card, 'Passport', passengerValue(i, 'passportNumber'));
+            passengerSection.appendChild(card);
         }
-        const bagEl = document.getElementById('baggage');
-        const seatEl = document.getElementById('seatPref');
-        const mealEl = document.getElementById('meal');
-        const assEl = document.getElementById('assistance');
-        document.getElementById('reviewContainer').innerHTML = `
-            <div class="review-section">
-                <div class="review-section-title"><i class="fas fa-plane me-2" style="color:var(--blue);"></i>Flight Details</div>
-                <div class="review-row"><span class="label">Flight Number</span><span class="value">${flightData.flightNumber}</span></div>
-                <div class="review-row"><span class="label">Route</span><span class="value">${flightData.origin} → ${flightData.destination}</span></div>
-                <div class="review-row"><span class="label">Class</span><span class="value">${flightData.cabinClass}</span></div>
-                <div class="review-row"><span class="label">Status</span><span class="value"><span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:50px;font-size:12px;">PENDING</span></span></div>
-            </div>
-            <div class="review-section">
-                <div class="review-section-title"><i class="fas fa-users me-2" style="color:var(--blue);"></i>Passenger Details</div>
-                ${paxHtml}
-            </div>
-            <div class="review-section">
-                <div class="review-section-title"><i class="fas fa-plus-circle me-2" style="color:var(--blue);"></i>Travel Extras</div>
-                <div class="review-row"><span class="label">Baggage</span><span class="value">${bagEl.options[bagEl.selectedIndex].text}</span></div>
-                <div class="review-row"><span class="label">Seat Preference</span><span class="value">${seatEl.options[seatEl.selectedIndex].text}</span></div>
-                <div class="review-row"><span class="label">Meal</span><span class="value">${mealEl.options[mealEl.selectedIndex].text}</span></div>
-                <div class="review-row"><span class="label">Assistance</span><span class="value">${assEl.options[assEl.selectedIndex].text}</span></div>
-            </div>
-            <div class="review-section">
-                <div class="review-section-title"><i class="fas fa-receipt me-2" style="color:var(--blue);"></i>Price Summary</div>
-                <div class="review-row"><span class="label">Flight Price (×${passengerCount})</span><span class="value">${fmt(base)}</span></div>
-                ${promoDiscount>0?`<div class="review-row"><span class="label" style="color:var(--green);">Promo Discount (${(promoDiscount*100).toFixed(0)}%)</span><span class="value" style="color:var(--green);">–${fmt(disc)}</span></div>`:''}
-                <div class="review-row"><span class="label">Extras Total</span><span class="value" style="color:var(--blue);">${fmt(bookingExtras)}</span></div>
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:16px;background:linear-gradient(135deg,#f0f6ff,#e8f0ff);border-radius:12px;margin-top:12px;">
-                    <span style="font-family:'Inter',system-ui,sans-serif;font-size:16px;font-weight:700;color:var(--navy);">Total Amount</span>
-                    <span style="font-family:'Inter',system-ui,sans-serif;font-size:26px;font-weight:800;color:var(--navy);">${fmt(total)}</span>
-                </div>
-            </div>`;
+
+        const extrasSection = reviewSection(container, 'Travel Extras');
+        for (const [label, id] of [['Baggage', 'baggage'], ['Seat Preference', 'seatPref'], ['Meal', 'meal'], ['Assistance', 'assistance']]) {
+            const select = document.getElementById(id);
+            reviewRow(extrasSection, label, select.selectedOptions[0].textContent);
+        }
+
+        const priceSection = reviewSection(container, 'Price Summary');
+        const base = flightData.price * passengerCount;
+        const discount = base * promoDiscount;
+        const total = base - discount + bookingExtras;
+        reviewRow(priceSection, `Flight Price (×${passengerCount})`, fmt(base));
+        if (promoDiscount > 0) reviewRow(priceSection, `Promo Discount (${(promoDiscount * 100).toFixed(0)}%)`, `–${fmt(discount)}`);
+        reviewRow(priceSection, 'Extras Total', fmt(bookingExtras));
+        const totalRow = reviewRow(priceSection, 'Total Amount', fmt(total));
+        totalRow.classList.add('review-total');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('passengerSelect').value = String(passengerCount);
         updatePassengerForms();
         renderSummary();
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
-            if (!validateStep1()) { e.preventDefault(); alert('Please complete all required fields.'); }
+            if (!validateStep1(false)) {
+                e.preventDefault();
+                toggle(currentStep, 1);
+                validateStep1();
+            }
         });
     });
 </script>
