@@ -82,6 +82,8 @@ body.traveler-payment-page {
 .traveler-payment-page .summary-total strong { font-size: 21px; font-weight: 800; letter-spacing: -.04em; }
 .traveler-payment-page .summary-note { margin: 14px 0 0; color: var(--muted); font-size: 11px; }
 .traveler-payment-page .alert { border-radius: 10px; }
+.traveler-payment-page .alert[hidden] { display: none; }
+.traveler-payment-page [aria-invalid="true"] { border-color: #b53145; box-shadow: 0 0 0 3px rgba(181, 49, 69, .12); }
 .traveler-payment-page footer { color: var(--muted) !important; }
 
 .traveler-payment-page a:focus-visible,

@@ -17,7 +17,7 @@
 <nav class="navbar navbar-dark navbar-expand-lg">
     <div class="container">
         <a class="navbar-brand" href="/"><i class="fas fa-paper-plane me-2"></i>SKY<span>LINK</span></a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navPay">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navPay" aria-controls="navPay" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navPay">
@@ -41,12 +41,13 @@
     <!-- Success/Error Messages -->
     <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss message"></button>
     </div>
     <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss error"></button>
     </div>
+    <div id="paymentClientError" class="alert alert-danger" role="alert" tabindex="-1" hidden></div>
 
     <div class="row g-4">
         <div class="col-lg-7">
@@ -55,12 +56,12 @@
                     <h2 class="form-heading">Choose a payment method</h2>
                     <ul class="nav nav-pills tab-pill mb-4" id="payTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="card-tab" data-bs-toggle="pill" data-bs-target="#tab-card" type="button" role="tab">
+                            <button class="nav-link active" id="card-tab" data-bs-toggle="pill" data-bs-target="#tab-card" type="button" role="tab" aria-controls="tab-card" aria-selected="true">
                                 <i class="fas fa-credit-card me-2"></i>Card
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="wallet-tab" data-bs-toggle="pill" data-bs-target="#tab-wallet" type="button" role="tab">
+                            <button class="nav-link" id="wallet-tab" data-bs-toggle="pill" data-bs-target="#tab-wallet" type="button" role="tab" aria-controls="tab-wallet" aria-selected="false">
                                 <i class="fas fa-mobile-screen-button me-2"></i>Mobile Wallet (eZ Cash)
                             </button>
                         </li>
@@ -68,7 +69,7 @@
 
                     <div class="tab-content" id="payTabsContent">
                         <!-- Card Payment -->
-                        <div class="tab-pane fade show active" id="tab-card" role="tabpanel">
+                        <div class="tab-pane fade show active" id="tab-card" role="tabpanel" aria-labelledby="card-tab">
                             <form id="cardPaymentForm" th:action="@{/api/payment/process}" method="post">
                                 <input type="hidden" name="paymentMethod" value="CARD">
                                 <input type="hidden" name="bookingId" th:value="${bookingId}">
@@ -77,33 +78,33 @@
 
                                 <div class="row g-3">
                                     <div class="col-12">
-                                        <label class="form-label">Name on Card <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="cardName" placeholder="As printed on card" required>
+                                        <label class="form-label" for="cardName">Name on Card <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="cardName" name="cardName" placeholder="As printed on card" autocomplete="cc-name" required>
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label">Card Number <span class="text-danger">*</span></label>
+                                        <label class="form-label" for="cardNumber">Card Number <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="far fa-credit-card"></i></span>
-                                            <input type="text" inputmode="numeric" class="form-control" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                            <input type="text" inputmode="numeric" class="form-control" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="23" autocomplete="cc-number" required>
                                         </div>
                                     </div>
                                     <div class="col-6 card-form-half">
-                                        <label class="form-label">Expiry <span class="text-danger">*</span></label>
+                                        <label class="form-label" for="expiry">Expiry <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="far fa-calendar"></i></span>
-                                            <input type="text" class="form-control" name="expiry" placeholder="MM/YY" pattern="^(0[1-9]|1[0-2])\/(\d{2})$" required>
+                                            <input type="text" class="form-control" id="expiry" name="expiry" placeholder="MM/YY" pattern="^(0[1-9]|1[0-2])\/(\d{2})$" autocomplete="cc-exp" required>
                                         </div>
                                     </div>
                                     <div class="col-6 card-form-half">
-                                        <label class="form-label">CVV <span class="text-danger">*</span></label>
+                                        <label class="form-label" for="cvv">CVV <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-shield-halved"></i></span>
-                                            <input type="password" class="form-control" name="cvv" placeholder="123" minlength="3" maxlength="4" required>
+                                            <input type="password" class="form-control" id="cvv" name="cvv" placeholder="123" minlength="3" maxlength="4" autocomplete="cc-csc" inputmode="numeric" required>
                                         </div>
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label">Billing Email <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" name="email" placeholder="you@example.com" required>
+                                        <label class="form-label" for="billingEmail">Billing Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="billingEmail" name="email" placeholder="you@example.com" autocomplete="email" required>
                                     </div>
                                 </div>
                                 <div class="d-grid mt-4">
@@ -115,7 +116,7 @@
                         </div>
 
                         <!-- Mobile Wallet (eZ Cash) -->
-                        <div class="tab-pane fade" id="tab-wallet" role="tabpanel">
+                        <div class="tab-pane fade" id="tab-wallet" role="tabpanel" aria-labelledby="wallet-tab">
                             <form id="walletPaymentForm" th:action="@{/api/payment/process}" method="post">
                                 <input type="hidden" name="paymentMethod" value="EZ_CASH">
                                 <input type="hidden" name="bookingId" th:value="${bookingId}">
@@ -124,16 +125,16 @@
 
                                 <div class="row g-3">
                                     <div class="col-12">
-                                        <label class="form-label">Registered Mobile Number <span class="text-danger">*</span></label>
+                                        <label class="form-label" for="mobile">Registered Mobile Number <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text">+94</span>
-                                            <input type="tel" class="form-control" name="mobile" placeholder="7XXXXXXXX" pattern="^7\d{8}$" required>
+                                            <input type="tel" class="form-control" id="mobile" name="mobile" placeholder="7XXXXXXXX" pattern="^7\d{8}$" autocomplete="tel-national" inputmode="numeric" required>
                                         </div>
-                                        <div class="form-text">You will receive a push/OTP on your eZ Cash wallet to authorize.</div>
+                                        <div class="form-text">Use a 9 digit mobile number starting with 7. Your submission will await finance review.</div>
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label">NIC / ID (optional)</label>
-                                        <input type="text" class="form-control" name="nic" placeholder="Optional for additional verification">
+                                        <label class="form-label" for="nic">NIC / ID (optional)</label>
+                                        <input type="text" class="form-control" id="nic" name="nic" placeholder="Optional for additional verification">
                                     </div>
                                 </div>
                                 <div class="d-grid mt-4">
@@ -194,22 +195,50 @@
         });
     }
 
-    // Form validation
-    document.getElementById('cardPaymentForm')?.addEventListener('submit', function(e) {
-        const cardNumber = document.getElementById('cardNumber').value.replace(/\s+/g, '');
-        if (cardNumber.length < 13) {
-            e.preventDefault();
-            alert('Please enter a valid card number (at least 13 digits)');
-            return false;
-        }
-    });
-
-    document.getElementById('walletPaymentForm')?.addEventListener('submit', function(e) {
-        const mobile = this.querySelector('input[name="mobile"]').value;
-        if (!/^7\d{8}$/.test(mobile)) {
-            e.preventDefault();
-            alert('Please enter a valid mobile number (format: 7XXXXXXXX)');
-            return false;
+    // Keep validation feedback on the page and lock a valid submission until navigation.
+    const paymentError = document.getElementById('paymentClientError');
+    function showPaymentError(message, field) {
+        paymentError.textContent = message;
+        paymentError.hidden = false;
+        paymentError.focus();
+        field?.setAttribute('aria-invalid', 'true');
+        field?.focus();
+    }
+    for (const form of [document.getElementById('cardPaymentForm'), document.getElementById('walletPaymentForm')]) {
+        form?.addEventListener('input', event => {
+            event.target.removeAttribute('aria-invalid');
+            paymentError.hidden = true;
+        });
+        form?.addEventListener('submit', event => {
+            if (form.dataset.submitting === 'true') {
+                event.preventDefault();
+                return;
+            }
+            const card = form.querySelector('[name="cardNumber"]');
+            const mobile = form.querySelector('[name="mobile"]');
+            if (card && !/^\d{13,19}$/.test(card.value.replace(/\s+/g, ''))) {
+                event.preventDefault();
+                showPaymentError('Enter a card number with 13 to 19 digits.', card);
+                return;
+            }
+            if (mobile && !/^7\d{8}$/.test(mobile.value)) {
+                event.preventDefault();
+                showPaymentError('Enter a 9 digit mobile number starting with 7.', mobile);
+                return;
+            }
+            form.dataset.submitting = 'true';
+            const submit = form.querySelector('button[type="submit"]');
+            submit.disabled = true;
+            submit.setAttribute('aria-busy', 'true');
+        });
+    }
+    window.addEventListener('pageshow', () => {
+        for (const form of [document.getElementById('cardPaymentForm'), document.getElementById('walletPaymentForm')]) {
+            if (!form) continue;
+            delete form.dataset.submitting;
+            const submit = form.querySelector('button[type="submit"]');
+            submit.disabled = false;
+            submit.removeAttribute('aria-busy');
         }
     });
 </script>
