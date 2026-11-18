@@ -1,12 +1,14 @@
 package com.skylinkapplication.skylinkairlinereservationsystem.controller;
 
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.BookingDTO;
-import com.skylinkapplication.skylinkairlinereservationsystem.dto.BookingDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.PaymentDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.Payment;
 import com.skylinkapplication.skylinkairlinereservationsystem.service.BookingService;
 import com.skylinkapplication.skylinkairlinereservationsystem.service.PaymentService;
+import com.skylinkapplication.skylinkairlinereservationsystem.repository.UserRepository;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,9 @@ public class PaymentController {
 
     @Autowired
     private BookingService bookingService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * Display payment management dashboard (Finance Executive only)
@@ -237,6 +242,7 @@ public class PaymentController {
                 model.addAttribute("error", "Booking not found");
                 return "error";
             }
+            assertBookingOwner(booking);
 
             // Check if payment already exists
             if (booking.getPaymentId() != null) {
@@ -246,7 +252,7 @@ public class PaymentController {
 
             // Calculate total with taxes
             Double subtotal = booking.getTotalPrice();
-            Double taxes = 45.00; // Fixed tax amount
+            Double taxes = PaymentService.TRAVELER_PROCESSING_FEE;
             Double total = subtotal + taxes;
 
             // Add attributes to model
@@ -259,6 +265,8 @@ public class PaymentController {
             logger.info("Payment page loaded for booking ID: {}", bookingId);
             return "traveler-payment";
 
+        } catch (AccessDeniedException e) {
+            throw e;
         } catch (RuntimeException e) {
             logger.error("Error loading payment page for booking ID: {}", bookingId, e);
             model.addAttribute("error", e.getMessage());
@@ -282,6 +290,7 @@ public class PaymentController {
             if (paymentDTO.getBookingId() == null) {
                 throw new RuntimeException("Booking ID is required");
             }
+            assertBookingOwner(bookingService.getBookingById(paymentDTO.getBookingId()));
             if (paymentDTO.getAmount() == null || paymentDTO.getAmount() <= 0) {
                 throw new RuntimeException("Valid payment amount is required");
             }
@@ -340,6 +349,8 @@ public class PaymentController {
 
             return "redirect:/api/payment/confirmation";
 
+        } catch (AccessDeniedException e) {
+            throw e;
         } catch (RuntimeException e) {
             logger.error("Payment processing failed for booking ID: {}", paymentDTO.getBookingId(), e);
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -365,6 +376,18 @@ public class PaymentController {
             logger.error("Error loading confirmation page", e);
             model.addAttribute("error", "Unable to load confirmation page");
             return "error";
+        }
+    }
+
+    private void assertBookingOwner(BookingDTO booking) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (booking == null || authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Booking access denied");
+        }
+        Long currentUserId = userRepository.findByUsername(authentication.getName())
+                .map(user -> user.getId()).orElse(null);
+        if (currentUserId == null || !currentUserId.equals(booking.getUserId())) {
+            throw new AccessDeniedException("Booking access denied");
         }
     }
 }

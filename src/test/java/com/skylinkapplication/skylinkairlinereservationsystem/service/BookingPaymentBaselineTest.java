@@ -188,6 +188,7 @@ class BookingPaymentBaselineTest {
         booking.setId(30L);
         booking.setUser(user());
         booking.setStatus(Booking.Status.PENDING);
+        booking.setTotalPrice(350.0);
         return booking;
     }
 

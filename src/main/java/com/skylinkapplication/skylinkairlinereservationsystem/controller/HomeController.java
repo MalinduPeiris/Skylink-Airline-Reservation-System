@@ -157,11 +157,12 @@ public class HomeController {
 								  @RequestParam(required = false, name = "taxes") Double taxes,
 								  @RequestParam(required = false, name = "total") Double total,
 								  Model model) {
-		model.addAttribute("bookingRef", bookingId != null ? bookingId : "N/A");
-		model.addAttribute("subtotal", subtotal != null ? String.format("%.2f", subtotal) : "0.00");
-		model.addAttribute("taxes", taxes != null ? String.format("%.2f", taxes) : "0.00");
-		model.addAttribute("total", total != null ? String.format("%.2f", total) : "0.00");
-		return "traveler-payment";
+		try {
+			long id = Long.parseLong(bookingId);
+			return id > 0 ? "redirect:/api/payment/page?bookingId=" + id : "redirect:/api/user/profile";
+		} catch (NumberFormatException e) {
+			return "redirect:/api/user/profile";
+		}
 	}
 
 	@GetMapping("/booking-confirmation")
