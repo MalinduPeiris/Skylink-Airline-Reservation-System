@@ -6,6 +6,7 @@ import com.skylinkapplication.skylinkairlinereservationsystem.dto.BookingRequest
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.FlightDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.PassengerDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.PaymentDTO;
+import com.skylinkapplication.skylinkairlinereservationsystem.dto.PromotionDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.Flight;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.User;
 import com.skylinkapplication.skylinkairlinereservationsystem.repository.FlightRepository;
@@ -13,6 +14,7 @@ import com.skylinkapplication.skylinkairlinereservationsystem.repository.UserRep
 import com.skylinkapplication.skylinkairlinereservationsystem.service.BookingService;
 import com.skylinkapplication.skylinkairlinereservationsystem.service.FlightService;
 import com.skylinkapplication.skylinkairlinereservationsystem.service.PaymentService;
+import com.skylinkapplication.skylinkairlinereservationsystem.service.PromotionService;
 import com.skylinkapplication.skylinkairlinereservationsystem.singleton.ConfigurationManager;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -50,6 +52,9 @@ public class BookingController {
     
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private PromotionService promotionService;
 
     /**
      * Display booking management dashboard for RESERVATION_MANAGER
@@ -218,6 +223,26 @@ public class BookingController {
             }
             model.addAttribute("error", e.getMessage());
             return "redirect:/api/flight/all";
+        }
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/promo-preview")
+    @ResponseBody
+    public ResponseEntity<Map<String, Double>> previewPromotion(@RequestParam(name = "code") String code) {
+        if (code == null || code.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            double discount = promotionService.getAllPromotions().stream()
+                    .filter(p -> p.getPromoCode() != null && code.trim().equalsIgnoreCase(p.getPromoCode()))
+                    .findFirst()
+                    .map(PromotionDTO::getDiscount)
+                    .orElse(0.0);
+            return ResponseEntity.ok(Map.of("discount", discount));
+        } catch (RuntimeException e) {
+            logger.warn("Promotion preview unavailable", e);
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 

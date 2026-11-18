@@ -194,24 +194,24 @@
                 <div class="summary-detail" id="summaryDiscountRow" style="display:none;"><span class="s-label" style="color:var(--green);">Promo Discount</span><span class="s-value" style="color:var(--green);" id="summaryDiscount">–Rs.0</span></div>
                 <div class="summary-detail"><span class="s-label">Extras</span><span class="s-value" style="color:var(--blue);" id="summaryExtras">Rs.0</span></div>
                 <div class="summary-price-block">
-                    <div class="total-label">Total Amount</div>
+                    <div class="total-label">Booking subtotal</div>
                     <div class="total-amount" id="summaryTotal">Rs.0</div>
-                    <div class="total-sub">Inclusive of all taxes & fees</div>
+                    <div class="total-sub">Additional fee shown at payment</div>
                 </div>
             </div>
             <!-- PROMO -->
             <div class="promo-wrap">
                 <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;"><i class="fas fa-tag me-2" style="color:var(--gold);"></i>Apply Promo Code</div>
                 <div class="promo-input-row">
-                    <input type="text" class="promo-input" id="promoCodeInput" placeholder="Enter code (e.g. SUMMER30)">
+                    <input type="text" class="promo-input" id="promoCodeInput" placeholder="Enter promotion code">
                     <button type="button" class="btn-promo" onclick="applyPromo()">Apply</button>
                 </div>
                 <div id="promoFeedback" class="mt-2 d-none" style="font-size:12.5px;font-weight:600;"></div>
-                <div style="margin-top:10px;font-size:11.5px;color:var(--text-light);">Try: SUMMER30 · FLYBACK25 · GROUP40</div>
+                <div style="margin-top:10px;font-size:11.5px;color:var(--text-light);">Enter a promotion code to preview its discount.</div>
             </div>
             <div class="trust-badges">
                 <div class="trust-item"><i class="fas fa-lock"></i> Secure payment</div>
-                <div class="trust-item"><i class="fas fa-check-circle"></i> Instant confirmation</div>
+                <div class="trust-item"><i class="fas fa-check-circle"></i> Confirmation after review</div>
                 <div class="trust-item"><i class="fas fa-headset"></i> 24/7 support</div>
             </div>
         </div>
@@ -234,6 +234,7 @@
     let passengerCount = Math.max(1, Math.min(5, parseInt(document.getElementById('passengerCount').value, 10) || 1));
     let bookingExtras = 0;
     let promoDiscount = 0;
+    let promoRequestVersion = 0;
     let currentStep = 1;
     const passengerValues = new Map();
 
@@ -348,22 +349,45 @@
         }
     }
 
-    function applyPromo() {
+    async function applyPromo() {
         const code = document.getElementById('promoCodeInput').value.trim().toUpperCase();
         const fb = document.getElementById('promoFeedback');
-        const codes = { 'SUMMER30':0.30, 'FLYBACK25':0.25, 'GROUP40':0.40, 'WEEKEND35':0.35, 'EARLY20':0.20 };
-        if (!code) { fb.textContent='Please enter a promo code.'; fb.style.color='var(--red)'; fb.classList.remove('d-none'); return; }
-        if (codes[code]) {
-            promoDiscount = codes[code];
-            document.getElementById('promoCode').value = code;
-            fb.textContent = `✓ Code "${code}" applied — ${(promoDiscount*100).toFixed(0)}% off flight price!`;
-            fb.style.color = 'var(--green)';
-            fb.classList.remove('d-none');
-            renderSummary();
-        } else {
-            fb.textContent = '✗ Invalid promo code. Try SUMMER30, FLYBACK25, GROUP40.';
+        const button = document.querySelector('.btn-promo');
+        const requestVersion = ++promoRequestVersion;
+        promoDiscount = 0;
+        document.getElementById('promoCode').value = '';
+        renderSummary();
+        if (!code) {
+            fb.textContent = 'Please enter a promo code.';
             fb.style.color = 'var(--red)';
             fb.classList.remove('d-none');
+            return;
+        }
+        button.disabled = true;
+        fb.textContent = 'Checking promotion…';
+        fb.style.color = 'var(--text-light)';
+        fb.classList.remove('d-none');
+        try {
+            const response = await fetch(`/api/booking/promo-preview?code=${encodeURIComponent(code)}`, {credentials: 'same-origin'});
+            if (!response.ok) throw new Error('Promotion preview unavailable');
+            const rate = Number((await response.json()).discount);
+            if (requestVersion !== promoRequestVersion) return;
+            if (Number.isFinite(rate) && rate > 0) {
+                promoDiscount = rate / 100;
+                document.getElementById('promoCode').value = code;
+                fb.textContent = `Code "${code}" applied — ${rate}% off flight price.`;
+                fb.style.color = 'var(--green)';
+            } else {
+                fb.textContent = 'This promotion code is not available.';
+                fb.style.color = 'var(--red)';
+            }
+        } catch (error) {
+            if (requestVersion !== promoRequestVersion) return;
+            fb.textContent = 'Unable to check this code. The final fare is calculated when you continue.';
+            fb.style.color = 'var(--red)';
+        } finally {
+            if (requestVersion === promoRequestVersion) button.disabled = false;
+            renderSummary();
         }
     }
 
@@ -497,7 +521,7 @@
         reviewRow(priceSection, `Flight Price (×${passengerCount})`, fmt(base));
         if (promoDiscount > 0) reviewRow(priceSection, `Promo Discount (${(promoDiscount * 100).toFixed(0)}%)`, `–${fmt(discount)}`);
         reviewRow(priceSection, 'Extras Total', fmt(bookingExtras));
-        const totalRow = reviewRow(priceSection, 'Total Amount', fmt(total));
+        const totalRow = reviewRow(priceSection, 'Booking subtotal', fmt(total));
         totalRow.classList.add('review-total');
     }
 

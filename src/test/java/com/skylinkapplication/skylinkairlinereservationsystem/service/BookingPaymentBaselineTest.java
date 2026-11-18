@@ -4,6 +4,7 @@ import com.skylinkapplication.skylinkairlinereservationsystem.dto.BookingDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.BookingRequestDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.PassengerDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.PaymentDTO;
+import com.skylinkapplication.skylinkairlinereservationsystem.dto.PromotionDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.Booking;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.Flight;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.Payment;
@@ -82,6 +83,37 @@ class BookingPaymentBaselineTest {
 
         assertEquals("Invalid number of passengers (maximum 5 passengers allowed)", error.getMessage());
         verifyNoInteractions(userRepository, flightRepository, bookingRepository, passengerRepository);
+    }
+
+    @Test
+    void bookingAppliesStoredPromotionToFareAndAddsExtras() {
+        BookingRequestDTO request = bookingRequest(2);
+        request.setPassengers(List.of(passenger("traveler@example.com"), passenger("guest@example.com")));
+        request.setBookingExtras(50.0);
+        request.setPromoCode("SKY20");
+        Flight flight = new Flight();
+        flight.setId(20L);
+        flight.setPrice(150.0);
+        flight.setSeatsAvailable(5);
+        PromotionDTO promotion = new PromotionDTO();
+        promotion.setPromoCode("SKY20");
+        promotion.setDiscount(20.0);
+        when(userRepository.findById(10L)).thenReturn(Optional.of(user()));
+        when(flightRepository.findById(20L)).thenReturn(Optional.of(flight));
+        when(promotionService.getAllPromotions()).thenReturn(List.of(promotion));
+        when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> {
+            Booking saved = invocation.getArgument(0);
+            saved.setId(31L);
+            return saved;
+        });
+
+        BookingDTO result = bookingService.createBookingWithPassengers(request);
+
+        assertEquals("PENDING", result.getStatus());
+        assertEquals("SKY20", result.getPromoCode());
+        assertEquals(50.0, result.getBookingExtras());
+        assertEquals(290.0, result.getTotalPrice()); // (150 × 2) less 20%, plus 50 extras
+        assertEquals(3, flight.getSeatsAvailable());
     }
 
     @Test

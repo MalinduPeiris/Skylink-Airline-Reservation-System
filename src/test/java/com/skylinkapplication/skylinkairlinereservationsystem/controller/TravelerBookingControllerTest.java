@@ -3,11 +3,13 @@ package com.skylinkapplication.skylinkairlinereservationsystem.controller;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.BookingDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.BookingRequestDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.PassengerDTO;
+import com.skylinkapplication.skylinkairlinereservationsystem.dto.PromotionDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.Flight;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.User;
 import com.skylinkapplication.skylinkairlinereservationsystem.repository.FlightRepository;
 import com.skylinkapplication.skylinkairlinereservationsystem.repository.UserRepository;
 import com.skylinkapplication.skylinkairlinereservationsystem.service.BookingService;
+import com.skylinkapplication.skylinkairlinereservationsystem.service.PromotionService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.ExtendedModelMap;
@@ -33,6 +36,7 @@ class TravelerBookingControllerTest {
     @Mock private BookingService bookingService;
     @Mock private FlightRepository flightRepository;
     @Mock private UserRepository userRepository;
+    @Mock private PromotionService promotionService;
     @InjectMocks private BookingController controller;
 
     @AfterEach
@@ -64,6 +68,22 @@ class TravelerBookingControllerTest {
         assertEquals(3, request.getPassengers().size());
         assertEquals("traveler@example.com", request.getPassengers().get(0).getEmail());
         assertSame(flight, model.get("flight"));
+    }
+
+    @Test
+    void promotionPreviewReturnsOnlyTheRequestedStoredDiscount() {
+        PromotionDTO promotion = new PromotionDTO();
+        promotion.setPromoCode("SKY20");
+        promotion.setDiscount(20.0);
+        when(promotionService.getAllPromotions()).thenReturn(List.of(promotion));
+
+        ResponseEntity<java.util.Map<String, Double>> matching = controller.previewPromotion("sky20");
+        ResponseEntity<java.util.Map<String, Double>> missing = controller.previewPromotion("OTHER");
+
+        assertEquals(200, matching.getStatusCode().value());
+        assertEquals(20.0, matching.getBody().get("discount"));
+        assertEquals(0.0, missing.getBody().get("discount"));
+        assertEquals(1, matching.getBody().size());
     }
 
     @Test
