@@ -1,0 +1,9 @@
+/target/
+/.vscode/
+/.idea/
+*.log
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
