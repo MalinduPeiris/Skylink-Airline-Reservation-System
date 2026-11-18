@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,6 +138,20 @@ public class PromotionService {
 		return promotionRepository.findAll().stream()
 				.map(this::convertToDTO)
 				.collect(Collectors.toList());
+	}
+
+	public Optional<PromotionDTO> findActivePromotion(String code) {
+		if (code == null || code.isBlank()) {
+			return Optional.empty();
+		}
+		Date now = new Date();
+		return getAllPromotions().stream()
+				.filter(p -> p.getPromoCode() != null && code.trim().equalsIgnoreCase(p.getPromoCode()))
+				.filter(p -> p.getValidityStart() != null && p.getValidityStart().before(now))
+				.filter(p -> p.getValidityEnd() != null && p.getValidityEnd().after(now))
+				.filter(p -> p.getDiscount() != null && Double.isFinite(p.getDiscount())
+						&& p.getDiscount() > 0 && p.getDiscount() <= 100)
+				.findFirst();
 	}
 
 	@Transactional

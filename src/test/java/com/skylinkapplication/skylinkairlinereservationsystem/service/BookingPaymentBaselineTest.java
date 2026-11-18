@@ -51,6 +51,8 @@ class BookingPaymentBaselineTest {
         BookingRequestDTO request = bookingRequest(2);
         request.setPassengers(List.of(passenger("traveler@example.com"), passenger("guest@example.com")));
         request.setBookingExtras(50.0);
+        request.setBaggage("2000");
+        request.setMeal("1500");
 
         when(userRepository.findById(10L)).thenReturn(Optional.of(user));
         when(flightRepository.findById(20L)).thenReturn(Optional.of(flight));
@@ -65,8 +67,8 @@ class BookingPaymentBaselineTest {
         assertEquals(30L, result.getId());
         assertEquals("PENDING", result.getStatus());
         assertEquals(2, result.getPassengers());
-        assertEquals(350.0, result.getTotalPrice());
-        assertEquals(50.0, result.getBookingExtras());
+        assertEquals(7300.0, result.getTotalPrice());
+        assertEquals(7000.0, result.getBookingExtras());
         assertEquals(2, result.getPassengerList().size());
         assertEquals("guest@example.com", result.getPassengerList().get(1).getEmail());
         assertEquals(8, flight.getSeatsAvailable());
@@ -90,6 +92,7 @@ class BookingPaymentBaselineTest {
         BookingRequestDTO request = bookingRequest(2);
         request.setPassengers(List.of(passenger("traveler@example.com"), passenger("guest@example.com")));
         request.setBookingExtras(50.0);
+        request.setMeal("1500");
         request.setPromoCode("SKY20");
         Flight flight = new Flight();
         flight.setId(20L);
@@ -100,7 +103,7 @@ class BookingPaymentBaselineTest {
         promotion.setDiscount(20.0);
         when(userRepository.findById(10L)).thenReturn(Optional.of(user()));
         when(flightRepository.findById(20L)).thenReturn(Optional.of(flight));
-        when(promotionService.getAllPromotions()).thenReturn(List.of(promotion));
+        when(promotionService.findActivePromotion("SKY20")).thenReturn(Optional.of(promotion));
         when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> {
             Booking saved = invocation.getArgument(0);
             saved.setId(31L);
@@ -111,9 +114,30 @@ class BookingPaymentBaselineTest {
 
         assertEquals("PENDING", result.getStatus());
         assertEquals("SKY20", result.getPromoCode());
-        assertEquals(50.0, result.getBookingExtras());
-        assertEquals(290.0, result.getTotalPrice()); // (150 × 2) less 20%, plus 50 extras
+        assertEquals(3000.0, result.getBookingExtras());
+        assertEquals(3240.0, result.getTotalPrice()); // (150 × 2) less 20%, plus approved meal extras for two
         assertEquals(3, flight.getSeatsAvailable());
+    }
+
+    @Test
+    void bookingRejectsUnavailablePromotionBeforeSavingOrReservingSeats() {
+        BookingRequestDTO request = bookingRequest(1);
+        request.setPassengers(List.of(passenger("traveler@example.com")));
+        request.setPromoCode("EXPIRED");
+        Flight flight = new Flight();
+        flight.setId(20L);
+        flight.setPrice(150.0);
+        flight.setSeatsAvailable(5);
+        when(userRepository.findById(10L)).thenReturn(Optional.of(user()));
+        when(flightRepository.findById(20L)).thenReturn(Optional.of(flight));
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> bookingService.createBookingWithPassengers(request));
+
+        assertEquals("Promotion code is invalid or not currently active", error.getMessage());
+        assertEquals(5, flight.getSeatsAvailable());
+        verify(bookingRepository, never()).save(any());
+        verify(passengerRepository, never()).saveAll(any());
     }
 
     @Test

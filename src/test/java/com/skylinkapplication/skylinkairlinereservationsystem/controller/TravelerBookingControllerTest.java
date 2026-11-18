@@ -75,7 +75,7 @@ class TravelerBookingControllerTest {
         PromotionDTO promotion = new PromotionDTO();
         promotion.setPromoCode("SKY20");
         promotion.setDiscount(20.0);
-        when(promotionService.getAllPromotions()).thenReturn(List.of(promotion));
+        when(promotionService.findActivePromotion("sky20")).thenReturn(Optional.of(promotion));
 
         ResponseEntity<java.util.Map<String, Double>> matching = controller.previewPromotion("sky20");
         ResponseEntity<java.util.Map<String, Double>> missing = controller.previewPromotion("OTHER");

@@ -234,9 +234,7 @@ public class BookingController {
             return ResponseEntity.badRequest().build();
         }
         try {
-            double discount = promotionService.getAllPromotions().stream()
-                    .filter(p -> p.getPromoCode() != null && code.trim().equalsIgnoreCase(p.getPromoCode()))
-                    .findFirst()
+            double discount = promotionService.findActivePromotion(code)
                     .map(PromotionDTO::getDiscount)
                     .orElse(0.0);
             return ResponseEntity.ok(Map.of("discount", discount));
