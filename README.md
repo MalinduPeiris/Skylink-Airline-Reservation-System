@@ -12,6 +12,7 @@ Payment page access is restricted to the booking owner. The submitted payment am
 ### Known limitations
 
 - Card and eZ Cash submissions are recorded for finance review; the traveler flow does not integrate a live payment gateway, send an OTP, issue an e-ticket, or provide a downloadable PDF.
-- Booking extras are accepted from the client as an amount, so their price is not independently verified against selected options on the server. Promotions match stored codes and discounts, but booking does not enforce promotion eligibility or validity dates. These pricing controls need separate business rule decisions and server validation.
+- Traveler extras use the approved per-passenger prices shown in the booking form. The server validates each submitted selection and calculates the extras total; the hidden `bookingExtras` and `totalPrice` values do not set the charge. The selected extras are not stored individually in the current database schema, so staff cannot independently verify each entitlement from a booking record.
+- Promotion codes and validity dates are checked again when booking. The free-text promotion name/target criteria and optional user association have no defined traveler eligibility rule, so targeted promotion eligibility still needs a business decision and server validation.
 - The confirmation page receives booking details through redirect flash attributes. Opening it directly shows a link to My Bookings for the current status.
 - Automated tests cover booking creation, pricing, pending payment, duplicate prevention, ownership, amount integrity, CSRF and role boundaries, and finance decisions. Browser layout and keyboard checks remain manual.
