@@ -3,6 +3,7 @@ package com.skylinkapplication.skylinkairlinereservationsystem.controller;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.*;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.Booking;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.Payment;
+import com.skylinkapplication.skylinkairlinereservationsystem.model.Promotion;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.Role;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.SupportTicket;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.User;
@@ -21,7 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.Calendar;
@@ -63,6 +66,14 @@ public class ITSystemEngineerController {
 
     @Autowired
     private FlightService flightService;
+
+    private Date parsePromotionDate(String value) throws ParseException {
+        try {
+            return Date.from(LocalDate.parse(value).atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant());
+        } catch (DateTimeParseException | NullPointerException e) {
+            throw new ParseException("Expected ISO calendar date", 0);
+        }
+    }
 
     // Main dashboard page
     @GetMapping("/dashboard")
@@ -339,15 +350,15 @@ public class ITSystemEngineerController {
                                   @RequestParam("promoCode") String promoCode,
                                   @RequestParam("validityStart") String validityStartStr,
                                   @RequestParam("validityEnd") String validityEndStr,
+                                  @RequestParam("scope") Promotion.Scope scope,
                                   RedirectAttributes redirectAttributes) {
         try {
             logger.info("IT System Engineer creating promotion with data: targetCriteria={}, discount={}, promoCode={}, validityStart={}, validityEnd={}",
                     targetCriteria, discount, promoCode, validityStartStr, validityEndStr);
 
             // Parse dates
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date validityStart = dateFormat.parse(validityStartStr);
-            Date validityEnd = dateFormat.parse(validityEndStr);
+            Date validityStart = parsePromotionDate(validityStartStr);
+            Date validityEnd = parsePromotionDate(validityEndStr);
 
             // Validate input
             if (targetCriteria == null || targetCriteria.trim().isEmpty() ||
@@ -365,6 +376,7 @@ public class ITSystemEngineerController {
             promotionDTO.setPromoCode(promoCode);
             promotionDTO.setValidityStart(validityStart);
             promotionDTO.setValidityEnd(validityEnd);
+            promotionDTO.setScope(scope);
 
             PromotionDTO createdPromotion = promotionService.createPromotion(promotionDTO);
             logger.info("Promotion created successfully: {}", createdPromotion.getDiscount());
@@ -396,9 +408,8 @@ public class ITSystemEngineerController {
                     id, targetCriteria, discount, promoCode, validityStartStr, validityEndStr);
 
             // Parse dates
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date validityStart = dateFormat.parse(validityStartStr);
-            Date validityEnd = dateFormat.parse(validityEndStr);
+            Date validityStart = parsePromotionDate(validityStartStr);
+            Date validityEnd = parsePromotionDate(validityEndStr);
 
             // Create DTO with the form data
             PromotionDTO updatedPromotionDTO = new PromotionDTO();
@@ -868,5 +879,28 @@ public class ITSystemEngineerController {
             model.addAttribute("error", "Unable to load booking management dashboard: " + e.getMessage());
             return "error";
         }
+    }
+
+    @GetMapping("/promotions/{id}/eligibility")
+    public String promotionEligibilityForm(@PathVariable Long id, Model model) {
+        model.addAttribute("promotion", promotionService.getPromotionById(id));
+        model.addAttribute("travelers", userRepository.findByRole(Role.FREQUENT_TRAVELER));
+        model.addAttribute("baseUrl", "/dashboard/it-system-engineer");
+        return "promotion-eligibility";
+    }
+
+    @PostMapping("/promotions/{id}/eligibility")
+    public String savePromotionEligibility(@PathVariable Long id,
+                                           @RequestParam("scope") Promotion.Scope scope,
+                                           @RequestParam(name = "active", defaultValue = "false") boolean active,
+                                           @RequestParam(name = "userIds", required = false) List<Long> userIds,
+                                           RedirectAttributes redirect) {
+        try {
+            promotionService.updateEligibility(id, scope, active, userIds);
+            redirect.addFlashAttribute("success", "Promotion eligibility saved");
+        } catch (IllegalArgumentException e) {
+            redirect.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/dashboard/it-system-engineer/promotions/" + id + "/eligibility";
     }
 }

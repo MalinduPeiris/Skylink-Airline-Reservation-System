@@ -94,6 +94,7 @@ class BookingPaymentBaselineTest {
         request.setBookingExtras(50.0);
         request.setMeal("1500");
         request.setPromoCode("SKY20");
+        request.setTotalPrice(1.0); // Client amount must not determine the stored booking total.
         Flight flight = new Flight();
         flight.setId(20L);
         flight.setPrice(150.0);
@@ -103,7 +104,7 @@ class BookingPaymentBaselineTest {
         promotion.setDiscount(20.0);
         when(userRepository.findById(10L)).thenReturn(Optional.of(user()));
         when(flightRepository.findById(20L)).thenReturn(Optional.of(flight));
-        when(promotionService.findActivePromotion("SKY20")).thenReturn(Optional.of(promotion));
+        when(promotionService.findRedeemablePromotion(eq("SKY20"), any(User.class))).thenReturn(Optional.of(promotion));
         when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> {
             Booking saved = invocation.getArgument(0);
             saved.setId(31L);

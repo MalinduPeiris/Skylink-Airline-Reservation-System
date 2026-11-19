@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,17 +38,9 @@ public class DealsController {
             List<PromotionDTO> allPromotions = new ArrayList<>();
 
             try {
-                // Get all active promotions with null checks
-                allPromotions = promotionService.getAllPromotions().stream()
-                        .filter(promo -> promo != null &&
-                                promo.getValidityStart() != null &&
-                                promo.getValidityEnd() != null)
-                        .filter(promo -> {
-                            Date now = new Date();
-                            return promo.getValidityStart().before(now) &&
-                                    promo.getValidityEnd().after(now);
-                        })
-                        .collect(Collectors.toList());
+                Long userId = (Long) session.getAttribute("userId");
+                User traveler = userId == null ? null : authService.getUserById(userId);
+                allPromotions = promotionService.getVisiblePromotions(traveler);
             } catch (Exception e) {
                 logger.error("Error fetching promotions", e);
             }
@@ -60,11 +51,9 @@ public class DealsController {
             Long userId = (Long) session.getAttribute("userId");
             if (userId != null) {
                 try {
-                    User user = authService.getUserById(userId);
-
-                    // Filter special promotions for this user
+                    // Only explicit linked-user promotions are special offers.
                     List<PromotionDTO> specialPromotions = allPromotions.stream()
-                            .filter(promo -> isSpecialForUser(promo, user))
+                            .filter(promo -> promo.getScope() == com.skylinkapplication.skylinkairlinereservationsystem.model.Promotion.Scope.TARGETED)
                             .limit(4)
                             .collect(Collectors.toList());
 
@@ -90,43 +79,4 @@ public class DealsController {
         }
     }
 
-    /**
-     * Determine if a promotion is special for a specific user
-     * Customize this logic based on your business rules
-     */
-    private boolean isSpecialForUser(PromotionDTO promo, User user) {
-        if (promo == null || user == null) {
-            return false;
-        }
-
-        try {
-            // Example logic: Check if target criteria matches user characteristics
-            String criteria = promo.getTargetCriteria().toLowerCase();
-            String userRole = user.getRole().name().toLowerCase();
-
-            // Frequent travelers get special deals
-            if (criteria.contains("frequent") && userRole.contains("frequent_traveler")) {
-                return true;
-            }
-
-            // Premium/VIP offers for certain users
-            if (criteria.contains("premium") || criteria.contains("vip")) {
-                return userRole.contains("frequent_traveler");
-            }
-
-            // Business class offers
-            if (criteria.contains("business")) {
-                return true;
-            }
-
-            // First-time user offers
-            if (criteria.contains("first") || criteria.contains("new")) {
-                return userRole.contains("frequent_traveler");
-            }
-        } catch (Exception e) {
-            logger.error("Error checking if promo is special for user", e);
-        }
-
-        return false;
-    }
 }

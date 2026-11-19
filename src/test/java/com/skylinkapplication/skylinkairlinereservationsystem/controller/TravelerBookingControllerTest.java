@@ -75,10 +75,13 @@ class TravelerBookingControllerTest {
         PromotionDTO promotion = new PromotionDTO();
         promotion.setPromoCode("SKY20");
         promotion.setDiscount(20.0);
-        when(promotionService.findActivePromotion("sky20")).thenReturn(Optional.of(promotion));
+        when(userRepository.findByUsername("traveler")).thenReturn(Optional.of(user()));
+        when(promotionService.findRedeemablePromotion(eq("sky20"), any(User.class))).thenReturn(Optional.of(promotion));
 
-        ResponseEntity<java.util.Map<String, Double>> matching = controller.previewPromotion("sky20");
-        ResponseEntity<java.util.Map<String, Double>> missing = controller.previewPromotion("OTHER");
+        var authentication = new UsernamePasswordAuthenticationToken("traveler", "unused");
+
+        ResponseEntity<java.util.Map<String, Double>> matching = controller.previewPromotion("sky20", authentication);
+        ResponseEntity<java.util.Map<String, Double>> missing = controller.previewPromotion("OTHER", authentication);
 
         assertEquals(200, matching.getStatusCode().value());
         assertEquals(20.0, matching.getBody().get("discount"));

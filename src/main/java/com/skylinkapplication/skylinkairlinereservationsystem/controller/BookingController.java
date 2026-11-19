@@ -229,12 +229,13 @@ public class BookingController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/promo-preview")
     @ResponseBody
-    public ResponseEntity<Map<String, Double>> previewPromotion(@RequestParam(name = "code") String code) {
+    public ResponseEntity<Map<String, Double>> previewPromotion(@RequestParam(name = "code") String code, Authentication authentication) {
         if (code == null || code.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
         try {
-            double discount = promotionService.findActivePromotion(code)
+            User traveler = authentication == null ? null : userRepository.findByUsername(authentication.getName()).orElse(null);
+            double discount = promotionService.findRedeemablePromotion(code, traveler)
                     .map(PromotionDTO::getDiscount)
                     .orElse(0.0);
             return ResponseEntity.ok(Map.of("discount", discount));

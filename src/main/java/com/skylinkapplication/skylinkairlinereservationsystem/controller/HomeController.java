@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,12 +67,18 @@ public class HomeController {
 					.collect(Collectors.toList());
 			model.addAttribute("topFlights", topFlights);
 
-			// Load top 4 active promotions
-			List<PromotionDTO> topPromotions = promotionService.getAllPromotions().stream()
-					.filter(promo -> {
-						Date now = new Date();
-						return promo.getValidityStart().before(now) && promo.getValidityEnd().after(now);
-					})
+			Long userId = (Long) session.getAttribute("userId");
+			User user = null;
+			if (userId != null) {
+				try {
+					user = authService.getUserById(userId);
+				} catch (RuntimeException e) {
+					logger.warn("Unable to resolve current traveler for promotion display");
+				}
+			}
+			List<PromotionDTO> visiblePromotions = promotionService.getVisiblePromotions(user);
+			// Show only promotions this visitor can redeem.
+			List<PromotionDTO> topPromotions = visiblePromotions.stream()
 					.sorted(Comparator.comparing(PromotionDTO::getDiscount).reversed())
 					.limit(4)
 					.collect(Collectors.toList());
@@ -106,12 +111,10 @@ public class HomeController {
 			model.addAttribute("statUsers", totalUsers);
 
 			// Check for user-specific promotions if logged in
-			Long userId = (Long) session.getAttribute("userId");
 			if (userId != null) {
 				try {
-					User user = authService.getUserById(userId);
-					List<PromotionDTO> userPromotions = topPromotions.stream()
-							.filter(promo -> isSpecialForUser(promo, user))
+					List<PromotionDTO> userPromotions = visiblePromotions.stream()
+							.filter(promo -> promo.getScope() == com.skylinkapplication.skylinkairlinereservationsystem.model.Promotion.Scope.TARGETED)
 							.limit(4)
 							.collect(Collectors.toList());
 
@@ -175,20 +178,4 @@ public class HomeController {
 		return "redirect:/api/user/profile";
 	}
 
-	private boolean isSpecialForUser(PromotionDTO promo, User user) {
-		String criteria = promo.getTargetCriteria().toLowerCase();
-		String userRole = user.getRole().name().toLowerCase();
-
-		if (criteria.contains("frequent") && userRole.contains("frequent_traveler")) {
-			return true;
-		}
-		if (criteria.contains("premium") || criteria.contains("vip")) {
-			return userRole.contains("frequent_traveler");
-		}
-		if (criteria.contains("business") || criteria.contains("first")) {
-			return true;
-		}
-
-		return false;
-	}
 }

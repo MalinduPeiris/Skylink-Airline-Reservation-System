@@ -183,7 +183,7 @@ public class BookingService {
 		Double discount = 0.0;
 
 		if (bookingRequest.getPromoCode() != null && !bookingRequest.getPromoCode().trim().isEmpty()) {
-			var promotion = promotionService.findActivePromotion(bookingRequest.getPromoCode())
+			var promotion = promotionService.findRedeemablePromotion(bookingRequest.getPromoCode(), user)
 					.orElseThrow(() -> new IllegalArgumentException("Promotion code is invalid or not currently active"));
 			discount = baseFlightPrice * (promotion.getDiscount() / 100.0);
 		}

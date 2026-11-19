@@ -2,6 +2,8 @@ package com.skylinkapplication.skylinkairlinereservationsystem.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.Date;
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.List;
 @Entity
 @Data
 public class Promotion {
+    public enum Scope { GENERAL, TARGETED }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,6 +30,14 @@ public class Promotion {
 
     @Column(unique = true, nullable = false)
     private String promoCode;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(length = 16)
+    private Scope scope;
+
+    @Column
+    private Boolean active;
 
     @ManyToMany
     @JoinTable(
