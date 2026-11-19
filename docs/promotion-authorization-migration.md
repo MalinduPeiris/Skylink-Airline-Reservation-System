@@ -5,7 +5,7 @@ The approved model adds nullable `promotion.scope` (`GENERAL` or `TARGETED`) and
 ## Before deployment
 
 1. Schedule a maintenance window and verify database access with the database owner. Stop application writes.
-2. Use a MySQL login path configured interactively outside this repository. Back up the full database, for example `mysqldump --login-path=skylink-backup --single-transaction --routines --triggers --databases skylink > C:\secure-backups\skylink-before-promotion.sql`. Keep the backup outside Git and verify that it can be restored in an isolated environment. Never place a password on a command line or in a tracked file.
+2. Use a MySQL login path configured interactively outside this repository. Confirm the database name from `SKYLINK_DB_URL`, then back it up, for example `mysqldump --login-path=skylink-backup --single-transaction --routines --triggers --databases YOUR_DATABASE_NAME > C:\secure-backups\skylink-before-promotion.sql` (replace `YOUR_DATABASE_NAME` with that confirmed name). Keep the backup outside Git and verify that it can be restored in an isolated environment. Never place a password on a command line or in a tracked file.
 3. Inventory the live schema and data before running DDL: `SHOW CREATE TABLE promotion;`, `SHOW CREATE TABLE promotion_users;`, `SELECT id, promo_code, validity_start, validity_end FROM promotion ORDER BY id;`, and `SELECT promotion_id, COUNT(*) FROM promotion_users GROUP BY promotion_id;`. Compare column names and types to the JPA mappings and review the result with the database owner.
 4. Test the additive DDL against a restored copy. Confirm existing IDs, row counts, and linked-user counts are unchanged.
 
