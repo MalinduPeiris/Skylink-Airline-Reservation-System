@@ -124,7 +124,7 @@
                                 <strong>Booking ID:</strong> <span th:text="${payment.bookingId}"></span><br>
                                 <strong>Amount:</strong> $<span th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}"></span><br>
                                 <strong>Transaction ID:</strong> <span th:text="${payment.transactionId}"></span><br>
-                                <strong>Date:</strong> <span th:text="${#dates.format(payment.transactionDate, 'dd MMM yyyy HH:mm')}"></span>
+                                <strong>Date:</strong> <span th:text="${#dates.format(payment.paymentDate, 'dd MMM yyyy HH:mm')}"></span>
                             </p>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-info btn-sm flex-fill" data-bs-toggle="modal"
@@ -162,7 +162,7 @@
                                               th:text="${payment.status}"></span>
                                     </p>
                                     <p><strong>Transaction ID:</strong> <span th:text="${payment.transactionId}"></span></p>
-                                    <p><strong>Transaction Date:</strong> <span th:text="${#dates.format(payment.transactionDate, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+                                    <p><strong>Transaction Date:</strong> <span th:text="${#dates.format(payment.paymentDate, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
                                 </div>
                                 <div class="modal-footer">
                                     <form th:action="@{/dashboard/it-system-engineer/finance/booking/refund-payment/{paymentId}(paymentId=${payment.id})}" method="post" class="me-auto" th:if="${payment.status == 'COMPLETED'}">
