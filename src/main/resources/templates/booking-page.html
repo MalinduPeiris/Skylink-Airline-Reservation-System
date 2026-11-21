@@ -509,7 +509,7 @@
         }
 
         const extrasSection = reviewSection(container, 'Travel Extras');
-        for (const [label, id] of [['Baggage', 'baggage'], ['Seat Preference', 'seatPref'], ['Meal', 'meal'], ['Assistance', 'assistance']]) {
+        for (const [label, id] of Object.entries({ Baggage: 'baggage', 'Seat Preference': 'seatPref', Meal: 'meal', Assistance: 'assistance' })) {
             const select = document.getElementById(id);
             reviewRow(extrasSection, label, select.selectedOptions[0].textContent);
         }
