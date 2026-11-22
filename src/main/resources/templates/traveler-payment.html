@@ -202,11 +202,15 @@
         paymentError.hidden = false;
         paymentError.focus();
         field?.setAttribute('aria-invalid', 'true');
+        field?.setAttribute('aria-describedby', 'paymentClientError');
         field?.focus();
     }
     for (const form of [document.getElementById('cardPaymentForm'), document.getElementById('walletPaymentForm')]) {
         form?.addEventListener('input', event => {
             event.target.removeAttribute('aria-invalid');
+            if (event.target.getAttribute('aria-describedby') === 'paymentClientError') {
+                event.target.removeAttribute('aria-describedby');
+            }
             paymentError.hidden = true;
         });
         form?.addEventListener('submit', event => {
