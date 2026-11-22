@@ -48,6 +48,7 @@
 <div class="booking-wrap">
     <!-- LEFT COLUMN -->
     <div>
+        <div th:if="${error}" class="alert alert-danger" role="alert" id="bookingError" th:text="${error}"></div>
         <form id="bookingForm" th:action="@{/api/booking/create-with-passengers}" th:object="${bookingRequest}" method="post">
             <input type="hidden" id="flightId" name="flightId" th:value="${flight?.id}">
             <input type="hidden" id="userId" name="userId" th:value="${session.userId}">
@@ -231,6 +232,14 @@
     };
     const userEmail = /*[[${userEmail}]]*/ '';
     const destinationCity = /*[[${destinationCity}]]*/ '';
+    const recoveryValues = /*[[${recoveryValues}]]*/ {};
+    const recoveredExtras = {
+        baggage: /*[[${bookingRequest.baggage}]]*/ null,
+        seatPref: /*[[${bookingRequest.seatPref}]]*/ null,
+        meal: /*[[${bookingRequest.meal}]]*/ null,
+        assistance: /*[[${bookingRequest.assistance}]]*/ null
+    };
+    const recoveredPromoCode = /*[[${bookingRequest.promoCode}]]*/ '';
     let passengerCount = Math.max(1, Math.min(5, parseInt(document.getElementById('passengerCount').value, 10) || 1));
     let bookingExtras = 0;
     let promoDiscount = 0;
@@ -268,8 +277,8 @@
                     <div class="field-group">
                         <label class="field-lbl" for="passenger-${i}-email">Email Address<span class="req">*</span></label>
                         <input type="email" class="field-input" id="passenger-${i}-email" name="passengers[${i}].email" required placeholder="your@email.com">
-                        ${isPrimary ? '<span class="hint-text"><i class="fas fa-info-circle me-1"></i>Pre-filled from your account — editable</span>' : ''}
-                        <span class="invalid-msg">Valid email is required.</span>
+                        ${isPrimary ? `<span class="hint-text" id="passenger-${i}-email-help"><i class="fas fa-info-circle me-1"></i>Must match your signed-in account email.</span>` : ''}
+                        <span class="invalid-msg">${isPrimary ? 'Enter your signed-in account email.' : 'Valid email is required.'}</span>
                     </div>
                     <div class="field-group">
                         <label class="field-lbl" for="passenger-${i}-phone">Phone Number<span class="req">*</span></label>
@@ -301,6 +310,12 @@
             </div>`);
         }
         container.querySelectorAll('input[name]').forEach(input => {
+            const error = input.closest('.field-group')?.querySelector('.invalid-msg');
+            if (error) {
+                error.id = input.id + '-error';
+                input.setAttribute('aria-describedby', `${input.id}-error` +
+                    (input.name === 'passengers[0].email' ? ` ${input.id}-help` : ''));
+            }
             if (passengerValues.has(input.name)) {
                 input.value = passengerValues.get(input.name);
             } else if (input.name === 'passengers[0].email') {
@@ -395,7 +410,9 @@
         const inputs = document.querySelectorAll('#stepPassenger input[required]');
         let firstInvalid = null;
         inputs.forEach(inp => {
-            const invalid = !inp.value.trim() || !inp.checkValidity();
+            const accountEmailMismatch = inp.name === 'passengers[0].email' &&
+                inp.value.trim().toLowerCase() !== userEmail.trim().toLowerCase();
+            const invalid = !inp.value.trim() || !inp.checkValidity() || accountEmailMismatch;
             inp.classList.toggle('is-invalid', invalid);
             inp.setAttribute('aria-invalid', String(invalid));
             if (invalid && !firstInvalid) firstInvalid = inp;
@@ -526,8 +543,18 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        Object.entries(recoveryValues).forEach(([name, value]) => passengerValues.set(name, value));
         document.getElementById('passengerSelect').value = String(passengerCount);
         updatePassengerForms();
+        Object.entries(recoveredExtras).forEach(([id, value]) => {
+            const select = document.getElementById(id);
+            if (value != null && [...select.options].some(option => option.value === value)) select.value = value;
+        });
+        updateExtrasTotal();
+        if (recoveredPromoCode) {
+            document.getElementById('promoCodeInput').value = recoveredPromoCode;
+            applyPromo();
+        }
         renderSummary();
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
             if (!validateStep1(false)) {

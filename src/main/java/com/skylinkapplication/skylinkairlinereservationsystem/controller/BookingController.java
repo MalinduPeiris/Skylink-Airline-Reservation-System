@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
 @Controller
@@ -187,30 +189,37 @@ public class BookingController {
                 destinationCity = flight.getDestination();
             }
 
-            BookingRequestDTO bookingRequest = new BookingRequestDTO();
-            bookingRequest.setFlightId(flight.getId());
-            bookingRequest.setUserId(user.getId());
-            bookingRequest.setPassengerCount(passengers);
+            BookingRequestDTO bookingRequest = model.asMap().get("bookingRequest") instanceof BookingRequestDTO previous
+                    && Objects.equals(previous.getFlightId(), flightId)
+                    && Objects.equals(previous.getPassengerCount(), passengers)
+                    ? previous : null;
+            boolean recovering = bookingRequest != null;
+            if (!recovering) {
+                bookingRequest = new BookingRequestDTO();
+                bookingRequest.setFlightId(flight.getId());
+                bookingRequest.setPassengerCount(passengers);
 
-            List<PassengerDTO> passengerList = new ArrayList<>();
-            for (int i = 0; i < passengers; i++) {
-                PassengerDTO passenger = new PassengerDTO();
-                if (i == 0) {
-                    passenger.setEmail(user.getEmail());
+                List<PassengerDTO> passengerList = new ArrayList<>();
+                for (int i = 0; i < passengers; i++) {
+                    PassengerDTO passenger = new PassengerDTO();
+                    if (i == 0) {
+                        passenger.setEmail(user.getEmail());
+                    }
+                    if (destinationCity != null) {
+                        passenger.setCountry(destinationCity);
+                    }
+                    passengerList.add(passenger);
                 }
-                // Set the destination city for all passengers
-                if (destinationCity != null) {
-                    passenger.setCountry(destinationCity);
-                }
-                passengerList.add(passenger);
+                bookingRequest.setPassengers(passengerList);
             }
-            bookingRequest.setPassengers(passengerList);
+            bookingRequest.setUserId(user.getId());
 
             model.addAttribute("bookingRequest", bookingRequest);
             model.addAttribute("flight", flight);
             model.addAttribute("passengerCount", passengers);
             model.addAttribute("userEmail", user.getEmail());
             model.addAttribute("destinationCity", destinationCity);
+            model.addAttribute("recoveryValues", recovering ? passengerRecoveryValues(bookingRequest) : Map.of());
 
             logger.info("Booking page loaded for user: {} and flight: {}", username, flight.getFlightNumber());
             return "booking-page";
@@ -358,11 +367,36 @@ public class BookingController {
 
             // Redirect back to booking page with error
             if (bookingRequest.getFlightId() != null) {
+                redirectAttributes.addFlashAttribute("bookingRequest", bookingRequest);
                 return "redirect:/api/booking/page?flightId=" + bookingRequest.getFlightId() +
                         "&passengers=" + (bookingRequest.getPassengerCount() != null ? bookingRequest.getPassengerCount() : 1);
             }
             return "redirect:/api/flight/all";
         }
+    }
+
+    private Map<String, String> passengerRecoveryValues(BookingRequestDTO request) {
+        Map<String, String> values = new LinkedHashMap<>();
+        if (request.getPassengers() == null) return values;
+        for (int i = 0; i < request.getPassengers().size(); i++) {
+            PassengerDTO passenger = request.getPassengers().get(i);
+            if (passenger == null) continue;
+            String prefix = "passengers[" + i + "].";
+            values.put(prefix + "firstName", Objects.toString(passenger.getFirstName(), ""));
+            values.put(prefix + "lastName", Objects.toString(passenger.getLastName(), ""));
+            values.put(prefix + "email", Objects.toString(passenger.getEmail(), ""));
+            values.put(prefix + "phone", Objects.toString(passenger.getPhone(), ""));
+            values.put(prefix + "dateOfBirth", recoveryDate(passenger.getDateOfBirth()));
+            values.put(prefix + "country", Objects.toString(passenger.getCountry(), ""));
+            values.put(prefix + "passportNumber", Objects.toString(passenger.getPassportNumber(), ""));
+            values.put(prefix + "passportExpiry", recoveryDate(passenger.getPassportExpiry()));
+        }
+        return values;
+    }
+
+    private String recoveryDate(Date date) {
+        return date == null ? "" : DateTimeFormatter.ISO_LOCAL_DATE.format(
+                date.toInstant().atZone(ZoneId.of("Asia/Colombo")).toLocalDate());
     }
 
     /**

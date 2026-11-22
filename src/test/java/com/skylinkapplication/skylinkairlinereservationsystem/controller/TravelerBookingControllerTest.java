@@ -119,6 +119,59 @@ class TravelerBookingControllerTest {
         assertEquals(1, submitted.getValue().getPassengers().size());
     }
 
+    @Test
+    void failedSubmissionKeepsPassengerAndExtraSelectionsForRedirect() {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("traveler", "unused"));
+        when(userRepository.findByUsername("traveler")).thenReturn(Optional.of(user()));
+        BookingRequestDTO request = new BookingRequestDTO();
+        request.setFlightId(20L);
+        request.setPassengerCount(2);
+        request.setBaggage("5000");
+        PassengerDTO passenger = new PassengerDTO();
+        passenger.setEmail("different@example.invalid");
+        request.setPassengers(List.of(passenger, new PassengerDTO()));
+        when(bookingService.createBookingWithPassengers(request))
+                .thenThrow(new IllegalArgumentException("Primary passenger email must match logged-in user email"));
+        RedirectAttributesModelMap flash = new RedirectAttributesModelMap();
+
+        assertEquals("redirect:/api/booking/page?flightId=20&passengers=2",
+                controller.createBookingWithPassengers(request, flash));
+        assertSame(request, flash.getFlashAttributes().get("bookingRequest"));
+        assertTrue(flash.getFlashAttributes().get("error").toString().contains("Primary passenger email"));
+    }
+
+    @Test
+    void bookingPageRestoresFlashedPassengerValuesAndExtras() {
+        User user = user();
+        Flight flight = new Flight();
+        flight.setId(20L);
+        flight.setSeatsAvailable(5);
+        when(userRepository.findByUsername("traveler")).thenReturn(Optional.of(user));
+        when(flightRepository.findById(20L)).thenReturn(Optional.of(flight));
+        BookingRequestDTO previous = new BookingRequestDTO();
+        previous.setFlightId(20L);
+        previous.setPassengerCount(1);
+        previous.setBaggage("5000");
+        PassengerDTO passenger = new PassengerDTO();
+        passenger.setFirstName("Ava");
+        passenger.setEmail("different@example.invalid");
+        passenger.setDateOfBirth(new Date(946684800000L));
+        previous.setPassengers(List.of(passenger));
+        ExtendedModelMap model = new ExtendedModelMap();
+        model.addAttribute("bookingRequest", previous);
+
+        assertEquals("booking-page", controller.showBookingPage(20L, 1, null, model,
+                new UsernamePasswordAuthenticationToken("traveler", "unused")));
+        assertSame(previous, model.get("bookingRequest"));
+        assertEquals("5000", ((BookingRequestDTO) model.get("bookingRequest")).getBaggage());
+        @SuppressWarnings("unchecked")
+        java.util.Map<String, String> values = (java.util.Map<String, String>) model.get("recoveryValues");
+        assertEquals("Ava", values.get("passengers[0].firstName"));
+        assertEquals("different@example.invalid", values.get("passengers[0].email"));
+        assertEquals("2000-01-01", values.get("passengers[0].dateOfBirth"));
+    }
+
     private static User user() {
         User user = new User();
         user.setId(10L);
