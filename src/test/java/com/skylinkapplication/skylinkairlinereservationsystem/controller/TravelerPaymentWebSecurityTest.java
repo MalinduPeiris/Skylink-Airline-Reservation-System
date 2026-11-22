@@ -71,6 +71,10 @@ class TravelerPaymentWebSecurityTest {
         mvc.perform(get("/api/payment/manage"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("TXN-TEST")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Payment #")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Payment #")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Amount:</strong> Rs.")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Amount (Rs.)")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        org.hamcrest.Matchers.containsString("Amount ($)"))));
     }
 }
