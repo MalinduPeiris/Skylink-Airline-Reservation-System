@@ -69,7 +69,7 @@
         @keyframes fade-up{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 
         .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;animation:fade-up .5s ease;}
-        .page-title{font-family:var(--font-display);font-size:30px;font-weight:700;letter-spacing:2px;color:var(--text-primary);}
+        .page-title{font-family:var(--font-display);font-size:30px;font-weight:700;letter-spacing:2px;color:var(--text-primary);margin:0;}
         .page-title span{color:var(--accent-cyan);}
         .page-breadcrumb{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;margin-top:6px;}
         .page-breadcrumb span{color:var(--accent-cyan);}
@@ -255,7 +255,7 @@
 
         <div class="page-header">
             <div>
-                <div class="page-title">PROMOTION <span>MANAGEMENT</span></div>
+                <h1 class="page-title">PROMOTION <span>MANAGEMENT</span></h1>
                 <div class="page-breadcrumb">SKYLINK / <span>PROMOTIONS</span></div>
             </div>
         </div>
@@ -353,28 +353,28 @@
                                 <small>New promotions remain inactive until eligibility is reviewed.</small>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Promotion Name / Target Criteria</label>
-                                <input type="text" class="form-control" name="targetCriteria" placeholder="e.g. FREQUENT_FLYERS" required>
+                                <label class="form-label" for="targetCriteria">Promotion Name / Target Criteria</label>
+                                <input type="text" class="form-control" id="targetCriteria" name="targetCriteria" placeholder="e.g. FREQUENT_FLYERS" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Promo Code</label>
-                                <input type="text" class="form-control" name="promoCode" placeholder="e.g. FLY20" style="text-transform:uppercase;" required>
+                                <label class="form-label" for="promoCode">Promo Code</label>
+                                <input type="text" class="form-control" id="promoCode" name="promoCode" placeholder="e.g. FLY20" style="text-transform:uppercase;" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Discount Percentage</label>
+                                <label class="form-label" for="discount">Discount Percentage</label>
                                 <div class="input-group-pct">
-                                    <input type="number" class="form-control" name="discount" min="0" max="100" step="0.01" placeholder="e.g. 20" required>
+                                    <input type="number" class="form-control" id="discount" name="discount" min="0" max="100" step="0.01" placeholder="e.g. 20" required>
                                     <div class="pct-label">%</div>
                                 </div>
                             </div>
                             <div class="row g-3 mb-3">
                                 <div class="col-6">
-                                    <label class="form-label">Start Date</label>
-                                    <input type="date" class="form-control" name="validityStart" required>
+                                    <label class="form-label" for="validityStart">Start Date</label>
+                                    <input type="date" class="form-control" id="validityStart" name="validityStart" required>
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label">End Date</label>
-                                    <input type="date" class="form-control" name="validityEnd" required>
+                                    <label class="form-label" for="validityEnd">End Date</label>
+                                    <input type="date" class="form-control" id="validityEnd" name="validityEnd" required>
                                 </div>
                             </div>
                             <div class="form-actions">

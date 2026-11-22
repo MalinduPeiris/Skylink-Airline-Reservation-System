@@ -98,7 +98,11 @@ class PromotionEligibilityWebSecurityTest {
         promotion.setEligibleUserIds(List.of());
         when(service.getAllPromotions()).thenReturn(List.of(promotion));
         when(service.getPromotionById(19L)).thenReturn(promotion);
-        mvc.perform(get("/api/marketing/promotions")).andExpect(status().isOk());
+        mvc.perform(get("/api/marketing/promotions"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("<h1 class=\"page-title\">")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("for=\"promoCode\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"promoCode\"")));
         mvc.perform(get("/api/marketing/promotion/19")).andExpect(status().isOk());
     }
 
