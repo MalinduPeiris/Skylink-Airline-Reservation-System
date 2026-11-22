@@ -176,6 +176,30 @@
         ::-webkit-scrollbar{width:5px;}
         ::-webkit-scrollbar-track{background:var(--bg-void);}
         ::-webkit-scrollbar-thumb{background:var(--border-dim);border-radius:3px;}
+        @media (max-width: 767px) {
+            .topbar { height:auto; min-height:64px; padding:8px 12px; gap:8px; }
+            .brand-sub, .sys-status { display:none; }
+            .topbar-right { gap:4px; }
+            .user-chip { padding:5px 8px 5px 5px; }
+            .layout { display:block; }
+            .sidebar { position:static; width:100%; height:auto; padding:8px; overflow:visible; }
+            .sidebar-label { display:none; }
+            .sidebar-section { display:flex; flex-wrap:nowrap; gap:4px; padding:0; overflow-x:auto; }
+            .nav-link-custom { flex:none; white-space:nowrap; margin:0; }
+            .main { width:100%; min-width:0; padding:18px 12px; overflow-x:visible; }
+            .page-header { flex-wrap:wrap; gap:12px; }
+            .page-title { font-size:24px; }
+            .metrics-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+            .metric-card { min-width:0; padding:14px; }
+            .form-panel { position:static; }
+            .promo-list { max-height:none; }
+            .promo-card { min-width:0; padding:14px; }
+            .promo-actions { flex-wrap:wrap; }
+        }
+        @media (max-width: 375px) {
+            .metrics-grid { grid-template-columns:minmax(0,1fr); }
+            .user-name, .user-role { display:none; }
+        }
     </style>
 </head>
 <body th:with="detailPath=${baseUrl == '/dashboard/it-system-engineer' ? '/promotions/' : '/promotion/'}">
