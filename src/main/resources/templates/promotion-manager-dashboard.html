@@ -247,8 +247,8 @@
             <div class="metric-card green">
                 <div class="metric-icon"><i class="fas fa-check-circle"></i></div>
                 <div class="metric-label">Active Campaigns</div>
-                <div class="metric-value" th:text="${promotions != null ? promotions.size() : 0}">0</div>
-                <div class="metric-sub"><i class="fas fa-play"></i> Currently Running</div>
+                <div class="metric-value" th:text="${promotions == null ? 0 : promotions.?[availabilityLabel == 'AVAILABLE'].size()}">0</div>
+                <div class="metric-sub"><i class="fas fa-play"></i> Available for redemption</div>
             </div>
             <div class="metric-card amber">
                 <div class="metric-icon"><i class="fas fa-percent"></i></div>
@@ -269,7 +269,7 @@
             <div class="col-lg-6">
                 <div class="d-flex align-items-center justify-content-between mb-16" style="margin-bottom:16px;">
                     <div style="font-family:var(--font-display);font-size:15px;font-weight:600;letter-spacing:1px;color:var(--text-secondary);text-transform:uppercase;">Current Promotions</div>
-                    <div class="count-chip" th:text="${promotions != null ? promotions.size() + ' active' : '0 active'}">0 active</div>
+                    <div class="count-chip" th:text="${promotions != null ? promotions.size() + ' total' : '0 total'}">0 total</div>
                 </div>
 
                 <div class="promo-list">

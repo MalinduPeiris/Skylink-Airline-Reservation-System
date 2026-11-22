@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -24,6 +26,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @WebMvcTest(PromotionController.class)
 @Import(SecurityConfig.class)
@@ -97,5 +100,35 @@ class PromotionEligibilityWebSecurityTest {
         when(service.getPromotionById(19L)).thenReturn(promotion);
         mvc.perform(get("/api/marketing/promotions")).andExpect(status().isOk());
         mvc.perform(get("/api/marketing/promotion/19")).andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "marketing", roles = "MARKETING_EXECUTIVE")
+    void marketingDashboardCountsOnlyRedeemableCampaignsAsActive() throws Exception {
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Colombo"));
+        PromotionDTO available = promotion(1L, Promotion.Scope.GENERAL, true, today.minusDays(1), today);
+        PromotionDTO expired = promotion(2L, Promotion.Scope.GENERAL, true, today.minusDays(3), today.minusDays(1));
+        PromotionDTO unclassified = promotion(3L, null, true, today.minusDays(1), today.plusDays(1));
+        when(service.getAllPromotions()).thenReturn(List.of(available, expired, unclassified));
+
+        mvc.perform(get("/api/marketing/promotions"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "<div class=\"metric-value\">1</div>")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("3 total")));
+    }
+
+    private static PromotionDTO promotion(Long id, Promotion.Scope scope, boolean active,
+                                          LocalDate start, LocalDate end) {
+        PromotionDTO dto = new PromotionDTO();
+        dto.setId(id);
+        dto.setPromoCode("TEST" + id);
+        dto.setDiscount(10.0);
+        dto.setTargetCriteria("Synthetic promotion");
+        dto.setScope(scope);
+        dto.setActive(active);
+        dto.setValidityStart(Date.from(start.atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant()));
+        dto.setValidityEnd(Date.from(end.atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant()));
+        return dto;
     }
 }
