@@ -109,13 +109,18 @@ class PromotionEligibilityWebSecurityTest {
         PromotionDTO available = promotion(1L, Promotion.Scope.GENERAL, true, today.minusDays(1), today);
         PromotionDTO expired = promotion(2L, Promotion.Scope.GENERAL, true, today.minusDays(3), today.minusDays(1));
         PromotionDTO unclassified = promotion(3L, null, true, today.minusDays(1), today.plusDays(1));
+        available.setDiscount(20.0);
+        expired.setDiscount(90.0);
         when(service.getAllPromotions()).thenReturn(List.of(available, expired, unclassified));
 
         mvc.perform(get("/api/marketing/promotions"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(
                         "<div class=\"metric-value\">1</div>")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("3 total")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("3 total")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("20.0%")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        org.hamcrest.Matchers.containsString("Expiring Soon"))));
     }
 
     private static PromotionDTO promotion(Long id, Promotion.Scope scope, boolean active,
