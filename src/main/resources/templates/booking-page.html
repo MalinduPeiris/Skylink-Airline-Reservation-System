@@ -48,6 +48,10 @@
 <div class="booking-wrap">
     <!-- LEFT COLUMN -->
     <div>
+        <header class="booking-intro">
+            <h1>Complete your booking</h1>
+            <p>Enter passenger details, choose travel extras, and review your fare before payment.</p>
+        </header>
         <div th:if="${error}" class="alert alert-danger" role="alert" id="bookingError" th:text="${error}"></div>
         <form id="bookingForm" th:action="@{/api/booking/create-with-passengers}" th:object="${bookingRequest}" method="post">
             <input type="hidden" id="flightId" name="flightId" th:value="${flight?.id}">
@@ -202,13 +206,13 @@
             </div>
             <!-- PROMO -->
             <div class="promo-wrap">
-                <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;"><i class="fas fa-tag me-2" style="color:var(--gold);"></i>Apply Promo Code</div>
+                <label for="promoCodeInput" class="promo-label"><i class="fas fa-tag me-2" style="color:var(--gold);"></i>Apply Promo Code</label>
                 <div class="promo-input-row">
-                    <input type="text" class="promo-input" id="promoCodeInput" placeholder="Enter promotion code">
+                    <input type="text" class="promo-input" id="promoCodeInput" placeholder="Enter promotion code" aria-describedby="promoHelp promoFeedback">
                     <button type="button" class="btn-promo" onclick="applyPromo()">Apply</button>
                 </div>
-                <div id="promoFeedback" class="mt-2 d-none" style="font-size:12.5px;font-weight:600;"></div>
-                <div style="margin-top:10px;font-size:11.5px;color:var(--text-light);">Enter a promotion code to preview its discount.</div>
+                <div id="promoFeedback" class="mt-2 d-none" style="font-size:12.5px;font-weight:600;" aria-live="polite"></div>
+                <div id="promoHelp" style="margin-top:10px;font-size:11.5px;color:var(--text-light);">Enter a promotion code to preview its discount.</div>
             </div>
             <div class="trust-badges">
                 <div class="trust-item"><i class="fas fa-lock"></i> Secure payment</div>

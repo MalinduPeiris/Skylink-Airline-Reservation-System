@@ -24,6 +24,11 @@ body.booking-page {
 .booking-page *::before,
 .booking-page *::after { box-sizing: border-box; }
 
+.booking-page .booking-intro { margin-bottom: 22px; }
+.booking-page .booking-intro h1 { margin: 0 0 6px; color: var(--navy); font-size: clamp(24px, 3vw, 34px); font-weight: 800; letter-spacing: -.03em; }
+.booking-page .booking-intro p { margin: 0; color: var(--text-light); }
+.booking-page .promo-label { display: block; margin-bottom: 10px; color: var(--navy); font-size: 13px; font-weight: 700; }
+
 .booking-page .navbar {
     position: sticky;
     top: 0;

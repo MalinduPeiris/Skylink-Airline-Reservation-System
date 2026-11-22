@@ -83,6 +83,34 @@ class TravelerPaymentSecurityTest {
     }
 
     @Test
+    void existingPendingPaymentRedirectUsesPendingWording() {
+        BookingDTO booking = ownBooking();
+        booking.setPaymentId(40L);
+        when(bookingService.getBookingById(30L)).thenReturn(booking);
+        when(userRepository.findByUsername("traveler")).thenReturn(Optional.of(currentUser()));
+        PaymentDTO existing = new PaymentDTO();
+        existing.setStatus("PENDING");
+        when(paymentService.getPaymentById(40L)).thenReturn(existing);
+
+        assertEquals("redirect:/api/user/profile?message=Payment+is+pending+finance+review",
+                controller.showPaymentPage(30L, new ExtendedModelMap()));
+    }
+
+    @Test
+    void existingCompletedPaymentRedirectUsesCompletedWording() {
+        BookingDTO booking = ownBooking();
+        booking.setPaymentId(40L);
+        when(bookingService.getBookingById(30L)).thenReturn(booking);
+        when(userRepository.findByUsername("traveler")).thenReturn(Optional.of(currentUser()));
+        PaymentDTO existing = new PaymentDTO();
+        existing.setStatus("COMPLETED");
+        when(paymentService.getPaymentById(40L)).thenReturn(existing);
+
+        assertEquals("redirect:/api/user/profile?message=Payment+already+completed",
+                controller.showPaymentPage(30L, new ExtendedModelMap()));
+    }
+
+    @Test
     void ownerSubmissionRedirectsWithPendingPaymentDetails() {
         when(bookingService.getBookingById(30L)).thenReturn(ownBooking());
         when(userRepository.findByUsername("traveler")).thenReturn(Optional.of(currentUser()));

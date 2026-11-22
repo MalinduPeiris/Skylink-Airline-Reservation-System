@@ -247,7 +247,16 @@ public class PaymentController {
             // Check if payment already exists
             if (booking.getPaymentId() != null) {
                 logger.warn("Payment already exists for booking ID: {}", bookingId);
-                return "redirect:/api/user/profile?message=Payment already completed";
+                PaymentDTO existingPayment = paymentService.getPaymentById(booking.getPaymentId());
+                String message = switch (existingPayment.getStatus() == null ? "" : existingPayment.getStatus()) {
+                    case "PENDING" -> "Payment is pending finance review";
+                    case "COMPLETED" -> "Payment already completed";
+                    case "FAILED" -> "Payment was rejected";
+                    case "REFUNDED" -> "Payment was refunded";
+                    default -> "Payment already submitted";
+                };
+                return "redirect:/api/user/profile?message=" +
+                        java.net.URLEncoder.encode(message, java.nio.charset.StandardCharsets.UTF_8);
             }
 
             // Calculate total with taxes
