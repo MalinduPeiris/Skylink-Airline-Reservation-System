@@ -158,6 +158,26 @@
     .btn-modal-secondary:hover{background:#f8fafc;border-color:var(--text-3);color:var(--text);}
 
     ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+    @media (max-width: 767px) {
+      .topbar { height:auto; min-height:60px; padding:8px 12px; gap:8px; }
+      .brand-sub, .sys-pill { display:none; }
+      .topbar-right { gap:4px; }
+      .user-chip { padding:5px 8px 5px 5px; }
+      .layout { display:block; }
+      .sidebar { position:static; width:100%; height:auto; padding:8px; overflow:visible; }
+      .sidebar-label { display:none; }
+      .sidebar-section { display:flex; flex-wrap:nowrap; gap:4px; padding:0; overflow-x:auto; }
+      .nav-item { flex:none; white-space:nowrap; margin:0; }
+      .main { width:100%; min-width:0; padding:18px 12px; overflow-x:visible; }
+      .page-header { flex-wrap:wrap; gap:12px; }
+      .page-title { font-size:23px; }
+      .cards-grid { grid-template-columns:minmax(0,1fr); }
+      .payment-card { min-width:0; padding:16px; }
+      .cf-val { overflow-wrap:anywhere; text-align:right; }
+    }
+    @media (max-width: 375px) {
+      .user-name, .user-role { display:none; }
+    }
   </style>
 </head>
 <body>

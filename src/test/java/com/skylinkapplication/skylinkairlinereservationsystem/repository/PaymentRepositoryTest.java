@@ -4,17 +4,26 @@ import com.skylinkapplication.skylinkairlinereservationsystem.model.Booking;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.Flight;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.Payment;
 import com.skylinkapplication.skylinkairlinereservationsystem.model.User;
+import com.skylinkapplication.skylinkairlinereservationsystem.model.Role;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@DataJpaTest(properties = {
+    "spring.datasource.url=jdbc:h2:mem:payment_repository_test;MODE=MySQL;NON_KEYWORDS=USER",
+    "spring.datasource.driver-class-name=org.h2.Driver",
+    "spring.datasource.username=sa",
+    "spring.datasource.password=",
+    "spring.jpa.hibernate.ddl-auto=create-drop"
+})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class PaymentRepositoryTest {
 
     @Autowired
@@ -33,6 +42,7 @@ class PaymentRepositoryTest {
         user.setUsername("testuser");
         user.setEmail("test@example.com");
         user.setPassword("password");
+        user.setRole(Role.FREQUENT_TRAVELER);
         entityManager.persistAndFlush(user);
 
         // Create a flight
@@ -56,7 +66,17 @@ class PaymentRepositoryTest {
         booking.setPassengers(2);
         booking.setBookingDate(new Date());
         booking.setTotalPrice(2000.0);
+        booking.setStatus(Booking.Status.PENDING);
         entityManager.persistAndFlush(booking);
+
+        Booking secondBooking = new Booking();
+        secondBooking.setUser(user);
+        secondBooking.setFlight(flight);
+        secondBooking.setPassengers(1);
+        secondBooking.setBookingDate(new Date());
+        secondBooking.setTotalPrice(1000.0);
+        secondBooking.setStatus(Booking.Status.PENDING);
+        entityManager.persistAndFlush(secondBooking);
 
         // Create payments
         Payment payment1 = new Payment();
@@ -69,7 +89,7 @@ class PaymentRepositoryTest {
         entityManager.persistAndFlush(payment1);
 
         Payment payment2 = new Payment();
-        payment2.setBooking(booking);
+        payment2.setBooking(secondBooking);
         payment2.setAmount(500.0);
         payment2.setPaymentDate(new Date());
         payment2.setStatus(Payment.Status.FAILED);

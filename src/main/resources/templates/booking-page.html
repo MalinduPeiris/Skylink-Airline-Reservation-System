@@ -9,145 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --navy: #001845;
-            --navy-mid: #0033a0;
-            --blue: #0057d9;
-            --gold: #e8a820;
-            --gold-light: #f5c842;
-            --off-white: #f4f6fb;
-            --text-dark: #0d1b3e;
-            --text-light: #6b7a99;
-            --green: #16a34a;
-            --red: #dc2626;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Inter',system-ui,-apple-system,sans-serif; background:var(--off-white); color:var(--text-dark); }
-
-        /* NAV */
-        nav { background:linear-gradient(135deg,var(--navy),var(--navy-mid) 60%,var(--blue)); position:sticky; top:0; z-index:1000; box-shadow:0 4px 24px rgba(0,0,0,0.18); }
-        .navbar-brand { font-family:'Inter',system-ui,sans-serif; font-size:24px; font-weight:800; color:white !important; letter-spacing:2px; }
-        .navbar-brand span { color:var(--gold); }
-        .nav-link-custom { color:rgba(255,255,255,0.85); font-size:14px; font-weight:500; padding:8px 14px; border-radius:6px; transition:all 0.25s; text-decoration:none; }
-        .nav-link-custom:hover { color:var(--gold-light); background:rgba(255,255,255,0.08); }
-
-        /* STEP INDICATOR */
-        .step-bar { background:white; border-bottom:1px solid #eef1fb; padding:20px 0; position:sticky; top:0; z-index:100; box-shadow:0 2px 12px rgba(0,24,69,0.06); }
-        .step-inner { display:flex; align-items:center; max-width:700px; margin:0 auto; padding:0 24px; }
-        .step-item { display:flex; align-items:center; gap:10px; }
-        .step-circle { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; transition:all 0.3s; }
-        .step-circle.active { background:linear-gradient(135deg,var(--blue),var(--navy-mid)); color:white; box-shadow:0 4px 12px rgba(0,87,217,0.35); }
-        .step-circle.done { background:var(--green); color:white; }
-        .step-circle.inactive { background:#eef1fb; color:var(--text-light); }
-        .step-label { font-size:13.5px; font-weight:600; }
-        .step-label.active { color:var(--navy); }
-        .step-label.done { color:var(--green); }
-        .step-label.inactive { color:var(--text-light); }
-        .step-connector { flex:1; height:2px; margin:0 16px; border-radius:2px; transition:background 0.3s; }
-        .step-connector.done { background:var(--green); }
-        .step-connector.inactive { background:#eef1fb; }
-
-        /* LAYOUT */
-        .booking-wrap { max-width:1200px; margin:0 auto; padding:40px 24px 80px; display:grid; grid-template-columns:1fr 380px; gap:32px; }
-        @media(max-width:960px) { .booking-wrap { grid-template-columns:1fr; } }
-
-        /* CARDS */
-        .bk-card { background:white; border-radius:16px; box-shadow:0 4px 20px rgba(0,24,69,0.08); border:1px solid #eef1fb; margin-bottom:20px; overflow:hidden; }
-        .bk-card-header { padding:20px 28px; border-bottom:1px solid #eef1fb; display:flex; align-items:center; gap:12px; }
-        .bk-card-header-icon { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--blue),var(--navy-mid)); display:flex; align-items:center; justify-content:center; color:white; font-size:14px; flex-shrink:0; }
-        .bk-card-header h5 { font-family:'Inter',system-ui,sans-serif; font-size:17px; font-weight:700; color:var(--navy); margin:0; }
-        .bk-card-body { padding:28px; }
-
-        /* PASSENGER FORM */
-        .pax-card { border:1.5px solid #eef1fb; border-radius:12px; padding:24px; margin-bottom:16px; background:#fafbff; transition:border-color 0.2s; }
-        .pax-card:hover { border-color:#c5d5f7; }
-        .pax-card-title { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
-        .pax-name { font-weight:700; font-size:15px; color:var(--navy); }
-        .pax-badge { background:linear-gradient(135deg,var(--navy),var(--blue)); color:white; font-size:11px; padding:3px 10px; border-radius:50px; font-weight:600; }
-        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-        .form-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px; }
-        @media(max-width:640px) { .form-grid { grid-template-columns:1fr; } .form-grid-3 { grid-template-columns:1fr 1fr; } }
-        .field-group { display:flex; flex-direction:column; }
-        .field-group.full { grid-column:1/-1; }
-        .field-lbl { font-size:12px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.7px; margin-bottom:7px; }
-        .field-lbl .req { color:var(--red); margin-left:2px; }
-        .field-input { padding:12px 14px; border:1.5px solid #e2e7f4; border-radius:10px; font-size:14px; color:var(--text-dark); font-family:'Inter',system-ui,sans-serif; transition:all 0.2s; background:white; }
-        .field-input:focus { border-color:var(--blue); outline:none; box-shadow:0 0 0 4px rgba(0,87,217,0.08); }
-        .field-input.is-invalid { border-color:var(--red); }
-        .field-input.is-invalid ~ .invalid-msg { display:block; }
-        .invalid-msg { display:none; font-size:12px; color:var(--red); margin-top:5px; }
-        .hint-text { font-size:11.5px; color:var(--text-light); margin-top:5px; }
-
-        /* EXTRAS */
-        .extras-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-        @media(max-width:640px) { .extras-grid { grid-template-columns:1fr; } }
-        .extra-card { border:1.5px solid #eef1fb; border-radius:12px; padding:18px; background:#fafbff; transition:all 0.2s; }
-        .extra-card:hover { border-color:#c5d5f7; background:white; }
-        .extra-label { font-size:13px; font-weight:700; color:var(--navy); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
-        .extra-label i { color:var(--blue); }
-        .extra-select { width:100%; padding:10px 14px; border:1.5px solid #e2e7f4; border-radius:8px; font-size:13.5px; color:var(--text-dark); font-family:'Inter',system-ui,sans-serif; background:white; transition:border-color 0.2s; }
-        .extra-select:focus { border-color:var(--blue); outline:none; }
-
-        /* EXTRAS SUMMARY */
-        .extras-summary { background:#f0f6ff; border:1px solid #cce0ff; border-radius:12px; padding:18px; margin-top:20px; }
-        .extras-row { display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:8px; color:var(--text-light); }
-        .extras-row strong { color:var(--text-dark); }
-        .extras-total-row { display:flex; justify-content:space-between; font-size:15px; font-weight:700; color:var(--navy); padding-top:12px; border-top:1px solid #c5d5f7; }
-
-        /* REVIEW */
-        .review-section { margin-bottom:20px; }
-        .review-section-title { font-size:13px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid #eef1fb; }
-        .review-row { display:flex; justify-content:space-between; font-size:14px; padding:8px 0; border-bottom:1px dotted #f0f2fa; }
-        .review-row:last-child { border-bottom:none; }
-        .review-row .label { color:var(--text-light); }
-        .review-row .value { font-weight:600; color:var(--text-dark); text-align:right; }
-
-        /* SIDEBAR SUMMARY CARD */
-        .summary-card { background:white; border-radius:16px; box-shadow:0 4px 20px rgba(0,24,69,0.08); border:1px solid #eef1fb; position:sticky; top:140px; max-height:calc(100vh - 160px); overflow-y:auto; overflow-x:hidden; }
-        .summary-header { background:linear-gradient(135deg,var(--navy),var(--blue)); color:white; padding:22px 24px; }
-        .summary-header h5 { font-family:'Inter',system-ui,sans-serif; font-size:17px; font-weight:700; margin:0 0 4px; }
-        .summary-header p { font-size:13px; opacity:0.75; margin:0; }
-        .summary-body { padding:24px; }
-        .summary-flight-route { text-align:center; padding:16px 0; margin-bottom:16px; border-bottom:1px solid #eef1fb; }
-        .summary-route-label { font-family:'Inter',system-ui,sans-serif; font-size:22px; font-weight:700; color:var(--navy); }
-        .summary-route-sub { font-size:12.5px; color:var(--text-light); margin-top:4px; }
-        .summary-detail { display:flex; justify-content:space-between; font-size:13.5px; padding:8px 0; border-bottom:1px dotted #f4f6fb; }
-        .summary-detail .s-label { color:var(--text-light); }
-        .summary-detail .s-value { font-weight:600; color:var(--text-dark); }
-        .summary-price-block { background:linear-gradient(135deg,#f0f6ff,#e8f0ff); border-radius:12px; padding:18px; margin-top:16px; text-align:center; }
-        .total-label { font-size:12px; color:var(--text-light); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
-        .total-amount { font-family:'Inter',system-ui,sans-serif; font-size:32px; font-weight:800; color:var(--navy); }
-        .total-sub { font-size:12px; color:var(--text-light); margin-top:4px; }
-
-        /* PROMO */
-        .promo-wrap { padding:0 24px 20px; }
-        .promo-input-row { display:flex; gap:8px; }
-        .promo-input { flex:1; padding:11px 14px; border:1.5px solid #e2e7f4; border-radius:10px; font-size:13.5px; font-family:'Inter',system-ui,sans-serif; }
-        .promo-input:focus { border-color:var(--blue); outline:none; }
-        .btn-promo { background:linear-gradient(135deg,var(--navy),var(--blue)); color:white; border:none; padding:11px 20px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; transition:all 0.25s; white-space:nowrap; }
-        .btn-promo:hover { transform:translateY(-1px); }
-
-        /* ACTION BUTTONS */
-        .step-actions { display:flex; justify-content:space-between; align-items:center; padding:20px 28px; border-top:1px solid #eef1fb; background:#fafbff; }
-        .btn-back { background:transparent; border:1.5px solid #e2e7f4; color:var(--text-light); padding:12px 24px; border-radius:10px; font-weight:600; font-size:14px; cursor:pointer; transition:all 0.2s; }
-        .btn-back:hover { border-color:var(--text-dark); color:var(--text-dark); }
-        .btn-next { background:linear-gradient(135deg,var(--blue),var(--navy-mid)); color:white; border:none; padding:13px 32px; border-radius:10px; font-weight:700; font-size:14.5px; cursor:pointer; transition:all 0.25s; display:flex; align-items:center; gap:8px; }
-        .btn-next:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,87,217,0.35); }
-        .btn-confirm { background:linear-gradient(135deg,var(--green),#15803d); color:white; border:none; padding:13px 32px; border-radius:10px; font-weight:700; font-size:14.5px; cursor:pointer; transition:all 0.25s; display:flex; align-items:center; gap:8px; }
-        .btn-confirm:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(22,163,74,0.35); }
-
-        /* TRUST BADGES */
-        .trust-badges { display:flex; gap:12px; padding:16px 24px; border-top:1px solid #eef1fb; flex-wrap:wrap; }
-        .trust-item { display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-light); }
-        .trust-item i { color:var(--green); }
-
-        .pax-count-selector { display:flex; align-items:center; gap:16px; }
-        .pax-count-selector label { font-size:14px; font-weight:600; color:var(--navy); }
-        .pax-count-select { padding:10px 18px; border:1.5px solid #e2e7f4; border-radius:10px; font-size:14px; font-family:'Inter',system-ui,sans-serif; color:var(--text-dark); background:white; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/booking-page.css}" href="/css/booking-page.css">
 </head>
-<body>
+<body class="booking-page">
 
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark">
@@ -184,6 +48,11 @@
 <div class="booking-wrap">
     <!-- LEFT COLUMN -->
     <div>
+        <header class="booking-intro">
+            <h1>Complete your booking</h1>
+            <p>Enter passenger details, choose travel extras, and review your fare before payment.</p>
+        </header>
+        <div th:if="${error}" class="alert alert-danger" role="alert" id="bookingError" th:text="${error}"></div>
         <form id="bookingForm" th:action="@{/api/booking/create-with-passengers}" th:object="${bookingRequest}" method="post">
             <input type="hidden" id="flightId" name="flightId" th:value="${flight?.id}">
             <input type="hidden" id="userId" name="userId" th:value="${session.userId}">
@@ -199,7 +68,7 @@
                 <div class="bk-card mb-4">
                     <div class="bk-card-body">
                         <div class="pax-count-selector">
-                            <label><i class="fas fa-users me-2" style="color:var(--blue);"></i>Number of Passengers</label>
+                            <label for="passengerSelect"><i class="fas fa-users me-2" style="color:var(--blue);"></i>Number of Passengers</label>
                             <select class="pax-count-select" id="passengerSelect" onchange="updatePassengerForms()">
                                 <option value="1">1 Passenger</option>
                                 <option value="2">2 Passengers</option>
@@ -235,7 +104,7 @@
                         <p style="font-size:14px;color:var(--text-light);margin-bottom:24px;">Enhance your journey with these optional add-ons. Prices shown are per passenger.</p>
                         <div class="extras-grid">
                             <div class="extra-card">
-                                <div class="extra-label"><i class="fas fa-suitcase-rolling"></i> Checked Baggage</div>
+                                <label class="extra-label" for="baggage"><i class="fas fa-suitcase-rolling"></i> Checked Baggage</label>
                                 <select class="extra-select" id="baggage" name="baggage" onchange="updateExtrasTotal()">
                                     <option value="0">No extra baggage — Rs.0</option>
                                     <option value="2000">1 bag (20kg) — Rs.2,000</option>
@@ -244,7 +113,7 @@
                                 </select>
                             </div>
                             <div class="extra-card">
-                                <div class="extra-label"><i class="fas fa-chair"></i> Seat Preference</div>
+                                <label class="extra-label" for="seatPref"><i class="fas fa-chair"></i> Seat Preference</label>
                                 <select class="extra-select" id="seatPref" name="seatPref" onchange="updateExtrasTotal()">
                                     <option value="0">Standard Seat — Rs.0</option>
                                     <option value="2500">Window Seat — Rs.2,500</option>
@@ -254,7 +123,7 @@
                                 </select>
                             </div>
                             <div class="extra-card">
-                                <div class="extra-label"><i class="fas fa-utensils"></i> Meal Preference</div>
+                                <label class="extra-label" for="meal"><i class="fas fa-utensils"></i> Meal Preference</label>
                                 <select class="extra-select" id="meal" name="meal" onchange="updateExtrasTotal()">
                                     <option value="0">Standard Meal — Rs.0</option>
                                     <option value="1500">Vegetarian — Rs.1,500</option>
@@ -266,7 +135,7 @@
                                 </select>
                             </div>
                             <div class="extra-card">
-                                <div class="extra-label"><i class="fas fa-wheelchair"></i> Special Assistance</div>
+                                <label class="extra-label" for="assistance"><i class="fas fa-wheelchair"></i> Special Assistance</label>
                                 <select class="extra-select" id="assistance" name="assistance" onchange="updateExtrasTotal()">
                                     <option value="0">None — Rs.0</option>
                                     <option value="3000">Wheelchair Assistance — Rs.3,000</option>
@@ -330,24 +199,24 @@
                 <div class="summary-detail" id="summaryDiscountRow" style="display:none;"><span class="s-label" style="color:var(--green);">Promo Discount</span><span class="s-value" style="color:var(--green);" id="summaryDiscount">–Rs.0</span></div>
                 <div class="summary-detail"><span class="s-label">Extras</span><span class="s-value" style="color:var(--blue);" id="summaryExtras">Rs.0</span></div>
                 <div class="summary-price-block">
-                    <div class="total-label">Total Amount</div>
+                    <div class="total-label">Booking subtotal</div>
                     <div class="total-amount" id="summaryTotal">Rs.0</div>
-                    <div class="total-sub">Inclusive of all taxes & fees</div>
+                    <div class="total-sub">Additional fee shown at payment</div>
                 </div>
             </div>
             <!-- PROMO -->
             <div class="promo-wrap">
-                <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;"><i class="fas fa-tag me-2" style="color:var(--gold);"></i>Apply Promo Code</div>
+                <label for="promoCodeInput" class="promo-label"><i class="fas fa-tag me-2" style="color:var(--gold);"></i>Apply Promo Code</label>
                 <div class="promo-input-row">
-                    <input type="text" class="promo-input" id="promoCodeInput" placeholder="Enter code (e.g. SUMMER30)">
+                    <input type="text" class="promo-input" id="promoCodeInput" placeholder="Enter promotion code" aria-describedby="promoHelp promoFeedback">
                     <button type="button" class="btn-promo" onclick="applyPromo()">Apply</button>
                 </div>
-                <div id="promoFeedback" class="mt-2 d-none" style="font-size:12.5px;font-weight:600;"></div>
-                <div style="margin-top:10px;font-size:11.5px;color:var(--text-light);">Try: SUMMER30 · FLYBACK25 · GROUP40</div>
+                <div id="promoFeedback" class="mt-2 d-none" style="font-size:12.5px;font-weight:600;" aria-live="polite"></div>
+                <div id="promoHelp" style="margin-top:10px;font-size:11.5px;color:var(--text-light);">Enter a promotion code to preview its discount.</div>
             </div>
             <div class="trust-badges">
                 <div class="trust-item"><i class="fas fa-lock"></i> Secure payment</div>
-                <div class="trust-item"><i class="fas fa-check-circle"></i> Instant confirmation</div>
+                <div class="trust-item"><i class="fas fa-check-circle"></i> Confirmation after review</div>
                 <div class="trust-item"><i class="fas fa-headset"></i> 24/7 support</div>
             </div>
         </div>
@@ -355,22 +224,32 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
+<script th:inline="javascript">
     const flightId = document.getElementById('flightId').value || '';
     const userId = document.getElementById('userId').value || '';
     const flightData = {
-        flightNumber: "[[${flight?.flightNumber}]]" || "FL123",
-        origin: "[[${flight?.origin}]]" || "Origin",
-        destination: "[[${flight?.destination}]]" || "Destination",
-        cabinClass: "[[${flight?.cabinClass}]]" || "ECONOMY",
-        price: parseFloat("[[${flight?.price}]]") || 0
+        flightNumber: /*[[${flight?.flightNumber}]]*/ "FL123",
+        origin: /*[[${flight?.origin}]]*/ "Origin",
+        destination: /*[[${flight?.destination}]]*/ "Destination",
+        cabinClass: /*[[${flight?.cabinClass}]]*/ "ECONOMY",
+        price: /*[[${flight?.price}]]*/ 0
     };
-    const userEmail = "[[${userEmail}]]" || '';
-    const destinationCity = "[[${destinationCity}]]" || '';
-    let passengerCount = 1;
+    const userEmail = /*[[${userEmail}]]*/ '';
+    const destinationCity = /*[[${destinationCity}]]*/ '';
+    const recoveryValues = /*[[${recoveryValues}]]*/ {};
+    const recoveredExtras = {
+        baggage: /*[[${bookingRequest.baggage}]]*/ null,
+        seatPref: /*[[${bookingRequest.seatPref}]]*/ null,
+        meal: /*[[${bookingRequest.meal}]]*/ null,
+        assistance: /*[[${bookingRequest.assistance}]]*/ null
+    };
+    const recoveredPromoCode = /*[[${bookingRequest.promoCode}]]*/ '';
+    let passengerCount = Math.max(1, Math.min(5, parseInt(document.getElementById('passengerCount').value, 10) || 1));
     let bookingExtras = 0;
     let promoDiscount = 0;
+    let promoRequestVersion = 0;
     let currentStep = 1;
+    const passengerValues = new Map();
 
     function fmt(n) { return 'Rs.' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
 
@@ -378,11 +257,11 @@
         passengerCount = parseInt(document.getElementById('passengerSelect').value);
         document.getElementById('passengerCount').value = passengerCount;
         const container = document.getElementById('passengerContainer');
+        container.querySelectorAll('input[name]').forEach(input => passengerValues.set(input.name, input.value));
         container.innerHTML = '';
         for (let i = 0; i < passengerCount; i++) {
             const isPrimary = i === 0;
-            const countryVal = isPrimary && destinationCity ? destinationCity : '';
-            container.innerHTML += `
+            container.insertAdjacentHTML('beforeend', `
             <div class="pax-card">
                 <div class="pax-card-title">
                     <div class="pax-name"><i class="fas fa-user me-2" style="color:var(--blue);opacity:0.7;"></i>Passenger ${i+1}</div>
@@ -390,50 +269,65 @@
                 </div>
                 <div class="form-grid">
                     <div class="field-group">
-                        <label class="field-lbl">First Name<span class="req">*</span></label>
-                        <input class="field-input" name="passengers[${i}].firstName" required placeholder="e.g. John">
+                        <label class="field-lbl" for="passenger-${i}-firstName">First Name<span class="req">*</span></label>
+                        <input class="field-input" id="passenger-${i}-firstName" name="passengers[${i}].firstName" required placeholder="e.g. John">
                         <span class="invalid-msg">First name is required.</span>
                     </div>
                     <div class="field-group">
-                        <label class="field-lbl">Last Name<span class="req">*</span></label>
-                        <input class="field-input" name="passengers[${i}].lastName" required placeholder="e.g. Smith">
+                        <label class="field-lbl" for="passenger-${i}-lastName">Last Name<span class="req">*</span></label>
+                        <input class="field-input" id="passenger-${i}-lastName" name="passengers[${i}].lastName" required placeholder="e.g. Smith">
                         <span class="invalid-msg">Last name is required.</span>
                     </div>
                     <div class="field-group">
-                        <label class="field-lbl">Email Address<span class="req">*</span></label>
-                        <input type="email" class="field-input" name="passengers[${i}].email" value="${isPrimary ? userEmail : ''}" required placeholder="your@email.com">
-                        ${isPrimary ? '<span class="hint-text"><i class="fas fa-info-circle me-1"></i>Pre-filled from your account — editable</span>' : ''}
-                        <span class="invalid-msg">Valid email is required.</span>
+                        <label class="field-lbl" for="passenger-${i}-email">Email Address<span class="req">*</span></label>
+                        <input type="email" class="field-input" id="passenger-${i}-email" name="passengers[${i}].email" required placeholder="your@email.com">
+                        ${isPrimary ? `<span class="hint-text" id="passenger-${i}-email-help"><i class="fas fa-info-circle me-1"></i>Must match your signed-in account email.</span>` : ''}
+                        <span class="invalid-msg">${isPrimary ? 'Enter your signed-in account email.' : 'Valid email is required.'}</span>
                     </div>
                     <div class="field-group">
-                        <label class="field-lbl">Phone Number<span class="req">*</span></label>
-                        <input type="tel" class="field-input" name="passengers[${i}].phone" required placeholder="+94 77 123 4567">
+                        <label class="field-lbl" for="passenger-${i}-phone">Phone Number<span class="req">*</span></label>
+                        <input type="tel" class="field-input" id="passenger-${i}-phone" name="passengers[${i}].phone" required placeholder="+94 77 123 4567">
                         <span class="invalid-msg">Phone number is required.</span>
                     </div>
                     <div class="field-group">
-                        <label class="field-lbl">Date of Birth<span class="req">*</span></label>
-                        <input type="date" class="field-input" name="passengers[${i}].dateOfBirth" required max="${new Date().toISOString().split('T')[0]}">
+                        <label class="field-lbl" for="passenger-${i}-dateOfBirth">Date of Birth<span class="req">*</span></label>
+                        <input type="date" class="field-input" id="passenger-${i}-dateOfBirth" name="passengers[${i}].dateOfBirth" required max="${new Date().toISOString().split('T')[0]}">
                         <span class="invalid-msg">Date of birth is required.</span>
                     </div>
                     <div class="field-group">
-                        <label class="field-lbl">Country<span class="req">*</span></label>
-                        <input class="field-input" name="passengers[${i}].country" value="${countryVal}" required placeholder="e.g. Sri Lanka">
+                        <label class="field-lbl" for="passenger-${i}-country">Country<span class="req">*</span></label>
+                        <input class="field-input" id="passenger-${i}-country" name="passengers[${i}].country" required placeholder="e.g. Sri Lanka">
                         ${isPrimary && destinationCity ? '<span class="hint-text"><i class="fas fa-info-circle me-1"></i>Pre-filled with destination</span>' : ''}
                         <span class="invalid-msg">Country is required.</span>
                     </div>
                 </div>
                 <div class="form-grid-3" style="margin-top:16px;">
                     <div class="field-group">
-                        <label class="field-lbl">Passport No.</label>
-                        <input class="field-input" name="passengers[${i}].passportNumber" placeholder="Optional">
+                        <label class="field-lbl" for="passenger-${i}-passportNumber">Passport No.</label>
+                        <input class="field-input" id="passenger-${i}-passportNumber" name="passengers[${i}].passportNumber" placeholder="Optional">
                     </div>
                     <div class="field-group">
-                        <label class="field-lbl">Passport Expiry</label>
-                        <input type="date" class="field-input" name="passengers[${i}].passportExpiry">
+                        <label class="field-lbl" for="passenger-${i}-passportExpiry">Passport Expiry</label>
+                        <input type="date" class="field-input" id="passenger-${i}-passportExpiry" name="passengers[${i}].passportExpiry">
                     </div>
                 </div>
-            </div>`;
+            </div>`);
         }
+        container.querySelectorAll('input[name]').forEach(input => {
+            const error = input.closest('.field-group')?.querySelector('.invalid-msg');
+            if (error) {
+                error.id = input.id + '-error';
+                input.setAttribute('aria-describedby', `${input.id}-error` +
+                    (input.name === 'passengers[0].email' ? ` ${input.id}-help` : ''));
+            }
+            if (passengerValues.has(input.name)) {
+                input.value = passengerValues.get(input.name);
+            } else if (input.name === 'passengers[0].email') {
+                input.value = userEmail || '';
+            } else if (input.name === 'passengers[0].country') {
+                input.value = destinationCity || '';
+            }
+        });
         renderSummary();
         updateExtrasTotal();
     }
@@ -474,42 +368,77 @@
         }
     }
 
-    function applyPromo() {
+    async function applyPromo() {
         const code = document.getElementById('promoCodeInput').value.trim().toUpperCase();
         const fb = document.getElementById('promoFeedback');
-        const codes = { 'SUMMER30':0.30, 'FLYBACK25':0.25, 'GROUP40':0.40, 'WEEKEND35':0.35, 'EARLY20':0.20 };
-        if (!code) { fb.textContent='Please enter a promo code.'; fb.style.color='var(--red)'; fb.classList.remove('d-none'); return; }
-        if (codes[code]) {
-            promoDiscount = codes[code];
-            document.getElementById('promoCode').value = code;
-            fb.textContent = `✓ Code "${code}" applied — ${(promoDiscount*100).toFixed(0)}% off flight price!`;
-            fb.style.color = 'var(--green)';
-            fb.classList.remove('d-none');
-            renderSummary();
-        } else {
-            fb.textContent = '✗ Invalid promo code. Try SUMMER30, FLYBACK25, GROUP40.';
+        const button = document.querySelector('.btn-promo');
+        const requestVersion = ++promoRequestVersion;
+        promoDiscount = 0;
+        document.getElementById('promoCode').value = '';
+        renderSummary();
+        if (!code) {
+            fb.textContent = 'Please enter a promo code.';
             fb.style.color = 'var(--red)';
             fb.classList.remove('d-none');
+            return;
+        }
+        button.disabled = true;
+        fb.textContent = 'Checking promotion…';
+        fb.style.color = 'var(--text-light)';
+        fb.classList.remove('d-none');
+        try {
+            const response = await fetch(`/api/booking/promo-preview?code=${encodeURIComponent(code)}`, {credentials: 'same-origin'});
+            if (!response.ok) throw new Error('Promotion preview unavailable');
+            const rate = Number((await response.json()).discount);
+            if (requestVersion !== promoRequestVersion) return;
+            if (Number.isFinite(rate) && rate > 0) {
+                promoDiscount = rate / 100;
+                document.getElementById('promoCode').value = code;
+                fb.textContent = `Code "${code}" applied — ${rate}% off flight price.`;
+                fb.style.color = 'var(--green)';
+            } else {
+                fb.textContent = 'This promotion code is not available.';
+                fb.style.color = 'var(--red)';
+            }
+        } catch (error) {
+            if (requestVersion !== promoRequestVersion) return;
+            fb.textContent = 'Unable to check this code. The final fare is calculated when you continue.';
+            fb.style.color = 'var(--red)';
+        } finally {
+            if (requestVersion === promoRequestVersion) button.disabled = false;
+            renderSummary();
         }
     }
 
-    function validateStep1() {
+    function validateStep1(focusInvalid = true) {
         const inputs = document.querySelectorAll('#stepPassenger input[required]');
-        let valid = true;
+        let firstInvalid = null;
         inputs.forEach(inp => {
-            if (!inp.value.trim()) { inp.classList.add('is-invalid'); valid = false; }
-            else inp.classList.remove('is-invalid');
+            const accountEmailMismatch = inp.name === 'passengers[0].email' &&
+                inp.value.trim().toLowerCase() !== userEmail.trim().toLowerCase();
+            const invalid = !inp.value.trim() || !inp.checkValidity() || accountEmailMismatch;
+            inp.classList.toggle('is-invalid', invalid);
+            inp.setAttribute('aria-invalid', String(invalid));
+            if (invalid && !firstInvalid) firstInvalid = inp;
         });
-        return valid;
+        if (firstInvalid && focusInvalid) {
+            firstInvalid.focus();
+            firstInvalid.reportValidity();
+        }
+        return !firstInvalid;
     }
 
     function goToExtras() {
-        if (!validateStep1()) { alert('Please complete all required passenger fields.'); return; }
+        if (!validateStep1()) return;
         toggle(1, 2);
     }
     function backToPassenger() { toggle(2, 1); }
     function goToReview() {
-        if (!validateStep1()) { alert('Please complete all required passenger fields.'); return; }
+        if (!validateStep1(false)) {
+            toggle(2, 1);
+            validateStep1();
+            return;
+        }
         toggle(2, 3);
         renderReview();
     }
@@ -545,70 +474,98 @@
         }
     }
 
+    function reviewSection(container, title) {
+        const section = document.createElement('div');
+        section.className = 'review-section';
+        const heading = document.createElement('div');
+        heading.className = 'review-section-title';
+        heading.textContent = title;
+        section.appendChild(heading);
+        container.appendChild(section);
+        return section;
+    }
+
+    function reviewRow(section, label, value) {
+        const row = document.createElement('div');
+        row.className = 'review-row';
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'label';
+        labelSpan.textContent = label;
+        const valueSpan = document.createElement('span');
+        valueSpan.className = 'value';
+        valueSpan.textContent = value;
+        row.append(labelSpan, valueSpan);
+        section.appendChild(row);
+        return row;
+    }
+
+    function passengerValue(index, field) {
+        return document.getElementById(`passenger-${index}-${field}`)?.value || '—';
+    }
+
     function renderReview() {
-        const base = flightData.price * passengerCount;
-        const disc = base * promoDiscount;
-        const total = (base - disc) + bookingExtras;
-        let paxHtml = '';
+        const container = document.getElementById('reviewContainer');
+        container.replaceChildren();
+        const flightSection = reviewSection(container, 'Flight Details');
+        reviewRow(flightSection, 'Flight Number', flightData.flightNumber);
+        reviewRow(flightSection, 'Route', `${flightData.origin} → ${flightData.destination}`);
+        reviewRow(flightSection, 'Class', flightData.cabinClass);
+        reviewRow(flightSection, 'Status', 'PENDING');
+
+        const passengerSection = reviewSection(container, 'Passenger Details');
         for (let i = 0; i < passengerCount; i++) {
-            const fn = document.querySelector(`input[name="passengers[${i}].firstName"]`)?.value || '—';
-            const ln = document.querySelector(`input[name="passengers[${i}].lastName"]`)?.value || '—';
-            const em = document.querySelector(`input[name="passengers[${i}].email"]`)?.value || '—';
-            const ph = document.querySelector(`input[name="passengers[${i}].phone"]`)?.value || '—';
-            const dob = document.querySelector(`input[name="passengers[${i}].dateOfBirth"]`)?.value || '—';
-            const co = document.querySelector(`input[name="passengers[${i}].country"]`)?.value || '—';
-            const pp = document.querySelector(`input[name="passengers[${i}].passportNumber"]`)?.value || '—';
-            paxHtml += `<div style="background:#fafbff;border:1px solid #eef1fb;border-radius:10px;padding:16px;margin-bottom:12px;">
-                <div style="font-weight:700;color:var(--navy);margin-bottom:10px;"><i class="fas fa-user me-2" style="color:var(--blue);"></i>Passenger ${i+1}${i===0?' <span style="background:var(--navy);color:white;font-size:10px;padding:2px 8px;border-radius:50px;font-weight:600;margin-left:6px;">Primary</span>':''}</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;font-size:13.5px;">
-                    <div><span style="color:var(--text-light);">Name: </span><strong>${fn} ${ln}</strong></div>
-                    <div><span style="color:var(--text-light);">Email: </span><strong>${em}</strong></div>
-                    <div><span style="color:var(--text-light);">Phone: </span><strong>${ph}</strong></div>
-                    <div><span style="color:var(--text-light);">DOB: </span><strong>${dob}</strong></div>
-                    <div><span style="color:var(--text-light);">Country: </span><strong>${co}</strong></div>
-                    <div><span style="color:var(--text-light);">Passport: </span><strong>${pp}</strong></div>
-                </div></div>`;
+            const card = document.createElement('div');
+            card.className = 'review-passenger';
+            const title = document.createElement('div');
+            title.className = 'review-passenger-title';
+            title.textContent = `Passenger ${i + 1}${i === 0 ? ' · Primary' : ''}`;
+            card.appendChild(title);
+            reviewRow(card, 'Name', `${passengerValue(i, 'firstName')} ${passengerValue(i, 'lastName')}`);
+            reviewRow(card, 'Email', passengerValue(i, 'email'));
+            reviewRow(card, 'Phone', passengerValue(i, 'phone'));
+            reviewRow(card, 'DOB', passengerValue(i, 'dateOfBirth'));
+            reviewRow(card, 'Country', passengerValue(i, 'country'));
+            reviewRow(card, 'Passport', passengerValue(i, 'passportNumber'));
+            passengerSection.appendChild(card);
         }
-        const bagEl = document.getElementById('baggage');
-        const seatEl = document.getElementById('seatPref');
-        const mealEl = document.getElementById('meal');
-        const assEl = document.getElementById('assistance');
-        document.getElementById('reviewContainer').innerHTML = `
-            <div class="review-section">
-                <div class="review-section-title"><i class="fas fa-plane me-2" style="color:var(--blue);"></i>Flight Details</div>
-                <div class="review-row"><span class="label">Flight Number</span><span class="value">${flightData.flightNumber}</span></div>
-                <div class="review-row"><span class="label">Route</span><span class="value">${flightData.origin} → ${flightData.destination}</span></div>
-                <div class="review-row"><span class="label">Class</span><span class="value">${flightData.cabinClass}</span></div>
-                <div class="review-row"><span class="label">Status</span><span class="value"><span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:50px;font-size:12px;">PENDING</span></span></div>
-            </div>
-            <div class="review-section">
-                <div class="review-section-title"><i class="fas fa-users me-2" style="color:var(--blue);"></i>Passenger Details</div>
-                ${paxHtml}
-            </div>
-            <div class="review-section">
-                <div class="review-section-title"><i class="fas fa-plus-circle me-2" style="color:var(--blue);"></i>Travel Extras</div>
-                <div class="review-row"><span class="label">Baggage</span><span class="value">${bagEl.options[bagEl.selectedIndex].text}</span></div>
-                <div class="review-row"><span class="label">Seat Preference</span><span class="value">${seatEl.options[seatEl.selectedIndex].text}</span></div>
-                <div class="review-row"><span class="label">Meal</span><span class="value">${mealEl.options[mealEl.selectedIndex].text}</span></div>
-                <div class="review-row"><span class="label">Assistance</span><span class="value">${assEl.options[assEl.selectedIndex].text}</span></div>
-            </div>
-            <div class="review-section">
-                <div class="review-section-title"><i class="fas fa-receipt me-2" style="color:var(--blue);"></i>Price Summary</div>
-                <div class="review-row"><span class="label">Flight Price (×${passengerCount})</span><span class="value">${fmt(base)}</span></div>
-                ${promoDiscount>0?`<div class="review-row"><span class="label" style="color:var(--green);">Promo Discount (${(promoDiscount*100).toFixed(0)}%)</span><span class="value" style="color:var(--green);">–${fmt(disc)}</span></div>`:''}
-                <div class="review-row"><span class="label">Extras Total</span><span class="value" style="color:var(--blue);">${fmt(bookingExtras)}</span></div>
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:16px;background:linear-gradient(135deg,#f0f6ff,#e8f0ff);border-radius:12px;margin-top:12px;">
-                    <span style="font-family:'Inter',system-ui,sans-serif;font-size:16px;font-weight:700;color:var(--navy);">Total Amount</span>
-                    <span style="font-family:'Inter',system-ui,sans-serif;font-size:26px;font-weight:800;color:var(--navy);">${fmt(total)}</span>
-                </div>
-            </div>`;
+
+        const extrasSection = reviewSection(container, 'Travel Extras');
+        for (const [label, id] of Object.entries({ Baggage: 'baggage', 'Seat Preference': 'seatPref', Meal: 'meal', Assistance: 'assistance' })) {
+            const select = document.getElementById(id);
+            reviewRow(extrasSection, label, select.selectedOptions[0].textContent);
+        }
+
+        const priceSection = reviewSection(container, 'Price Summary');
+        const base = flightData.price * passengerCount;
+        const discount = base * promoDiscount;
+        const total = base - discount + bookingExtras;
+        reviewRow(priceSection, `Flight Price (×${passengerCount})`, fmt(base));
+        if (promoDiscount > 0) reviewRow(priceSection, `Promo Discount (${(promoDiscount * 100).toFixed(0)}%)`, `–${fmt(discount)}`);
+        reviewRow(priceSection, 'Extras Total', fmt(bookingExtras));
+        const totalRow = reviewRow(priceSection, 'Booking subtotal', fmt(total));
+        totalRow.classList.add('review-total');
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        Object.entries(recoveryValues).forEach(([name, value]) => passengerValues.set(name, value));
+        document.getElementById('passengerSelect').value = String(passengerCount);
         updatePassengerForms();
+        Object.entries(recoveredExtras).forEach(([id, value]) => {
+            const select = document.getElementById(id);
+            if (value != null && [...select.options].some(option => option.value === value)) select.value = value;
+        });
+        updateExtrasTotal();
+        if (recoveredPromoCode) {
+            document.getElementById('promoCodeInput').value = recoveredPromoCode;
+            applyPromo();
+        }
         renderSummary();
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
-            if (!validateStep1()) { e.preventDefault(); alert('Please complete all required fields.'); }
+            if (!validateStep1(false)) {
+                e.preventDefault();
+                toggle(currentStep, 1);
+                validateStep1();
+            }
         });
     });
 </script>

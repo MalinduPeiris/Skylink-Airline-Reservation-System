@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 @Service
 public class PaymentService {
 	private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
+	public static final double TRAVELER_PROCESSING_FEE = 45.00;
 
 	@Autowired
 	private PaymentRepository paymentRepository;
@@ -47,6 +48,10 @@ public class PaymentService {
 
 		Booking booking = bookingRepository.findById(paymentDTO.getBookingId())
 				.orElseThrow(() -> new RuntimeException("Booking not found with ID: " + paymentDTO.getBookingId()));
+		if (booking.getTotalPrice() == null || !Double.isFinite(booking.getTotalPrice()) ||
+				Double.compare(paymentDTO.getAmount(), booking.getTotalPrice() + TRAVELER_PROCESSING_FEE) != 0) {
+			throw new IllegalArgumentException("Payment amount does not match the booking total");
+		}
 
 		if (booking.getPayment() != null) {
 			throw new RuntimeException("Payment already exists for this booking. Booking ID: BK-" + booking.getId());

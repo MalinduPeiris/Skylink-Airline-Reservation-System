@@ -7,6 +7,10 @@ public class BookingRequestDTO {
     private Long userId;
     private Integer passengerCount;
     private Double bookingExtras;
+    private String baggage;
+    private String seatPref;
+    private String meal;
+    private String assistance;
     private String promoCode;
     private Double totalPrice;
     private List<PassengerDTO> passengers;
@@ -50,6 +54,15 @@ public class BookingRequestDTO {
     public void setBookingExtras(Double bookingExtras) {
         this.bookingExtras = bookingExtras != null ? bookingExtras : 0.0;
     }
+
+    public String getBaggage() { return baggage; }
+    public void setBaggage(String baggage) { this.baggage = baggage; }
+    public String getSeatPref() { return seatPref; }
+    public void setSeatPref(String seatPref) { this.seatPref = seatPref; }
+    public String getMeal() { return meal; }
+    public void setMeal(String meal) { this.meal = meal; }
+    public String getAssistance() { return assistance; }
+    public void setAssistance(String assistance) { this.assistance = assistance; }
 
     public String getPromoCode() {
         return promoCode != null ? promoCode : "";

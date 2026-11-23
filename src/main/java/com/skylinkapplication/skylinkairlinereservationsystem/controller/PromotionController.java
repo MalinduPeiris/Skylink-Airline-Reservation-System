@@ -1,6 +1,9 @@
 package com.skylinkapplication.skylinkairlinereservationsystem.controller;
 
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.PromotionDTO;
+import com.skylinkapplication.skylinkairlinereservationsystem.model.Promotion;
+import com.skylinkapplication.skylinkairlinereservationsystem.model.Role;
+import com.skylinkapplication.skylinkairlinereservationsystem.repository.UserRepository;
 import com.skylinkapplication.skylinkairlinereservationsystem.service.PromotionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,8 +15,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 
 @Controller
 @RequestMapping("/api/marketing")
@@ -24,6 +29,16 @@ public class PromotionController {
 
     @Autowired
     private PromotionService promotionService;
+    @Autowired
+    private UserRepository userRepository;
+
+    private Date parseColomboDate(String value) throws ParseException {
+        try {
+            return Date.from(LocalDate.parse(value).atStartOfDay(ZoneId.of("Asia/Colombo")).toInstant());
+        } catch (DateTimeParseException | NullPointerException e) {
+            throw new ParseException("Expected ISO calendar date", 0);
+        }
+    }
 
     @GetMapping("/promotions")
     public String viewPromotions(Model model) {
@@ -79,15 +94,15 @@ public class PromotionController {
                                   @RequestParam("promoCode") String promoCode,
                                   @RequestParam("validityStart") String validityStartStr,
                                   @RequestParam("validityEnd") String validityEndStr,
+                                  @RequestParam("scope") Promotion.Scope scope,
                                   Model model) {
         try {
             logger.info("Creating promotion with data: targetCriteria={}, discount={}, promoCode={}, validityStart={}, validityEnd={}",
                     targetCriteria, discount, promoCode, validityStartStr, validityEndStr);
 
             // Parse dates
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date validityStart = dateFormat.parse(validityStartStr);
-            Date validityEnd = dateFormat.parse(validityEndStr);
+            Date validityStart = parseColomboDate(validityStartStr);
+            Date validityEnd = parseColomboDate(validityEndStr);
 
             // Validate input
             if (targetCriteria == null || targetCriteria.trim().isEmpty() ||
@@ -105,6 +120,7 @@ public class PromotionController {
             promotionDTO.setPromoCode(promoCode);
             promotionDTO.setValidityStart(validityStart);
             promotionDTO.setValidityEnd(validityEnd);
+            promotionDTO.setScope(scope);
 
             PromotionDTO createdPromotion = promotionService.createPromotion(promotionDTO);
             logger.info("Promotion created successfully: {}", createdPromotion.getDiscount());
@@ -133,9 +149,8 @@ public class PromotionController {
                     id, targetCriteria, discount, promoCode, validityStartStr, validityEndStr);
 
             // Parse dates
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date validityStart = dateFormat.parse(validityStartStr);
-            Date validityEnd = dateFormat.parse(validityEndStr);
+            Date validityStart = parseColomboDate(validityStartStr);
+            Date validityEnd = parseColomboDate(validityEndStr);
 
             // Create DTO with the form data
             PromotionDTO updatedPromotionDTO = new PromotionDTO();
@@ -167,6 +182,30 @@ public class PromotionController {
         } catch (RuntimeException e) {
             logger.error("Error deleting promotion with ID: {}", id, e);
             return "redirect:/dashboard/marketing-manager?error=Unable to delete promotion. Please try again.";
+        }
+    }
+
+    @GetMapping("/promotion/{id}/eligibility")
+    public String eligibilityForm(@PathVariable Long id, Model model) {
+        model.addAttribute("promotion", promotionService.getPromotionById(id));
+        model.addAttribute("travelers", userRepository.findByRole(Role.FREQUENT_TRAVELER));
+        model.addAttribute("baseUrl", "/api/marketing");
+        return "promotion-eligibility";
+    }
+
+    @PostMapping("/promotion/{id}/eligibility")
+    public String saveEligibility(@PathVariable Long id,
+                                  @RequestParam("scope") Promotion.Scope scope,
+                                  @RequestParam(name = "active", defaultValue = "false") boolean active,
+                                  @RequestParam(name = "userIds", required = false) List<Long> userIds,
+                                  org.springframework.web.servlet.mvc.support.RedirectAttributes redirect) {
+        try {
+            promotionService.updateEligibility(id, scope, active, userIds);
+            redirect.addFlashAttribute("success", "Promotion eligibility saved");
+            return "redirect:/api/marketing/promotion/" + id + "/eligibility";
+        } catch (IllegalArgumentException e) {
+            redirect.addFlashAttribute("error", e.getMessage());
+            return "redirect:/api/marketing/promotion/" + id + "/eligibility";
         }
     }
 }

@@ -21,6 +21,16 @@ import java.util.List;
 public class FinanceController {
     private static final Logger logger = LoggerFactory.getLogger(FinanceController.class);
 
+    private String financeTabRedirect(String activeTab) {
+        String path = switch (activeTab) {
+            case "all", "all-payments" -> "all-payments";
+            case "cancelled", "cancelled-bookings" -> "cancelled-bookings";
+            case "completed", "failed", "refunded" -> activeTab;
+            default -> "pending";
+        };
+        return "redirect:/dashboard/finance/" + path;
+    }
+
     @Autowired
     private PaymentService paymentService;
 
@@ -198,11 +208,11 @@ public class FinanceController {
             logger.info("Payment accepted: id={}", id);
             redirectAttributes.addFlashAttribute("success",
                     "Payment #" + id + " accepted — booking confirmed!");
-            return "redirect:/dashboard/finance/" + activeTab;
+            return financeTabRedirect(activeTab);
         } catch (RuntimeException e) {
             logger.error("Error accepting payment: id={}", id, e);
             redirectAttributes.addFlashAttribute("error", "Error accepting payment: " + e.getMessage());
-            return "redirect:/dashboard/finance/" + activeTab;
+            return financeTabRedirect(activeTab);
         }
     }
 
@@ -223,11 +233,11 @@ public class FinanceController {
             logger.info("Payment cancelled: id={}", id);
             redirectAttributes.addFlashAttribute("success",
                     "Payment #" + id + " cancelled — booking has been cancelled.");
-            return "redirect:/dashboard/finance/" + activeTab;
+            return financeTabRedirect(activeTab);
         } catch (RuntimeException e) {
             logger.error("Error cancelling payment: id={}", id, e);
             redirectAttributes.addFlashAttribute("error", "Error cancelling payment: " + e.getMessage());
-            return "redirect:/dashboard/finance/" + activeTab;
+            return financeTabRedirect(activeTab);
         }
     }
 
@@ -246,7 +256,7 @@ public class FinanceController {
         try {
             if (amount == null || amount <= 0) {
                 redirectAttributes.addFlashAttribute("error", "Amount must be greater than zero");
-                return "redirect:/dashboard/finance/" + activeTab;
+                return financeTabRedirect(activeTab);
             }
 
             // Validate status enum
@@ -254,7 +264,7 @@ public class FinanceController {
                 Payment.Status.valueOf(status);
             } catch (IllegalArgumentException e) {
                 redirectAttributes.addFlashAttribute("error", "Invalid status");
-                return "redirect:/dashboard/finance/" + activeTab;
+                return financeTabRedirect(activeTab);
             }
 
             PaymentDTO paymentDTO = new PaymentDTO();
@@ -267,11 +277,11 @@ public class FinanceController {
             logger.info("Payment updated successfully: id={}", id);
             redirectAttributes.addFlashAttribute("success", "Payment #" + id + " updated successfully!");
 
-            return "redirect:/dashboard/finance/" + activeTab;
+            return financeTabRedirect(activeTab);
         } catch (RuntimeException e) {
             logger.error("Error updating payment: id={}", id, e);
             redirectAttributes.addFlashAttribute("error", "Error updating payment: " + e.getMessage());
-            return "redirect:/dashboard/finance/" + activeTab;
+            return financeTabRedirect(activeTab);
         }
     }
 
@@ -290,11 +300,11 @@ public class FinanceController {
             logger.info("Payment deleted successfully: id={}", id);
             redirectAttributes.addFlashAttribute("success", "Payment #" + id + " deleted successfully!");
 
-            return "redirect:/dashboard/finance/" + activeTab;
+            return financeTabRedirect(activeTab);
         } catch (RuntimeException e) {
             logger.error("Error deleting payment: id={}", id, e);
             redirectAttributes.addFlashAttribute("error", "Error deleting payment: " + e.getMessage());
-            return "redirect:/dashboard/finance/" + activeTab;
+            return financeTabRedirect(activeTab);
         }
     }
 

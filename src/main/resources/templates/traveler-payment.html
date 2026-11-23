@@ -8,26 +8,16 @@
     <title>Skylink Airlines - Payment</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        body { background: #f5f7fa; }
-        .navbar { background: linear-gradient(90deg, #1a2a6c, #0d6efd); }
-        .page-header { background: linear-gradient(135deg, rgba(26,42,108,.9), rgba(13,110,253,.9)), url('https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=1200&auto=format&fit=crop'); background-size: cover; background-position: center; color: #fff; padding: 48px 0; border-radius: 0 0 18px 18px; }
-        .card-elevated { border: 0; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
-        .tab-pill .nav-link { border-radius: 999px; font-weight: 600; }
-        .summary { background: #ffffff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.06); }
-        .brand-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: #f1f5ff; color: #0d6efd; font-weight: 600; font-size: 12px; }
-        .secure-note { font-size: 13px; color: #e9ecef; }
-        .input-group-text { background: #f8f9fc; border: 1px solid #e9ecef; }
-        .form-control { border: 1.6px solid #e9ecef; }
-        .form-control:focus { border-color: #0d6efd; box-shadow: 0 0 0 .25rem rgba(13,110,253,.15); }
-        .alert { border-radius: 10px; }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/traveler-payment.css}" href="/css/traveler-payment.css">
 </head>
-<body>
+<body class="traveler-payment-page">
 <nav class="navbar navbar-dark navbar-expand-lg">
     <div class="container">
-        <a class="navbar-brand" href="/"><i class="fas fa-plane-departure"></i> Skylink Airlines</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navPay">
+        <a class="navbar-brand" href="/"><i class="fas fa-paper-plane me-2"></i>SKY<span>LINK</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navPay" aria-controls="navPay" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navPay">
@@ -41,9 +31,9 @@
 
 <header class="page-header">
     <div class="container">
-        <h2 class="mb-1">Complete Your Payment</h2>
-        <div class="brand-badge"><i class="fas fa-crown"></i> Frequent Traveler</div>
-        <p class="mt-2 mb-0 secure-note"><i class="fas fa-lock"></i> Payments are secured with industry-standard encryption.</p>
+        <div class="brand-badge"><i class="fas fa-shield-halved"></i> Secure checkout</div>
+        <h1>Submit your payment</h1>
+        <p>Choose a payment method and review your booking total. Your submission will await Finance Executive approval.</p>
     </div>
 </header>
 
@@ -51,25 +41,27 @@
     <!-- Success/Error Messages -->
     <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss message"></button>
     </div>
     <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Dismiss error"></button>
     </div>
+    <div id="paymentClientError" class="alert alert-danger" role="alert" tabindex="-1" hidden></div>
 
     <div class="row g-4">
         <div class="col-lg-7">
             <div class="card card-elevated">
                 <div class="card-body p-4">
+                    <h2 class="form-heading">Choose a payment method</h2>
                     <ul class="nav nav-pills tab-pill mb-4" id="payTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="card-tab" data-bs-toggle="pill" data-bs-target="#tab-card" type="button" role="tab">
+                            <button class="nav-link active" id="card-tab" data-bs-toggle="pill" data-bs-target="#tab-card" type="button" role="tab" aria-controls="tab-card" aria-selected="true">
                                 <i class="fas fa-credit-card me-2"></i>Card
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="wallet-tab" data-bs-toggle="pill" data-bs-target="#tab-wallet" type="button" role="tab">
+                            <button class="nav-link" id="wallet-tab" data-bs-toggle="pill" data-bs-target="#tab-wallet" type="button" role="tab" aria-controls="tab-wallet" aria-selected="false">
                                 <i class="fas fa-mobile-screen-button me-2"></i>Mobile Wallet (eZ Cash)
                             </button>
                         </li>
@@ -77,7 +69,7 @@
 
                     <div class="tab-content" id="payTabsContent">
                         <!-- Card Payment -->
-                        <div class="tab-pane fade show active" id="tab-card" role="tabpanel">
+                        <div class="tab-pane fade show active" id="tab-card" role="tabpanel" aria-labelledby="card-tab">
                             <form id="cardPaymentForm" th:action="@{/api/payment/process}" method="post">
                                 <input type="hidden" name="paymentMethod" value="CARD">
                                 <input type="hidden" name="bookingId" th:value="${bookingId}">
@@ -86,45 +78,45 @@
 
                                 <div class="row g-3">
                                     <div class="col-12">
-                                        <label class="form-label">Name on Card <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="cardName" placeholder="As printed on card" required>
+                                        <label class="form-label" for="cardName">Name on Card <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="cardName" name="cardName" placeholder="As printed on card" autocomplete="cc-name" required>
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label">Card Number <span class="text-danger">*</span></label>
+                                        <label class="form-label" for="cardNumber">Card Number <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="far fa-credit-card"></i></span>
-                                            <input type="text" inputmode="numeric" class="form-control" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                            <input type="text" inputmode="numeric" class="form-control" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" maxlength="23" autocomplete="cc-number" required>
                                         </div>
                                     </div>
-                                    <div class="col-6">
-                                        <label class="form-label">Expiry <span class="text-danger">*</span></label>
+                                    <div class="col-6 card-form-half">
+                                        <label class="form-label" for="expiry">Expiry <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="far fa-calendar"></i></span>
-                                            <input type="text" class="form-control" name="expiry" placeholder="MM/YY" pattern="^(0[1-9]|1[0-2])\/(\d{2})$" required>
+                                            <input type="text" class="form-control" id="expiry" name="expiry" placeholder="MM/YY" pattern="^(0[1-9]|1[0-2])\/(\d{2})$" autocomplete="cc-exp" required>
                                         </div>
                                     </div>
-                                    <div class="col-6">
-                                        <label class="form-label">CVV <span class="text-danger">*</span></label>
+                                    <div class="col-6 card-form-half">
+                                        <label class="form-label" for="cvv">CVV <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-shield-halved"></i></span>
-                                            <input type="password" class="form-control" name="cvv" placeholder="123" minlength="3" maxlength="4" required>
+                                            <input type="password" class="form-control" id="cvv" name="cvv" placeholder="123" minlength="3" maxlength="4" autocomplete="cc-csc" inputmode="numeric" required>
                                         </div>
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label">Billing Email <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" name="email" placeholder="you@example.com" required>
+                                        <label class="form-label" for="billingEmail">Billing Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="billingEmail" name="email" placeholder="you@example.com" autocomplete="email" required>
                                     </div>
                                 </div>
                                 <div class="d-grid mt-4">
-                                    <button type="submit" class="btn btn-primary btn-lg">
-                                        <i class="fas fa-lock me-2"></i>Pay Securely $<span th:text="${#numbers.formatDecimal(total, 1, 2)}">0.00</span>
+                                    <button type="submit" class="btn payment-submit btn-lg">
+                                        <i class="fas fa-credit-card me-2"></i>Submit card payment · Rs.<span th:text="${#numbers.formatDecimal(total, 1, 2)}">0.00</span>
                                     </button>
                                 </div>
                             </form>
                         </div>
 
                         <!-- Mobile Wallet (eZ Cash) -->
-                        <div class="tab-pane fade" id="tab-wallet" role="tabpanel">
+                        <div class="tab-pane fade" id="tab-wallet" role="tabpanel" aria-labelledby="wallet-tab">
                             <form id="walletPaymentForm" th:action="@{/api/payment/process}" method="post">
                                 <input type="hidden" name="paymentMethod" value="EZ_CASH">
                                 <input type="hidden" name="bookingId" th:value="${bookingId}">
@@ -133,21 +125,21 @@
 
                                 <div class="row g-3">
                                     <div class="col-12">
-                                        <label class="form-label">Registered Mobile Number <span class="text-danger">*</span></label>
+                                        <label class="form-label" for="mobile">Registered Mobile Number <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text">+94</span>
-                                            <input type="tel" class="form-control" name="mobile" placeholder="7XXXXXXXX" pattern="^7\d{8}$" required>
+                                            <input type="tel" class="form-control" id="mobile" name="mobile" placeholder="7XXXXXXXX" pattern="^7\d{8}$" autocomplete="tel-national" inputmode="numeric" required>
                                         </div>
-                                        <div class="form-text">You will receive a push/OTP on your eZ Cash wallet to authorize.</div>
+                                        <div class="form-text">Use a 9 digit mobile number starting with 7. Your submission will await finance review.</div>
                                     </div>
                                     <div class="col-12">
-                                        <label class="form-label">NIC / ID (optional)</label>
-                                        <input type="text" class="form-control" name="nic" placeholder="Optional for additional verification">
+                                        <label class="form-label" for="nic">NIC / ID (optional)</label>
+                                        <input type="text" class="form-control" id="nic" name="nic" placeholder="Optional for additional verification">
                                     </div>
                                 </div>
                                 <div class="d-grid mt-4">
-                                    <button type="submit" class="btn btn-success btn-lg">
-                                        <i class="fas fa-mobile-screen-button me-2"></i>Pay with eZ Cash $<span th:text="${#numbers.formatDecimal(total, 1, 2)}">0.00</span>
+                                    <button type="submit" class="btn payment-submit btn-lg">
+                                        <i class="fas fa-mobile-screen-button me-2"></i>Submit eZ Cash payment · Rs.<span th:text="${#numbers.formatDecimal(total, 1, 2)}">0.00</span>
                                     </button>
                                 </div>
                             </form>
@@ -158,52 +150,24 @@
         </div>
 
         <div class="col-lg-5">
-            <div class="summary p-4">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="mb-0">Payment Summary</h5>
-                    <span class="badge bg-primary">Booking</span>
+            <div class="summary">
+                <div class="summary-header">
+                    <h2>Payment summary</h2>
+                    <p>Review your flight and amount before submitting</p>
                 </div>
-                <hr>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Traveler</span>
-                    <strong th:text="${booking?.user?.username}">Guest</strong>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Booking Ref</span>
-                    <strong>BK-<span th:text="${bookingId}">123456</span></strong>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Flight</span>
-                    <strong th:text="${booking?.flight?.flightNumber}">FL123</strong>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Route</span>
-                    <strong><span th:text="${booking?.flight?.origin}">NYC</span> → <span th:text="${booking?.flight?.destination}">LON</span></strong>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Passengers</span>
-                    <strong th:text="${booking?.passengers}">1</strong>
-                </div>
-                <hr>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Subtotal</span>
-                    <strong>$<span th:text="${#numbers.formatDecimal(subtotal, 1, 2)}">299.99</span></strong>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Taxes & Fees</span>
-                    <strong>$<span th:text="${#numbers.formatDecimal(taxes, 1, 2)}">45.00</span></strong>
-                </div>
-                <div th:if="${booking?.bookingExtras != null && booking?.bookingExtras > 0}" class="d-flex justify-content-between mb-2 text-success">
-                    <span>Extras</span>
-                    <strong>$<span th:text="${#numbers.formatDecimal(booking.bookingExtras, 1, 2)}">0.00</span></strong>
-                </div>
-                <hr>
-                <div class="d-flex justify-content-between">
-                    <span class="fw-bold">Total</span>
-                    <strong class="fs-5 text-primary">$<span th:text="${#numbers.formatDecimal(total, 1, 2)}">344.99</span></strong>
-                </div>
-                <div class="mt-3 small text-muted">
-                    <i class="fas fa-info-circle me-1"></i> Any discounts for Frequent Travelers are applied automatically.
+                <div class="summary-route"><span th:text="${booking?.flight?.origin}">NYC</span> → <span th:text="${booking?.flight?.destination}">LON</span></div>
+                <div class="summary-details">
+                    <div class="summary-row"><span>Traveler</span><strong th:text="${booking?.user?.username}">Guest</strong></div>
+                    <div class="summary-row"><span>Booking reference</span><strong>BK-<span th:text="${bookingId}">123456</span></strong></div>
+                    <div class="summary-row"><span>Flight</span><strong th:text="${booking?.flight?.flightNumber}">FL123</strong></div>
+                    <div class="summary-row"><span>Passengers</span><strong th:text="${booking?.passengers}">1</strong></div>
+                    <div class="summary-row"><span>Booking subtotal</span><strong>Rs.<span th:text="${#numbers.formatDecimal(subtotal, 1, 2)}">299.99</span></strong></div>
+                    <div th:if="${booking?.bookingExtras != null && booking?.bookingExtras > 0}" class="summary-row included">
+                        <span>Extras included in subtotal</span><strong>Rs.<span th:text="${#numbers.formatDecimal(booking.bookingExtras, 1, 2)}">0.00</span></strong>
+                    </div>
+                    <div class="summary-row"><span>Payment fee</span><strong>Rs.<span th:text="${#numbers.formatDecimal(taxes, 1, 2)}">45.00</span></strong></div>
+                    <div class="summary-total"><span>Total to submit</span><strong>Rs.<span th:text="${#numbers.formatDecimal(total, 1, 2)}">344.99</span></strong></div>
+                    <p class="summary-note"><i class="fas fa-circle-info me-1"></i>Submitting this amount creates a pending payment for finance review.</p>
                 </div>
             </div>
         </div>
@@ -231,22 +195,54 @@
         });
     }
 
-    // Form validation
-    document.getElementById('cardPaymentForm')?.addEventListener('submit', function(e) {
-        const cardNumber = document.getElementById('cardNumber').value.replace(/\s+/g, '');
-        if (cardNumber.length < 13) {
-            e.preventDefault();
-            alert('Please enter a valid card number (at least 13 digits)');
-            return false;
-        }
-    });
-
-    document.getElementById('walletPaymentForm')?.addEventListener('submit', function(e) {
-        const mobile = this.querySelector('input[name="mobile"]').value;
-        if (!/^7\d{8}$/.test(mobile)) {
-            e.preventDefault();
-            alert('Please enter a valid mobile number (format: 7XXXXXXXX)');
-            return false;
+    // Keep validation feedback on the page and lock a valid submission until navigation.
+    const paymentError = document.getElementById('paymentClientError');
+    function showPaymentError(message, field) {
+        paymentError.textContent = message;
+        paymentError.hidden = false;
+        paymentError.focus();
+        field?.setAttribute('aria-invalid', 'true');
+        field?.setAttribute('aria-describedby', 'paymentClientError');
+        field?.focus();
+    }
+    for (const form of [document.getElementById('cardPaymentForm'), document.getElementById('walletPaymentForm')]) {
+        form?.addEventListener('input', event => {
+            event.target.removeAttribute('aria-invalid');
+            if (event.target.getAttribute('aria-describedby') === 'paymentClientError') {
+                event.target.removeAttribute('aria-describedby');
+            }
+            paymentError.hidden = true;
+        });
+        form?.addEventListener('submit', event => {
+            if (form.dataset.submitting === 'true') {
+                event.preventDefault();
+                return;
+            }
+            const card = form.querySelector('[name="cardNumber"]');
+            const mobile = form.querySelector('[name="mobile"]');
+            if (card && !/^\d{13,19}$/.test(card.value.replace(/\s+/g, ''))) {
+                event.preventDefault();
+                showPaymentError('Enter a card number with 13 to 19 digits.', card);
+                return;
+            }
+            if (mobile && !/^7\d{8}$/.test(mobile.value)) {
+                event.preventDefault();
+                showPaymentError('Enter a 9 digit mobile number starting with 7.', mobile);
+                return;
+            }
+            form.dataset.submitting = 'true';
+            const submit = form.querySelector('button[type="submit"]');
+            submit.disabled = true;
+            submit.setAttribute('aria-busy', 'true');
+        });
+    }
+    window.addEventListener('pageshow', () => {
+        for (const form of [document.getElementById('cardPaymentForm'), document.getElementById('walletPaymentForm')]) {
+            if (!form) continue;
+            delete form.dataset.submitting;
+            const submit = form.querySelector('button[type="submit"]');
+            submit.disabled = false;
+            submit.removeAttribute('aria-busy');
         }
     });
 </script>

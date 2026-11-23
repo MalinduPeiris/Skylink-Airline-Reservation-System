@@ -69,7 +69,7 @@
         @keyframes fade-up{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 
         .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;animation:fade-up .5s ease;}
-        .page-title{font-family:var(--font-display);font-size:30px;font-weight:700;letter-spacing:2px;color:var(--text-primary);}
+        .page-title{font-family:var(--font-display);font-size:30px;font-weight:700;letter-spacing:2px;color:var(--text-primary);margin:0;}
         .page-title span{color:var(--accent-cyan);}
         .page-breadcrumb{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;margin-top:6px;}
         .page-breadcrumb span{color:var(--accent-cyan);}
@@ -79,7 +79,7 @@
         .alert-danger-custom{background:var(--accent-red-dim);border-color:rgba(255,61,87,.3);color:var(--accent-red);}
 
         /* METRIC CARDS */
-        .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+        .metrics-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:24px;}
         .metric-card{background:var(--bg-card);border:1px solid var(--border-dim);border-radius:10px;padding:20px 22px;position:relative;overflow:hidden;transition:all .3s;animation:fade-up .5s ease both;}
         .metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
         .metric-card.cyan::before{background:linear-gradient(90deg,transparent,var(--accent-cyan),transparent);}
@@ -176,9 +176,35 @@
         ::-webkit-scrollbar{width:5px;}
         ::-webkit-scrollbar-track{background:var(--bg-void);}
         ::-webkit-scrollbar-thumb{background:var(--border-dim);border-radius:3px;}
+        @media (max-width: 767px) {
+            .topbar { height:auto; min-height:64px; padding:8px 12px; gap:8px; }
+            .brand-sub, .sys-status { display:none; }
+            .topbar-right { gap:4px; }
+            .user-chip { padding:5px 8px 5px 5px; }
+            .layout { display:block; }
+            .sidebar { position:static; width:100%; height:auto; padding:8px; overflow:visible; }
+            .sidebar-label { display:none; }
+            .sidebar-section { display:flex; flex-wrap:nowrap; gap:4px; padding:0; overflow-x:auto; }
+            .nav-link-custom { flex:none; white-space:nowrap; margin:0; }
+            .main { width:100%; min-width:0; padding:18px 12px; overflow-x:visible; }
+            .page-header { flex-wrap:wrap; gap:12px; }
+            .page-title { font-size:24px; }
+            .metrics-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+            .metric-card { min-width:0; padding:14px; }
+            .form-panel { position:static; }
+            .promo-list { max-height:none; }
+            .promo-card { min-width:0; padding:14px; }
+            .promo-discount-badge { position:static; display:table; margin:0 0 12px auto; }
+            .promo-title { overflow-wrap:anywhere; }
+            .promo-actions { flex-wrap:wrap; }
+        }
+        @media (max-width: 375px) {
+            .metrics-grid { grid-template-columns:minmax(0,1fr); }
+            .user-name, .user-role { display:none; }
+        }
     </style>
 </head>
-<body>
+<body th:with="detailPath=${baseUrl == '/dashboard/it-system-engineer' ? '/promotions/' : '/promotion/'}">
 <!-- TOPBAR -->
 <nav class="topbar">
     <a class="brand" href="#">
@@ -231,7 +257,7 @@
 
         <div class="page-header">
             <div>
-                <div class="page-title">PROMOTION <span>MANAGEMENT</span></div>
+                <h1 class="page-title">PROMOTION <span>MANAGEMENT</span></h1>
                 <div class="page-breadcrumb">SKYLINK / <span>PROMOTIONS</span></div>
             </div>
         </div>
@@ -247,20 +273,14 @@
             <div class="metric-card green">
                 <div class="metric-icon"><i class="fas fa-check-circle"></i></div>
                 <div class="metric-label">Active Campaigns</div>
-                <div class="metric-value" th:text="${promotions != null ? promotions.size() : 0}">0</div>
-                <div class="metric-sub"><i class="fas fa-play"></i> Currently Running</div>
+                <div class="metric-value" th:text="${promotions == null ? 0 : promotions.?[availabilityLabel == 'AVAILABLE'].size()}">0</div>
+                <div class="metric-sub"><i class="fas fa-play"></i> Available for redemption</div>
             </div>
             <div class="metric-card amber">
                 <div class="metric-icon"><i class="fas fa-percent"></i></div>
                 <div class="metric-label">Average Discount</div>
-                <div class="metric-value">-</div>
-                <div class="metric-sub"><i class="fas fa-chart-line"></i> Across Active</div>
-            </div>
-            <div class="metric-card red">
-                <div class="metric-icon"><i class="fas fa-clock"></i></div>
-                <div class="metric-label">Expiring Soon</div>
-                <div class="metric-value">0</div>
-                <div class="metric-sub"><i class="fas fa-exclamation-circle"></i> Needs Attention</div>
+                <div class="metric-value" th:text="${promotions == null or promotions.?[availabilityLabel == 'AVAILABLE'].empty ? '—' : #numbers.formatDecimal(#aggregates.avg(promotions.?[availabilityLabel == 'AVAILABLE'].![discount]), 1, 1) + '%'}">—</div>
+                <div class="metric-sub"><i class="fas fa-chart-line"></i> Across available promotions</div>
             </div>
         </div>
 
@@ -269,7 +289,7 @@
             <div class="col-lg-6">
                 <div class="d-flex align-items-center justify-content-between mb-16" style="margin-bottom:16px;">
                     <div style="font-family:var(--font-display);font-size:15px;font-weight:600;letter-spacing:1px;color:var(--text-secondary);text-transform:uppercase;">Current Promotions</div>
-                    <div class="count-chip" th:text="${promotions != null ? promotions.size() + ' active' : '0 active'}">0 active</div>
+                    <div class="count-chip" th:text="${promotions != null ? promotions.size() + ' total' : '0 total'}">0 total</div>
                 </div>
 
                 <div class="promo-list">
@@ -291,20 +311,21 @@
                                      th:classappend="${promo.discount >= 20 ? 'dot-high' : (promo.discount >= 10 ? 'dot-medium' : 'dot-low')}"></div>
                                 <span th:text="${promo.discount + '% discount'}">0% discount</span>
                             </div>
-                            <div class="active-badge">ACTIVE</div>
+                            <div class="active-badge" th:text="${promo.availabilityLabel}">INACTIVE</div>
                         </div>
                         <div class="promo-dates">
                             <i class="fas fa-calendar-alt"></i>
-                            <span th:text="${#dates.format(promo.validityStart, 'MMM dd, yyyy')} + ' — ' + ${#dates.format(promo.validityEnd, 'MMM dd, yyyy')}">Date range</span>
+                            <span th:text="${promo.validityStartColombo + ' — ' + promo.validityEndColombo}">Date range</span>
                         </div>
                         <div class="promo-actions">
-                            <a th:href="${baseUrl} + '/promotion/' + ${promo.id}" class="btn-promo btn-view">
+                            <a th:href="${baseUrl + detailPath + promo.id}" class="btn-promo btn-view">
                                 <i class="fas fa-eye"></i> VIEW
                             </a>
-                            <a th:href="${baseUrl} + '/promotion/' + ${promo.id} + '/edit'" class="btn-promo btn-edit-p">
+                            <a th:href="${baseUrl + detailPath + promo.id + '/edit'}" class="btn-promo btn-edit-p">
                                 <i class="fas fa-pen"></i> EDIT
                             </a>
-                            <form th:action="${baseUrl} + '/delete/' + ${promo.id}" method="post" style="display:inline;">
+                            <a th:href="${baseUrl + detailPath + promo.id + '/eligibility'}" class="btn-promo btn-edit-p">SCOPE &amp; USERS</a>
+                            <form th:action="${baseUrl + (detailPath == '/promotions/' ? '/promotions/delete/' : '/delete/') + promo.id}" method="post" style="display:inline;">
                                 <input type="hidden" name="_csrf" th:value="${_csrf != null ? _csrf.token : ''}"/>
                                 <button type="submit" class="btn-promo btn-del" onclick="return confirm('Delete this promotion?')">
                                     <i class="fas fa-trash"></i> DELETE
@@ -322,31 +343,40 @@
                         <div class="form-panel-title"><i class="fas fa-plus-circle"></i> CREATE NEW PROMOTION</div>
                     </div>
                     <div class="form-panel-body">
-                        <form th:action="${baseUrl} + '/create'" method="post">
+                        <form th:action="${baseUrl + (detailPath == '/promotions/' ? '/promotions/create' : '/create')}" method="post">
                             <input type="hidden" name="_csrf" th:value="${_csrf != null ? _csrf.token : ''}"/>
                             <div class="mb-3">
-                                <label class="form-label">Promotion Name / Target Criteria</label>
-                                <input type="text" class="form-control" name="targetCriteria" placeholder="e.g. FREQUENT_FLYERS" required>
+                                <label class="form-label" for="promotionScope">Promotion scope</label>
+                                <select id="promotionScope" name="scope" class="form-control" required>
+                                    <option value="" selected disabled>Choose scope</option>
+                                    <option value="GENERAL">General</option>
+                                    <option value="TARGETED">Targeted</option>
+                                </select>
+                                <small>New promotions remain inactive until eligibility is reviewed.</small>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Promo Code</label>
-                                <input type="text" class="form-control" name="promoCode" placeholder="e.g. FLY20" style="text-transform:uppercase;" required>
+                                <label class="form-label" for="targetCriteria">Promotion Name / Target Criteria</label>
+                                <input type="text" class="form-control" id="targetCriteria" name="targetCriteria" placeholder="e.g. FREQUENT_FLYERS" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Discount Percentage</label>
+                                <label class="form-label" for="promoCode">Promo Code</label>
+                                <input type="text" class="form-control" id="promoCode" name="promoCode" placeholder="e.g. FLY20" style="text-transform:uppercase;" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="discount">Discount Percentage</label>
                                 <div class="input-group-pct">
-                                    <input type="number" class="form-control" name="discount" min="0" max="100" step="0.01" placeholder="e.g. 20" required>
+                                    <input type="number" class="form-control" id="discount" name="discount" min="0" max="100" step="0.01" placeholder="e.g. 20" required>
                                     <div class="pct-label">%</div>
                                 </div>
                             </div>
                             <div class="row g-3 mb-3">
                                 <div class="col-6">
-                                    <label class="form-label">Start Date</label>
-                                    <input type="date" class="form-control" name="validityStart" required>
+                                    <label class="form-label" for="validityStart">Start Date</label>
+                                    <input type="date" class="form-control" id="validityStart" name="validityStart" required>
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label">End Date</label>
-                                    <input type="date" class="form-control" name="validityEnd" required>
+                                    <label class="form-label" for="validityEnd">End Date</label>
+                                    <input type="date" class="form-control" id="validityEnd" name="validityEnd" required>
                                 </div>
                             </div>
                             <div class="form-actions">

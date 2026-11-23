@@ -695,6 +695,27 @@
         ::-webkit-scrollbar-track { background: var(--bg-primary); }
         ::-webkit-scrollbar-thumb { background: var(--border-dim); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+        @media (max-width: 767px) {
+            .topbar { height:auto; min-height:64px; padding:8px 12px; gap:8px; }
+            .brand-sub, .sys-status { display:none; }
+            .topbar-right { gap:4px; }
+            .user-chip { padding:5px 8px 5px 5px; }
+            .layout { display:block; }
+            .sidebar { position:static; width:100%; height:auto; padding:8px; overflow:visible; }
+            .sidebar-label { display:none; }
+            .sidebar-section { display:flex; flex-wrap:nowrap; gap:4px; padding:0; overflow-x:auto; }
+            .nav-link-custom { flex:none; white-space:nowrap; margin:0; }
+            .main { width:100%; min-width:0; padding:18px 12px; overflow-x:visible; }
+            .page-header { flex-wrap:wrap; gap:12px; }
+            .metrics-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+            .content-grid, .stats-row { grid-template-columns:minmax(0,1fr); }
+            .qa-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+            .metric-card, .panel, .stat-bar-card { min-width:0; }
+        }
+        @media (max-width: 375px) {
+            .metrics-grid { grid-template-columns:minmax(0,1fr); }
+            .user-name, .user-role { display:none; }
+        }
     </style>
 </head>
 <body>

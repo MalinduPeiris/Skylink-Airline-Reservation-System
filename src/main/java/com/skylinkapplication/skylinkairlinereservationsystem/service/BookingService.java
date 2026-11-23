@@ -182,23 +182,14 @@ public class BookingService {
 		Double baseFlightPrice = flight.getPrice() * bookingRequest.getPassengerCount();
 		Double discount = 0.0;
 
- 		if (bookingRequest.getPromoCode() != null && !bookingRequest.getPromoCode().trim().isEmpty()) {
-			try {
-				var promoOpt = promotionService.getAllPromotions().stream()
-						.filter(p -> bookingRequest.getPromoCode().equalsIgnoreCase(p.getPromoCode()))
-						.findFirst();
-				if (promoOpt.isPresent()) {
-					discount = baseFlightPrice * (promoOpt.get().getDiscount() / 100.0);
-				}
-			} catch (Exception ignored) {
-			}
+		if (bookingRequest.getPromoCode() != null && !bookingRequest.getPromoCode().trim().isEmpty()) {
+			var promotion = promotionService.findRedeemablePromotion(bookingRequest.getPromoCode(), user)
+					.orElseThrow(() -> new IllegalArgumentException("Promotion code is invalid or not currently active"));
+			discount = baseFlightPrice * (promotion.getDiscount() / 100.0);
 		}
 
 		Double flightPriceAfterDiscount = baseFlightPrice - discount;
-		Double bookingExtras = bookingRequest.getBookingExtras() != null ? bookingRequest.getBookingExtras() : 0.0;
-		if (bookingExtras < 0) {
-			throw new IllegalArgumentException("Booking extras cannot be negative");
-		}
+		Double bookingExtras = TravelerExtrasPricing.calculate(bookingRequest);
 		Double totalPrice = flightPriceAfterDiscount + bookingExtras;
 
 		Booking booking = new Booking();
