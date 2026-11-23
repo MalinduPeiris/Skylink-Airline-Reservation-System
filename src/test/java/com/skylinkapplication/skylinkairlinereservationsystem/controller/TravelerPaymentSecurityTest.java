@@ -132,7 +132,26 @@ class TravelerPaymentSecurityTest {
         assertEquals("TXN-12345678", flash.getFlashAttributes().get("transactionId"));
         assertEquals(345.0, flash.getFlashAttributes().get("amount"));
         assertNotNull(flash.getFlashAttributes().get("booking"));
+        assertEquals(true, flash.getFlashAttributes().get("submissionAnimation"));
         verify(paymentService).processPayment(request);
+    }
+
+    @Test
+    void failedSubmissionDoesNotSignalConfirmationAnimation() {
+        when(bookingService.getBookingById(30L)).thenReturn(ownBooking());
+        when(userRepository.findByUsername("traveler")).thenReturn(Optional.of(currentUser()));
+        PaymentDTO request = new PaymentDTO();
+        request.setBookingId(30L);
+        request.setAmount(345.0);
+        request.setPaymentMethod("EZ_CASH");
+        request.setMobile("712345678");
+        when(paymentService.processPayment(request)).thenThrow(new IllegalStateException("Payment not submitted"));
+        RedirectAttributesModelMap flash = new RedirectAttributesModelMap();
+
+        assertEquals("redirect:/api/payment/page?bookingId=30",
+                controller.processPayment(request, flash, new ExtendedModelMap()));
+        assertFalse(flash.getFlashAttributes().containsKey("submissionAnimation"));
+        assertEquals("Payment not submitted", flash.getFlashAttributes().get("error"));
     }
 
     @Test

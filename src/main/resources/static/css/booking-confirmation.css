@@ -7,6 +7,29 @@ body.booking-confirmation-page { --navy:#10253f; --gold:#c99c4f; --ink:#172b40; 
 .booking-confirmation-page .confirmation-header { padding:48px 0 52px; background:linear-gradient(120deg,var(--navy),#1b4163); color:#fff; }
 .booking-confirmation-page .confirmation-header h1 { margin:12px 0 8px; font-size:clamp(30px,4vw,44px); font-weight:800; letter-spacing:-.04em; }
 .booking-confirmation-page .confirmation-header p { max-width:640px; margin:0; color:#dbe7ee; font-size:14px; }
+.booking-confirmation-page .confirmation-header .submission-heading { margin:0 0 12px; }
+.booking-confirmation-page .confirmation-header .submission-description { margin-top:14px; }
+.booking-confirmation-page .submission-flight-mark { position:relative; width:128px; height:80px; margin-bottom:12px; color:#e9c887; }
+.booking-confirmation-page .submission-trail { display:block; width:100%; height:100%; opacity:.72; }
+.booking-confirmation-page .submission-plane { position:absolute; top:46px; left:9px; width:26px; height:26px; opacity:0; filter:drop-shadow(0 3px 6px rgba(0,0,0,.2)); }
+.booking-confirmation-page .submission-check { position:absolute; top:7px; left:87px; width:34px; height:34px; filter:drop-shadow(0 4px 8px rgba(0,0,0,.18)); }
+.booking-confirmation-page.submission-animation .submission-trail { animation:submission-trail-in .3s ease-out both; }
+.booking-confirmation-page.submission-animation .submission-plane { animation:submission-plane-flight .78s ease-in-out both; }
+.booking-confirmation-page.submission-animation .submission-check { animation:submission-check-in .24s .74s ease-out both; }
+.booking-confirmation-page.submission-animation .submission-heading { animation:submission-reveal .24s .9s ease-out both; }
+.booking-confirmation-page.submission-animation .confirmation-status-badge { animation:submission-reveal .24s 1.04s ease-out both; }
+.booking-confirmation-page.submission-animation .submission-description { animation:submission-reveal .24s 1.1s ease-out both; }
+.booking-confirmation-page.submission-animation .submission-success-note,
+.booking-confirmation-page.submission-animation .submission-details { animation:submission-reveal .32s 1.12s ease-out both; }
+@keyframes submission-trail-in { from { opacity:0; } to { opacity:.72; } }
+@keyframes submission-plane-flight {
+    0% { opacity:1; transform:translate(0,0) rotate(-8deg); }
+    42% { opacity:1; transform:translate(31px,-27px) rotate(0deg); }
+    82% { opacity:1; transform:translate(69px,-38px) rotate(8deg); }
+    100% { opacity:0; transform:translate(82px,-35px) rotate(8deg); }
+}
+@keyframes submission-check-in { from { opacity:0; transform:scale(.72); } to { opacity:1; transform:scale(1); } }
+@keyframes submission-reveal { from { opacity:0; } to { opacity:1; } }
 .booking-confirmation-page .status-eyebrow { display:inline-flex; align-items:center; padding:6px 12px; border:1px solid rgba(233,200,135,.4); border-radius:999px; background:rgba(233,200,135,.11); color:#e9c887; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
 .booking-confirmation-page main.container { max-width:1210px; }
 .booking-confirmation-page .info-card,.booking-confirmation-page .next-card { overflow:hidden; border:1px solid var(--border); border-radius:16px; background:#fff; box-shadow:0 14px 36px rgba(15,38,61,.07); }
@@ -32,3 +55,13 @@ body.booking-confirmation-page { --navy:#10253f; --gold:#c99c4f; --ink:#172b40; 
 .booking-confirmation-page footer { color:var(--muted); }
 .booking-confirmation-page a:focus-visible,.booking-confirmation-page button:focus-visible { outline:3px solid var(--gold); outline-offset:3px; }
 @media(max-width:575px) { .booking-confirmation-page .confirmation-header { padding:35px 0; } .booking-confirmation-page .details-grid { grid-template-columns:1fr; padding:10px 20px 20px; } .booking-confirmation-page .card-heading,.booking-confirmation-page .next-card { padding:20px; } }
+@media(prefers-reduced-motion:reduce) {
+    .booking-confirmation-page.submission-animation .submission-trail,
+    .booking-confirmation-page.submission-animation .submission-check,
+    .booking-confirmation-page.submission-animation .submission-heading,
+    .booking-confirmation-page.submission-animation .confirmation-status-badge,
+    .booking-confirmation-page.submission-animation .submission-description,
+    .booking-confirmation-page.submission-animation .submission-success-note,
+    .booking-confirmation-page.submission-animation .submission-details { animation:none; opacity:1; }
+    .booking-confirmation-page.submission-animation .submission-plane { animation:none; opacity:0; }
+}

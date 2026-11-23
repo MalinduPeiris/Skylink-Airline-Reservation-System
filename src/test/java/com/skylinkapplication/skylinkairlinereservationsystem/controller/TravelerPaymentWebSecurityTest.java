@@ -1,6 +1,7 @@
 package com.skylinkapplication.skylinkairlinereservationsystem.controller;
 
 import com.skylinkapplication.skylinkairlinereservationsystem.config.SecurityConfig;
+import com.skylinkapplication.skylinkairlinereservationsystem.dto.BookingDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.dto.PaymentDTO;
 import com.skylinkapplication.skylinkairlinereservationsystem.repository.UserRepository;
 import com.skylinkapplication.skylinkairlinereservationsystem.service.BookingService;
@@ -76,5 +77,48 @@ class TravelerPaymentWebSecurityTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Amount (Rs.)")))
                 .andExpect(content().string(org.hamcrest.Matchers.not(
                         org.hamcrest.Matchers.containsString("Amount ($)"))));
+    }
+
+    @Test
+    @WithMockUser(username = "traveler", roles = "FREQUENT_TRAVELER")
+    void directConfirmationVisitShowsStaticStatusWithoutSubmissionAnimation() throws Exception {
+        mvc.perform(get("/api/payment/confirmation"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Booking status</h1>")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("View My Bookings")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        org.hamcrest.Matchers.containsString("submission-flight-mark"))))
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        org.hamcrest.Matchers.containsString("submission-animation"))));
+    }
+
+    @Test
+    @WithMockUser(username = "traveler", roles = "FREQUENT_TRAVELER")
+    void pendingSubmissionFlashRendersOneTimeAnimationAndAccurateStatus() throws Exception {
+        BookingDTO booking = new BookingDTO();
+        booking.setId(30L);
+        booking.setStatus("PENDING");
+        PaymentDTO payment = new PaymentDTO();
+        payment.setStatus("PENDING");
+        booking.setPayment(payment);
+
+        mvc.perform(get("/api/payment/confirmation")
+                        .flashAttr("booking", booking)
+                        .flashAttr("submissionAnimation", true)
+                        .flashAttr("transactionId", "TXN-TEST")
+                        .flashAttr("amount", 345.0))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("submission-flight-mark")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("submission-animation")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Payment submitted!</h1>")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Pending finance review")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("TXN-TEST")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("PENDING")));
+
+        mvc.perform(get("/api/payment/confirmation"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Booking status</h1>")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        org.hamcrest.Matchers.containsString("submission-flight-mark"))));
     }
 }

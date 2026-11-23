@@ -347,6 +347,9 @@ public class PaymentController {
             redirectAttributes.addFlashAttribute("transactionId", processedPayment.getTransactionId());
             redirectAttributes.addFlashAttribute("bookingId", paymentDTO.getBookingId());
             redirectAttributes.addFlashAttribute("amount", processedPayment.getAmount());
+            if ("PENDING".equals(processedPayment.getStatus())) {
+                redirectAttributes.addFlashAttribute("submissionAnimation", true);
+            }
             
             // Add booking details for confirmation page
             try {
