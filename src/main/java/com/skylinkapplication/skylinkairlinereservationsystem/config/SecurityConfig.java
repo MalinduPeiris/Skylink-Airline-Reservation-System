@@ -181,6 +181,8 @@ public class SecurityConfig {
     public AuthenticationProvider authenticationProvider(
             @Qualifier("customUserDetailsService") UserDetailsService userDetailsService,
             PasswordEncoder passwordEncoder) {
+        // This explicit DAO provider intentionally supplies the custom user lookup and BCrypt
+        // verifier. Spring Security's UserDetailsService auto-configuration warning is expected.
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);

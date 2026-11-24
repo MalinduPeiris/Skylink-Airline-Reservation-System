@@ -287,6 +287,7 @@ public class BookingService {
 	}
 
 
+	@Transactional(readOnly = true)
 	public BookingDTO getBookingById(Long id) {
 		if (id == null) {
 			throw new IllegalArgumentException("Booking ID is required");
@@ -296,12 +297,14 @@ public class BookingService {
 		return convertToDTO(booking);
 	}
 
+	@Transactional(readOnly = true)
 	public List<BookingDTO> getAllBookings() {
 		return bookingRepository.findAll().stream()
 				.map(this::convertToDTO)
 				.collect(Collectors.toList());
 	}
 
+	@Transactional(readOnly = true)
 	public List<BookingDTO> getBookingsByStatus(String status) {
 		if (status == null || status.trim().isEmpty()) {
 			throw new IllegalArgumentException("Status is required");
@@ -316,6 +319,7 @@ public class BookingService {
 		}
 	}
 
+	@Transactional(readOnly = true)
 	public List<BookingDTO> getBookingsByUserId(Long userId) {
 		if (userId == null) {
 			throw new IllegalArgumentException("User ID is required");
